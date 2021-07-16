@@ -1,0 +1,88 @@
+{
+  "name": "vega-rb-result",
+  "version": "0.0.1",
+  "description": "Модуль вывода результатов расчета",
+  "repository": "git@github.com:gpn-prototypes/vega-rb-result.git",
+  "author": "gpn",
+  "license": "UNLICENSED",
+  "engines": {
+    "node": "^12.16.2",
+    "yarn": "^1.22.4"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-customizable"
+    },
+    "cz-customizable": {
+      "config": "./node_modules/@gpn-prototypes/frontend-configs/git/commitizen.js"
+    }
+  },
+  "scripts": {
+    "build": "cross-env NODE_ENV=production webpack --progress --config ./webpack.forShellConfig.js",
+    "dev": "cross-env NODE_ENV=development webpack-dev-server --open --mode development",
+    "dev-in-shell": "cross-env NODE_ENV=development webpack-dev-server --open --mode development  --config ./webpack.forShellConfig.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "format": "prettier --write '{src,types,scripts}/**/*.{json,{j,t}s{,x},css,}'",
+    "coverage": "jest --all --coverage",
+    "lint": "npm-run-all lint:*",
+    "lint-fix": "npm-run-all format lint-fix:*",
+    "lint:ts": "eslint '{src,types}/**/*.ts{,x}'",
+    "lint-fix:ts": "eslint '{src,types}/**/*.ts{,x}' --fix",
+    "lint:css": "stylelint 'src/**/*.css'",
+    "lint-fix:css": "stylelint 'src/**/*.css' --fix"
+  },
+  "dependencies": {
+    "@apollo/client": "^3.3.11",
+    "@gpn-prototypes/vega-ui": "^3.1.11",
+    "@graphql-codegen/cli": "1.16.3",
+    "@graphql-codegen/introspection": "1.16.3",
+    "@graphql-codegen/typescript": "^1.16.3",
+    "@graphql-codegen/typescript-operations": "1.16.3",
+    "@graphql-codegen/typescript-react-apollo": "1.16.3",
+    "bem-cn": "^3.0.1",
+    "graphql": "^15.4.0",
+    "react": "^16.14.0",
+    "react-dom": "^16.13.1",
+    "react-redux": "^7.2.0",
+    "react-router-dom": "^5.2.0",
+    "redux": "^4.0.5",
+    "single-spa-react": "^3.1.0"
+  },
+  "devDependencies": {
+    "@gpn-prototypes/frontend-configs": "^1.3.4",
+    "@testing-library/jest-dom": "^5.11.4",
+    "@testing-library/react": "^11.0.4",
+    "@types/jest": "^26.0.14",
+    "@types/node": "^14.11.8",
+    "@types/react": "^16.9.51",
+    "@types/react": "^17.0.0",
+    "@types/react-dom": "^16.9.8",
+    "@types/react-redux": "^7.1.9",
+    "@types/react-router-dom": "^5.1.5",
+    "@types/single-spa-react": "^2.12.0",
+    "babel-loader": "^8.1.0",
+    "commitizen": "^4.2.1",
+    "cross-env": "^7.0.2",
+    "cz-customizable": "^6.3.0",
+    "dotenv": "^8.2.0",
+    "eslint-import-resolver-alias": "^1.1.2",
+    "file-loader": "^6.1.0",
+    "husky": "^4.3.0",
+    "jest": "^26.5.3",
+    "lint-staged": "^10.4.0",
+    "npm-run-all": "^4.1.5",
+    "postcss": "^8.1.1",
+    "postcss-loader": "^4.0.4",
+    "systemjs-webpack-interop": "^2.1.2",
+    "ts-essentials": "^7.0.0",
+    "webpack": "^4.44.2",
+    "webpack-cli": "^3.3.12",
+    "webpack-config-single-spa-react": "^1.12.0",
+    "webpack-config-single-spa-react-ts": "^1.12.0",
+    "webpack-config-single-spa-ts": "^1.12.0",
+    "webpack-dev-server": "^3.11.2",
+    "webpack-import-map-plugin": "^1.0.0-alpha0",
+    "webpack-merge": "^4.2.2"
+  }
+}

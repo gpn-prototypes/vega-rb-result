@@ -1,0 +1,15 @@
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+
+  box-sizing: border-box;
+}
+
+.App {
+  /* Просто заглушка */
+  height: 100vh;
+
+  background: var(--color-bg-default);
+}
