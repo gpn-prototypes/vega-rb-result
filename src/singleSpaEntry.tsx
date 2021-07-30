@@ -11,6 +11,6 @@ const lifecycles = singleSpaReact({
   ReactDOM,
   rootComponent: App,
   suppressComponentDidCatchWarning: true,
-});
+} as singleSpaReact.Options);
 
 export const { bootstrap, mount, unmount } = lifecycles;
