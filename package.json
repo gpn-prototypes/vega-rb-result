@@ -19,6 +19,7 @@
   },
   "scripts": {
     "build": "cross-env NODE_ENV=production webpack --progress --config ./webpack.forShellConfig.js",
+    "gen:codegen:dev": "graphql-codegen --config codegen.yml",
     "dev": "cross-env NODE_ENV=development webpack-dev-server --open --mode development",
     "dev-in-shell": "cross-env NODE_ENV=development webpack-dev-server --open --mode development  --config ./webpack.forShellConfig.js",
     "test": "jest",
@@ -47,6 +48,9 @@
     "react-redux": "^7.2.0",
     "react-router-dom": "^5.2.0",
     "redux": "^4.0.5",
+    "redux-devtools-extension": "^2.13.8",
+    "redux-persist": "^6.0.0",
+    "redux-thunk": "^2.3.0",
     "single-spa-react": "^3.1.0",
     "ts-config-single-spa": "^1.7.0"
   },

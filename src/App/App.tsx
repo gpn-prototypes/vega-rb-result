@@ -1,20 +1,27 @@
 import React from 'react';
-import { Button, Root } from '@gpn-prototypes/vega-ui';
+import { Root } from '@gpn-prototypes/vega-ui';
 
-import { AppConfig } from '../../app-config';
+import { AppView } from './AppView';
+import { cnApp } from './cn-app';
 
 import './App.css';
 
-declare global {
-  interface Window {
-    appConfig: AppConfig;
-  }
-}
+import { Providers } from '../react-context/providers';
+import {ShellToolkit} from "../types";
 
-export const App = (): React.ReactElement => {
+
+export const App: React.FC<ShellToolkit> = (props) => {
+  const { graphqlClient, identity, currentProject } = props;
+
   return (
-    <Root className="App" defaultTheme="dark" initialPortals={[{ name: 'portalRoot' }]}>
-      <Button label="Кнопка" />
+    <Root
+      initialPortals={[{ name: 'modalRoot' }]}
+      defaultTheme="dark"
+      className={cnApp('App-Wrapper').toString()}
+    >
+      <Providers currentProject={currentProject} graphqlClient={graphqlClient} identity={identity}>
+        <AppView />
+      </Providers>
     </Root>
   );
 };

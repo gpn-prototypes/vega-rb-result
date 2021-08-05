@@ -1,14 +1,17 @@
 {
   "extends": "@gpn-prototypes/frontend-configs/tsconfig",
   "shouldExtractLiteralValuesFromEnum": true,
-  "files": ["./types/assets.d.ts"],
+  "files": [
+    "./src/types/assets.d.ts"
+  ],
   "include": ["src/**/*.ts", "src/**/*.tsx"],
   "exclude": ["node_modules", "**/dist/**/*"],
   "compilerOptions": {
     "baseUrl": "./",
+    "jsx": "react",
     "moduleResolution": "node",
     "paths": {
-      "@vega/*": ["./src/*"]
+      "@/*": ["./src/*"]
     }
   }
 }
