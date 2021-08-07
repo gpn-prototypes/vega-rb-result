@@ -5,12 +5,11 @@ import { Loader } from '@gpn-prototypes/vega-ui';
 import { cnApp } from './cn-app';
 
 import './App.css';
-import '../styles/colors.css';
 
-import { fetchProjectSchema } from '@/redux-store/project-structure/actions';
-import { StoreRES } from '@/types/redux-store';
-import {ProjectContext} from "@/react-context";
-import ResultPage from "@/pages/RbResult/ResultPage";
+import { fetchProjectSchema } from '@app/redux-store/project-structure/actions';
+import { StoreRES } from '@app/types/redux-store';
+import {ProjectContext} from "@app/react-context";
+import ResultPage from "@app/pages/RbResult/ResultPage";
 
 export const AppView = (): React.ReactElement => {
   const dispatch = useDispatch();

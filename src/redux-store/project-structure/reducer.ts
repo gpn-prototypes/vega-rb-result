@@ -1,4 +1,4 @@
-import createReducer from "@/utils/create-reducer";
+import createReducer from "@app/utils/create-reducer";
 
 import { ClearActionTypes } from '../clear/action-types';
 
@@ -6,7 +6,7 @@ import { ProjectStructureActionTypes } from './action-types';
 
 import initialState from './initial-state';
 
-import { ProjectStructureQuery, ProjectStructureState } from '@/types/redux-store';
+import { ProjectStructureQuery, ProjectStructureState } from '@app/types/redux-store';
 
 const setProjectStructureQuerySuccessStrategy = (
   state: ProjectStructureState,

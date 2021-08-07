@@ -6,8 +6,8 @@ import { cnApp } from './cn-app';
 
 import './App.css';
 
-import { Providers } from '../react-context/providers';
-import {ShellToolkit} from "../types";
+import { Providers } from '@app/react-context';
+import {ShellToolkit} from "@app/types";
 
 
 export const App: React.FC<ShellToolkit> = (props) => {

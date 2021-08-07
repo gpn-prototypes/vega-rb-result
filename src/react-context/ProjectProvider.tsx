@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
-import { rbResultService } from '@/utils/rb-result-service';
-import {ShellToolkit} from "@/types";
+import { rbResultService } from '@app/utils/rb-result-service';
+import {ShellToolkit} from "@app/types";
 
 export interface ProjectContextData {
   projectId: string;

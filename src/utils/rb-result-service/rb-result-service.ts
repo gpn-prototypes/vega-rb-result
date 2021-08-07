@@ -10,12 +10,11 @@ import {
 
 //TODO
 import {
-  ACTIVITY_LIST_QUERY,
   PROJECT_STRUCTURE_QUERY,
 } from '../queries';
 
-import { config } from '@/config/config.public';
-import { Identity } from '@/types';
+import { config } from '@app/config/config.public';
+import { Identity } from '@app/types';
 
 export type Data = Record<string, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
 

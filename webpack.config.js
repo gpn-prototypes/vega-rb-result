@@ -45,8 +45,9 @@ const commonWebpack = () => {
     devServer,
     resolve: {
       alias: {
-        '@vega': path.resolve(__dirname, 'src'),
+        '@app': path.resolve(__dirname, 'src'),
       },
+        extensions: ['.js', '.ts'],
     },
   };
 };

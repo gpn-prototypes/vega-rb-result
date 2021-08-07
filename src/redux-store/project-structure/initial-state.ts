@@ -1,4 +1,4 @@
-import { ProjectStructureState } from '@/types/redux-store';
+import { ProjectStructureState } from '@app/types/redux-store';
 
 const initialState: ProjectStructureState = {
 };

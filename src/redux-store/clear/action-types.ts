@@ -1,4 +1,4 @@
-import { applyActionTypesNames } from '@/utils/apply-action-types-names';
+import { applyActionTypesNames } from '@app/utils/apply-action-types-names';
 
 export type ClearActions = 'CLEAR_STORES';
 

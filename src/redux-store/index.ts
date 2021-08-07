@@ -5,7 +5,7 @@ import thunkMiddleware from 'redux-thunk';
 
 import projectStructureReducer from './project-structure/reducer';
 
-import { StoreRES } from '@/types/redux-store';
+import { StoreRES } from '@app/types/redux-store';
 
 const rootReducer = combineReducers({
   projectStructure: projectStructureReducer,

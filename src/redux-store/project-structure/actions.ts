@@ -1,4 +1,3 @@
-import { gql } from '@apollo/client';
 
 import { AnyAction } from 'redux';
 import { ThunkAction } from 'redux-thunk';
@@ -7,8 +6,8 @@ import { clearStores } from '../clear/actions';
 
 import { ProjectStructureActionTypes } from './action-types';
 
-import { ProjectStructureQuery, StoreRES } from '@/types/redux-store';
-import { logicConstructorService } from '@/utils/lc-service';
+import { ProjectStructureQuery, StoreRES } from '@app/types/redux-store';
+import { rbResultService } from '@app/utils/rb-result-service';
 
 interface DomainObject {
   vid: string;
@@ -97,7 +96,7 @@ const fetchProjectSchema = (): ThunkAction<void, StoreRES, unknown, AnyAction> =
   dispatch(clearStores());
 
   try {
-    const response = await logicConstructorService.projectStructureQuery();
+    const response = await rbResultService.projectStructureQuery();
 
     if (response?.data) {
       const structureQuery = buildStructureQuery(response.data?.project.domainSchema.entityImages);

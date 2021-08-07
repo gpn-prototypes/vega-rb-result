@@ -7,9 +7,9 @@ import { PersistGate } from 'redux-persist/es/integration/react';
 
 import { ProjectProvider } from './ProjectProvider';
 
-import { persistor, store } from '@/redux-store';
-import { ShellToolkit } from '@/types';
-import { vegaApi } from '@/utils/api-clients/vega-api';
+import { persistor, store } from '@app/redux-store';
+import { ShellToolkit } from '@app/types';
+import { vegaApi } from '@app/utils/api-clients/vega-api';
 
 export const Providers: React.FC<ShellToolkit> = (props) => {
   const { graphqlClient = vegaApi, identity, currentProject, children } = props;
