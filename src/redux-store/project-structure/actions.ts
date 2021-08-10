@@ -9,6 +9,7 @@ import { ProjectStructureActionTypes } from './action-types';
 import { ProjectStructureQuery, StoreRES } from '@app/types/redux-store';
 import { rbResultService } from '@app/utils/rb-result-service';
 
+// @ts-ignore TODO use DomainObject
 interface DomainObject {
   vid: string;
   name: string;
@@ -40,6 +41,7 @@ const setProjectStructureQuery = (projectStructureQuery: ProjectStructureQuery) 
   projectStructureQuery,
 });
 
+// @ts-ignore TODO use Default_QUERY
 const DEFAULT_QUERY = `{
   project {
     vid
@@ -112,8 +114,9 @@ const fetchProjectSchema = (): ThunkAction<void, StoreRES, unknown, AnyAction> =
         Array.isArray(errors) &&
         errors.find((error) => error.message === 'badly formed hexadecimal UUID string')
       ) {
+        // @ts-ignore TODO notify
         const message = 'В url не корректный UUID проекта';
-        //TODO notify
+
       }
     }
   }

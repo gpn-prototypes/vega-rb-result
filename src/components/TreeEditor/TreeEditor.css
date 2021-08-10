@@ -1,0 +1,28 @@
+.TreeEditor {
+  width: 100%;
+
+  &__Content {
+    display: none;
+
+    &.is-open {
+      display: block;
+    }
+  }
+
+  &__Placeholder {
+    width: 105px;
+
+    transform: rotate(-90deg) translate(-40px, -42px);
+
+    &.is-open {
+      padding-left: var(--space-s);
+      padding-bottom: var(--space-2xs);
+
+      width: 100%;
+
+      border-bottom: 1px solid var(--color-bg-secondary);
+
+      transform: none;
+    }
+  }
+}
