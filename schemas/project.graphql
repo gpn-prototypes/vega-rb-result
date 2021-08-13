@@ -1,0 +1,2034 @@
+# This file was generated based on ".graphqlconfig". Do not edit manually.
+
+schema {
+  query: Query
+  mutation: Mutation
+}
+
+"Интерфейс доменного объекта."
+interface DomainObjectInterface {
+  name: String
+  vid: UUID
+}
+
+"Интерфейс ошибок, отображаемых пользователю."
+interface ErrorInterface {
+  "Код ошибки, соответствующий человекочитаемому сообщению об ошибке"
+  code: ErrorCodesEnum!
+  details: String
+  "Сообщение об ошибке. Отображается в случае отсутствия соответствующего коду человекочитаемого сообщения на клиенте"
+  message: String!
+  payload: DictType
+}
+
+"Интерфейс ошибок, отображаемых пользователю."
+interface RBErrorInterface {
+  "Код ошибки, соответствующий человекочитаемому сообщению об ошибке"
+  code: RBErrorCodes!
+  "Сообщение об ошибке. Отображается в случае отсутствия соответствующего коду человекочитаемого сообщения на клиенте"
+  message: String!
+}
+
+union AlternativeDefinitionResult = AlternativeDefinitions | CommonErrors | DistributionDefinitionErrors
+
+union CalculatedOrError = CalculationResult | DetailError | DistributionDefinitionErrors | TableErrors
+
+union CapexExpenseGroupListOrError = CapexExpenseGroupList | Error
+
+union CapexExpenseGroupOrDiffOrError = CapexExpenseGroup | Error
+
+union CapexExpenseGroupOrError = CapexExpenseGroup | Error
+
+union CapexExpenseListOrError = CapexExpenseList | Error
+
+union CapexExpenseOrDiffOrError = CapexExpense | Error
+
+union CapexExpenseOrError = CapexExpense | Error
+
+union CapexGlobalValueListOrError = CapexGlobalValueList | Error
+
+union CapexGlobalValueOrDiffOrError = CapexGlobalValue | Error
+
+union CapexGlobalValueOrError = CapexGlobalValue | Error
+
+union CapexOrDiffOrError = Capex | Error
+
+union CapexOrError = Capex | Error
+
+union DistributionChartResult = CommonErrors | DiscreteDistributionChart | DistributionChart | DistributionDefinitionErrors
+
+union MacroparameterGroupListOrError = Error | MacroparameterGroupList
+
+union MacroparameterGroupOrDiffOrError = Error | MacroparameterGroup
+
+union MacroparameterGroupOrError = Error | MacroparameterGroup
+
+union MacroparameterListOrError = Error | MacroparameterList
+
+union MacroparameterOrDiffOrError = Error | Macroparameter
+
+union MacroparameterOrError = Error | Macroparameter
+
+union MacroparameterSetListOrError = Error | MacroparameterSetList
+
+union MacroparameterSetOrDiffOrError = Error | MacroparameterSet
+
+union MacroparameterSetOrError = Error | MacroparameterSet
+
+union NetbackPriceOrDiffOrError = Error | NetbackPriceType
+
+union OpexExpenseGroupListOrError = Error | OpexExpenseGroupList
+
+union OpexExpenseGroupOrError = Error | OpexExpenseGroup
+
+union OpexExpenseListOrError = Error | OpexExpenseList
+
+union OpexExpenseOrError = Error | OpexExpense
+
+union OpexOrError = Error | Opex
+
+union OpexSdfOrError = Error | OpexSdf
+
+union ProductOrDiffOrError = Error | Product
+
+union ProductTypeOrDiffOrError = Error | ProductType
+
+union ProjectMutationOrError = Error | ProjectMutation | UpdateProjectInnerDiff
+
+"Результат сохранения проекта."
+union SavedOrError = DistributionDefinitionErrors | Error | TableErrors
+
+union ScenarioOrDiffOrError = Error | ScenarioType
+
+union UpdateRiskValueResult = DetailError | GCoSCalculationResult
+
+union UuidOrError = Error | Result
+
+union VisibleValueResult = CommonErrors | DistributionDefinitionErrors | VisibleValue
+
+union YearValueOrError = Error | YearValue
+
+type Activity {
+  category: ActivityLibraryCategory
+  code: String
+  createdAt: DateTime
+  description: String
+  editedAt: DateTime
+  isDeleted: Boolean
+  name: String
+  title: String
+  vid: ID
+}
+
+"Эффект мероприятия."
+type ActivityEffect {
+  code: String
+  formula: String
+  name: String
+  trigger: String
+  vid: ID
+}
+
+type ActivityEffectMutations {
+  create(code: String, formula: String, name: String!, stepItemVid: UUID!, stepVid: UUID!, trigger: String, vid: UUID): CreateActivityEffect
+  delete(stepItemVid: UUID!, stepVid: UUID!, vid: UUID!): DeleteActivityEffect
+  update(code: String, formula: String, name: String, stepItemVid: UUID!, stepVid: UUID!, trigger: String, vid: UUID!): UpdateActivityEffect
+}
+
+type ActivityLibraryCategory {
+  code: String
+  isDeleted: Boolean
+  name: String
+  parent: ActivityLibraryCategory
+  vid: ID
+}
+
+"Результаты определения альтернативных способов задания распределения."
+type AlternativeDefinitions {
+  "Альтернативные способы задания с расчитанными параметрами"
+  distributions: [Distribution!]!
+}
+
+type Attachment {
+  category: AttachmentType
+  code: String
+  comment: String
+  contentType: String
+  createdAt: DateTime
+  createdBy: User
+  editedAt: DateTime
+  editedBy: User
+  extension: String
+  isDeleted: Boolean
+  name: String
+  projectId: ID
+  size: Int
+  status: Int
+  uri: String
+  vid: ID
+}
+
+type AttachmentType {
+  code: String
+  createdAt: DateTime
+  editedAt: DateTime
+  isDeleted: Boolean
+  name: String
+  vid: ID
+}
+
+type Attendee {
+  roles: [ProjectRole]
+  status: AttendeeStatus
+  user: User
+}
+
+type Attribute {
+  "Кодовое обозначение подсчётного параметра"
+  code: String!
+  "Имя подсчётного параметра"
+  name: String!
+  "Сокращенное имя или обозначение подсчётного параметра"
+  shortName: String!
+  "Единицы измерения подсчётного параметра"
+  units: String!
+}
+
+type AttributeValue {
+  "Кодовое обозначение подсчётного параметра"
+  code: String!
+  distribution: Distribution
+  "Отображаемый в ячейке процентиль"
+  visibleValue(visibleRank: Int): VisibleValueResult!
+}
+
+type AverageAnnualPriceType {
+  "Цена"
+  price: Float
+  "Год"
+  year: Int
+}
+
+type Calculation {
+  "Название"
+  name: String!
+  "Цены"
+  prices: [AverageAnnualPriceType]!
+}
+
+type CalculationResult {
+  "Архив с результатом вычислений.             Доступен по url /files/calculation_result/<resultId>"
+  resultId: ID
+}
+
+type CanvasMutations {
+  create(childrenVids: [UUID], code: String, nodeRef: UUID, nodeType: String!, parentVids: [UUID], position: [Float], title: String, width: Float): CreateCanvasNode
+  delete(vid: UUID!): DeleteCanvasNode
+  update(childrenVids: [UUID], code: String, nodeRef: UUID, nodeType: String, parentVids: [UUID], position: [Float], title: String, vid: UUID!, width: Float): UpdateCanvasNode
+}
+
+"Узлы логики проекта (шаги сценария, мероприятия, объекты, группы объектов)."
+type CanvasNode {
+  children: [CanvasNode]
+  code: String
+  nodeRef: ID
+  nodeType: String
+  parents: [CanvasNode]
+  position: [Float]
+  title: String
+  vid: ID
+  width: Float
+}
+
+type Capex {
+  capexExpenseGroup(caption: String, id: String, name: String): CapexExpenseGroupOrError
+  capexExpenseGroupList: CapexExpenseGroupListOrError
+  capexGlobalValue(caption: String, id: String, name: String): CapexGlobalValueOrError
+  capexGlobalValueList: CapexGlobalValueListOrError
+  yearStart: Int
+  years: Int
+}
+
+type CapexExpense {
+  caption: String
+  createdAt: DateTime
+  id: ID
+  name: String
+  unit: String
+  value: [CapexYearValueType]
+  valueTotal: Float
+  yearValue(year: Int): YearValueOrError
+}
+
+type CapexExpenseGroup {
+  capexExpense(caption: String, id: String, name: String): CapexExpenseOrError
+  capexExpenseList: CapexExpenseListOrError
+  caption: String
+  createdAt: DateTime
+  id: ID
+  name: String
+  totalValueByYear: [CapexYearValueType]
+  valueTotal: Float
+}
+
+type CapexExpenseGroupList {
+  capexExpenseGroupList: [CapexExpenseGroup]
+}
+
+type CapexExpenseList {
+  capexExpenseList: [CapexExpense]
+}
+
+type CapexGlobalValue {
+  caption: String
+  id: ID
+  name: String
+  unit: String
+  value: Float
+}
+
+type CapexGlobalValueList {
+  capexGlobalValueList: [CapexGlobalValue]
+}
+
+type CapexMutation {
+  changeCapexExpense(capexExpenseGroupId: ID!, capexExpenseId: ID!, caption: String, name: String, unit: String, value: Float): ChangeCapexExpense
+  changeCapexExpenseGroup(capexExpenseGroupId: ID!, caption: String, name: String, yearStart: Int, years: Int): ChangeCapexExpenseGroup
+  createCapexExpense(capexExpenseGroupId: ID, caption: String, name: String, unit: String, value: Float): CreateCapexExpense
+  createCapexExpenseGroup(caption: String, name: String): CreateCapexExpenseGroup
+  createCapexGlobalValue(caption: String, name: String, unit: String, value: Float): CreateCapexGlobalValue
+  deleteCapexExpense(capexExpenseGroupId: ID!, capexExpenseId: ID!): DeleteCapexExpense
+  deleteCapexExpenseGroup(capexExpenseGroupId: ID): DeleteCapexExpenseGroup
+  deleteCapexGlobalValue(capexGlobalValueId: ID!): DeleteCapexGlobalValue
+  setCapexExpenseYearValue(capexExpenseGroupId: ID!, capexExpenseId: ID!, value: Float!, year: Int!): SetCapexExpenseYearValue
+  updateCapexGlobalValue(capexGlobalValueId: ID!, caption: String, name: String, unit: String, value: Float): UpdateCapexGlobalValue
+}
+
+type CapexYearValueType {
+  value: Float
+  year: Int
+}
+
+type ChangeCapexExpense {
+  capexExpense: CapexExpenseOrDiffOrError
+  totalValueByYear: [CapexYearValueType]
+}
+
+type ChangeCapexExpenseGroup {
+  capexExpenseGroup: CapexExpenseGroupOrDiffOrError
+}
+
+type ChangeMacroparameter {
+  macroparameter: MacroparameterOrDiffOrError
+}
+
+type ChangeMacroparameterGroup {
+  macroparameterGroup: MacroparameterGroupOrDiffOrError
+}
+
+type ChangeMacroparameterSet {
+  macroparameterSet: MacroparameterSetOrDiffOrError
+}
+
+type ChangeOpexAutoexport {
+  autoexport: OpexExpenseGroupOrError
+}
+
+type ChangeOpexAutoexportExpense {
+  opexExpense: OpexExpenseOrError
+}
+
+type ChangeOpexCase {
+  opexCase: OpexExpenseGroupOrError
+}
+
+type ChangeOpexCaseExpense {
+  opexExpense: OpexExpenseOrError
+  totalValueByYear: [OpexYearValue]
+}
+
+type ChangeOpexMkos {
+  mkos: OpexExpenseGroupOrError
+}
+
+type ChangeOpexMkosExpense {
+  opexExpense: OpexExpenseOrError
+}
+
+type ClearMacroparameterValue {
+  macroparameter: MacroparameterOrDiffOrError
+}
+
+type CommonChapterType {
+  macroparameters(caption: String, id: String, name: String): [Macroparameter]
+  profiles(caption: String, id: String, name: String): [TaxDnsProfileType]
+}
+
+"Общая ошибка."
+type CommonError implements RBErrorInterface {
+  "Код ошибки, соответствующий человекочитаемому сообщению об ошибке"
+  code: RBErrorCodes!
+  "Сообщение об ошибке. Отображается в случае отсутствия соответствующего коду человекочитаемого сообщения на клиенте"
+  message: String!
+}
+
+"Список ошибок."
+type CommonErrors {
+  errors: [CommonError!]!
+}
+
+type Conception {
+  "Описание концепции"
+  description: String!
+  "Наименование концепции"
+  name: String!
+  "Вероятность концепции"
+  probability: Float
+  structure: ProjectStructure!
+}
+
+type Country {
+  code: String
+  coordinateSystems: [String]
+  createdAt: DateTime
+  editedAt: DateTime
+  isDeleted: Boolean
+  name: String
+  vid: ID
+}
+
+type CreateActivityEffect {
+  result: ActivityEffect
+}
+
+type CreateCanvasNode {
+  result: CanvasNode
+}
+
+type CreateCapex {
+  capex: CapexOrDiffOrError
+}
+
+type CreateCapexExpense {
+  capexExpense: CapexExpenseOrDiffOrError
+}
+
+type CreateCapexExpenseGroup {
+  capexExpenseGroup: CapexExpenseGroupOrDiffOrError
+}
+
+type CreateCapexGlobalValue {
+  capexGlobalValue: CapexGlobalValueOrDiffOrError
+}
+
+type CreateDomainGroupResult {
+  formula: String
+  ok: Boolean
+  vid: UUID
+  vids: [UUID]
+}
+
+type CreateMacroparameter {
+  macroparameter: MacroparameterOrDiffOrError
+}
+
+type CreateMacroparameterGroup {
+  macroparameterGroup: MacroparameterGroupOrDiffOrError
+}
+
+type CreateMacroparameterSet {
+  macroparameterSet: MacroparameterSetOrDiffOrError
+}
+
+type CreateNetback {
+  netback: NetbackPriceOrDiffOrError
+}
+
+type CreateOpexAutoexportExpense {
+  opexExpense: OpexExpenseOrError
+}
+
+type CreateOpexCase {
+  opexCase: OpexExpenseGroupOrError
+}
+
+type CreateOpexCaseExpense {
+  opexExpense: OpexExpenseOrError
+}
+
+type CreateOpexMkosExpense {
+  opexExpense: OpexExpenseOrError
+}
+
+type CreateProduct {
+  product: ProductOrDiffOrError
+}
+
+type CreateProductType {
+  productType: ProductTypeOrDiffOrError
+}
+
+"Создание шага сценария."
+type CreateScenarioStep {
+  result: ScenarioStep
+}
+
+"Создание элемента шага сценария."
+type CreateScenarioStepItem {
+  result: ScenarioStepItem
+}
+
+type DeleteActivityEffect {
+  ok: Boolean
+}
+
+type DeleteCanvasNode {
+  ok: Boolean
+}
+
+type DeleteCapexExpense {
+  result: UuidOrError
+}
+
+type DeleteCapexExpenseGroup {
+  result: UuidOrError
+}
+
+type DeleteCapexGlobalValue {
+  result: UuidOrError
+}
+
+type DeleteDomainGroupResult {
+  ok: Boolean
+}
+
+type DeleteDomainObjectMutation {
+  ok: Boolean
+}
+
+type DeleteMacroparameter {
+  result: UuidOrError
+}
+
+type DeleteMacroparameterGroup {
+  result: UuidOrError
+}
+
+type DeleteMacroparameterSet {
+  result: UuidOrError
+}
+
+type DeleteNetback {
+  result: UuidOrError
+}
+
+type DeleteOpexAutoexportExpense {
+  result: UuidOrError
+}
+
+type DeleteOpexCase {
+  result: UuidOrError
+}
+
+type DeleteOpexCaseExpense {
+  result: UuidOrError
+}
+
+type DeleteOpexMkosExpense {
+  result: UuidOrError
+}
+
+type DeleteProduct {
+  result: UuidOrError
+}
+
+type DeleteProductType {
+  result: UuidOrError
+}
+
+"Удаление шага сценария."
+type DeleteScenarioStep {
+  ok: Boolean
+}
+
+"Удаление элемента шага сценария."
+type DeleteScenarioStepItem {
+  ok: Boolean
+}
+
+"Ошибка с дополнительной информацией."
+type DetailError implements RBErrorInterface {
+  "Код ошибки, соответствующий человекочитаемому сообщению об ошибке"
+  code: RBErrorCodes!
+  "Детальная информация об ошибке"
+  details: String
+  "Сообщение об ошибке. Отображается в случае отсутствия соответствующего коду человекочитаемого сообщения на клиенте"
+  message: String!
+}
+
+"Результаты вычисления заданного дискретного распределения."
+type DiscreteDistributionChart {
+  "График функции вероятности распределения"
+  pmf: [Point!]!
+  "Отображаемый в ячейке процентиль"
+  visiblePercentile: Percentile!
+  "Точки процентилей"
+  percentiles: [Percentile!]!
+}
+
+"Параметры распределения."
+type Distribution {
+  "Способ задания распределения"
+  definition: DistributionDefinitionTypes!
+  "Верхняя граница усечения"
+  maxBound: Float
+  "Нижняя граница усечения"
+  minBound: Float
+  "Параметры распределения"
+  parameters: [DistributionParameter]!
+  "Тип распределения"
+  type: DistributionTypes!
+}
+
+"Результаты вычисления заданного непрерывного распределения."
+type DistributionChart {
+  "График функции плотности распределения"
+  pdf: [Point!]!
+  "Точки процентилей"
+  percentiles: [Percentile!]!
+  "Функция надежности (1 - cdf)"
+  sf: [Point!]!
+  "Отображаемый в ячейке процентиль"
+  visiblePercentile: Percentile!
+}
+
+"Ошибка задания распределения."
+type DistributionDefinitionError implements RBErrorInterface {
+  "Код ошибки, соответствующий человекочитаемому сообщению об ошибке"
+  code: RBErrorCodes!
+  "Список параметров задания распределения, к которым относится ошибка"
+  fields: [String!]!
+  "Сообщение об ошибке. Отображается в случае отсутствия соответствующего коду человекочитаемого сообщения на клиенте"
+  message: String!
+}
+
+"Список ошибок задания распределения."
+type DistributionDefinitionErrors {
+  errors: [DistributionDefinitionError!]!
+}
+
+"Параметр способа задания распределения."
+type DistributionParameter {
+  "Тип параметра распределения"
+  type: DistributionParameterTypes!
+  value: Float!
+}
+
+"Пространство имен для работы с распределениями."
+type DistributionQueries {
+  "Результат поиска альтернативных способов задания распределения"
+  alternativeDefinitions(distribution: DistributionInput!): AlternativeDefinitionResult
+  "Результат вычисления значения распределения"
+  distributionChart(distribution: DistributionInput!, visibleRank: Int): DistributionChartResult
+}
+
+type DnsProfileYearValueType {
+  value: Float
+  year: Int
+}
+
+type DnsType {
+  commonChapter: CommonChapterType
+  ndpiGasChapter: NdpiGasChapterType
+  ndpiOilChapter: NdpiOilChapterType
+}
+
+type DomainEntity {
+  code: String
+  createdAt: DateTime
+  editedAt: DateTime
+  isDeleted: Boolean
+  name: String
+  vid: ID
+}
+
+type DomainEntityImage {
+  attributes: [PropertyMeta]
+  code: String
+  description: String
+  entity: DomainEntity
+  name: String
+  title: String
+  vid: ID
+}
+
+type DomainMutations {
+  object: DomainObjectMutations
+  objectGroup: DomainObjectGroupMutations
+}
+
+type DomainObject {
+  "Значение GCoS геологического объекта"
+  GCoS: Float
+  "Список значений атрибутов геологического объекта"
+  attributeValues: [AttributeValue!]!
+  "Иерархия геологического объекта в структуре проекта"
+  domainObjectPath: [DomainObjectPathLevel!]!
+  "Категория геологического объекта"
+  geoObjectCategory: GeoObjectCategories!
+  "Список рисков геологического объекта"
+  risksValues: [RiskValue!]!
+  "Отображения/Скрытие объекта в таблице"
+  visible: Boolean!
+}
+
+type DomainObjectGroupMutations {
+  create(formula: String, name: String!, vids: [UUID]): CreateDomainGroupResult
+  delete(vid: UUID!): DeleteDomainGroupResult
+  update(formula: String, name: String, vid: UUID!, vids: [UUID]): UpdateDomainGroupResult
+}
+
+type DomainObjectGroupType {
+  formula: String
+  name: String
+  objects: [DomainObjectInterface]
+  vid: UUID
+}
+
+type DomainObjectMutations {
+  delete(vid: UUID): DeleteDomainObjectMutation
+}
+
+type DomainObjectPathLevel {
+  "Кодовое обозначение уровня иерархии геологического объекта"
+  code: String!
+  "Название уровня иерархии геологического объекта"
+  value: String
+}
+
+type DomainObjectQuery {
+  domainObject(name: String, vid: UUID): DomainObjectInterface
+  objectGroup(name: String, vid: UUID): DomainObjectGroupType
+  objectGroupList: [DomainObjectGroupType]
+}
+
+type DomainSchema {
+  entityImages: [DomainEntityImage]
+  version: String
+}
+
+"Common error-object class."
+type Error implements ErrorInterface {
+  "Код ошибки, соответствующий человекочитаемому сообщению об ошибке"
+  code: ErrorCodesEnum!
+  details: String
+  "Сообщение об ошибке. Отображается в случае отсутствия соответствующего коду человекочитаемого сообщения на клиенте"
+  message: String!
+  payload: DictType
+}
+
+type GCoSCalculationResult {
+  "Список значений GCoS геологических объектов"
+  GCoSValues: [Float]
+  errors: [TableError!]
+}
+
+"Модель логики проекта - хранение внутри сущности проекта."
+type Logic {
+  canvas: [CanvasNode]
+  stepList: [ScenarioStep]
+}
+
+type LogicMutations {
+  canvas: CanvasMutations
+  scenarioStep: ScenarioStepMutations
+}
+
+type Macroparameter {
+  caption: String
+  createdAt: DateTime
+  id: ID
+  name: String
+  unit: String
+  value: [MacroparameterYearValueType]
+  yearValue(year: Int): YearValueOrError
+}
+
+type MacroparameterGroup {
+  caption: String
+  createdAt: DateTime
+  id: ID
+  macroparameter(caption: String, id: String, name: String): MacroparameterOrError
+  macroparameterList(id: String): MacroparameterListOrError
+  name: String
+}
+
+type MacroparameterGroupList {
+  macroparameterGroupList: [MacroparameterGroup]
+}
+
+type MacroparameterList {
+  macroparameterList: [Macroparameter]
+}
+
+type MacroparameterMutation {
+  changeMacroparameter(caption: String, macroparameterGroupId: ID!, macroparameterId: ID!, macroparameterSetId: ID!, name: String, unit: String, value: Float): ChangeMacroparameter
+  changeMacroparameterGroup(caption: String, macroparameterGroupId: ID!, macroparameterSetId: ID!, name: String): ChangeMacroparameterGroup
+  changeMacroparameterSet(allProjects: Boolean, caption: String, category: MacroparameterSetCategory, macroparameterSetId: ID!, name: String, yearStart: Int, years: Int): ChangeMacroparameterSet
+  clearMacroparameterValue(macroparameterGroupId: ID!, macroparameterId: ID!, macroparameterSetId: ID!): ClearMacroparameterValue
+  createMacroparameter(caption: String, macroparameterGroupId: ID, macroparameterSetId: ID, name: String, unit: String, value: Float): CreateMacroparameter
+  createMacroparameterGroup(caption: String, macroparameterSetId: ID, name: String): CreateMacroparameterGroup
+  createMacroparameterSet(allProjects: Boolean, caption: String, category: MacroparameterSetCategory, name: String, yearStart: Int, years: Int): CreateMacroparameterSet
+  deleteMacroparameter(macroparameterGroupId: ID, macroparameterId: ID, macroparameterSetId: ID): DeleteMacroparameter
+  deleteMacroparameterGroup(macroparameterGroupId: ID, macroparameterSetId: ID): DeleteMacroparameterGroup
+  deleteMacroparameterSet(macroparameterSetId: ID): DeleteMacroparameterSet
+  setMacroparameterYearValue(macroparameterGroupId: ID!, macroparameterId: ID!, macroparameterSetId: ID!, value: Float!, year: Int!): SetMacroparameterYearValue
+}
+
+type MacroparameterSet {
+  allProjects: Boolean
+  caption: String
+  category: MacroparameterSetCategory
+  id: ID
+  macroparameterGroup(caption: String, id: String, name: String): MacroparameterGroupOrError
+  macroparameterGroupList: MacroparameterGroupListOrError
+  name: String
+  yearStart: Int
+  years: Int
+}
+
+type MacroparameterSetList {
+  macroparameterSetList: [MacroparameterSet]
+}
+
+type MacroparameterYearValueType {
+  value: Float
+  year: Int
+}
+
+type Mutation {
+  project(version: Int!): ProjectMutationOrError
+  "Актуальная версия текущего проекта"
+  version: Int
+}
+
+type NddType {
+  incomeTaxBase: IncomeTaxBase
+  macroparameters(caption: String, id: String, name: String): [Macroparameter]
+  uralsQualityDiscount: Float
+  uralsQualityPremium: Float
+}
+
+type NdpiGasChapterType {
+  macroparameters(caption: String, id: String, name: String): [Macroparameter]
+}
+
+type NdpiOilChapterType {
+  macroparameters(caption: String, id: String, name: String): [Macroparameter]
+  yearStartKkan: Int
+  zeroValues: Float
+}
+
+type NetbackPriceType {
+  name: String
+  netbackType: String
+  prices: [AverageAnnualPriceType]
+  units: String
+  value: [AverageAnnualPriceType]
+}
+
+type Opex {
+  autoexport: OpexExpenseGroupOrError
+  hasAutoexport: Boolean
+  hasMkos: Boolean
+  mkos: OpexExpenseGroupOrError
+  opexCase(caption: String, id: String, name: String): OpexExpenseGroupOrError
+  opexCaseList: OpexExpenseGroupListOrError
+  sdf: Boolean
+}
+
+type OpexExpense {
+  caption: String
+  description: String
+  id: ID
+  name: String
+  unit: String
+  value: [OpexYearValue]
+  valueTotal: Float
+  yearValue(year: Int): YearValueOrError
+}
+
+type OpexExpenseGroup {
+  caption: String
+  id: ID
+  name: String
+  opexExpense(caption: String, id: String, name: String): OpexExpenseOrError
+  opexExpenseList: OpexExpenseListOrError
+  yearEnd: Int
+  yearStart: Int
+}
+
+type OpexExpenseGroupList {
+  opexCaseList: [OpexExpenseGroup]
+}
+
+type OpexExpenseList {
+  opexExpenseList: [OpexExpense]
+}
+
+type OpexMutation {
+  changeOpexAutoexport(yearEnd: Int, yearStart: Int): ChangeOpexAutoexport
+  changeOpexAutoexportExpense(caption: String, description: String, expenseId: ID!, name: String, unit: String, value: Float): ChangeOpexAutoexportExpense
+  changeOpexCase(caption: String, caseId: ID!, name: String, yearEnd: Int, yearStart: Int): ChangeOpexCase
+  changeOpexCaseExpense(caption: String, caseId: ID!, description: String, expenseId: ID!, name: String, unit: String, value: Float): ChangeOpexCaseExpense
+  changeOpexMkos(yearEnd: Int, yearStart: Int): ChangeOpexMkos
+  changeOpexMkosExpense(caption: String, description: String, expenseId: ID!, name: String, unit: String, value: Float): ChangeOpexMkosExpense
+  createOpexAutoexportExpense(caption: String, description: String, name: String, unit: String, value: Float): CreateOpexAutoexportExpense
+  createOpexCase(caption: String, name: String, yearEnd: Int, yearStart: Int): CreateOpexCase
+  createOpexCaseExpense(caption: String, caseId: ID!, description: String, name: String, unit: String, value: Float): CreateOpexCaseExpense
+  createOpexMkosExpense(caption: String, description: String, name: String, unit: String, value: Float): CreateOpexMkosExpense
+  deleteOpexAutoexportExpense(expenseId: ID!): DeleteOpexAutoexportExpense
+  deleteOpexCase(caseId: ID!): DeleteOpexCase
+  deleteOpexCaseExpense(caseId: ID!, expenseId: ID!): DeleteOpexCaseExpense
+  deleteOpexMkosExpense(expenseId: ID!): DeleteOpexMkosExpense
+  removeOpexAutoexport: Error
+  removeOpexMkos: Error
+  setOpexAutoexport(yearEnd: Int, yearStart: Int): SetOpexAutoexport
+  setOpexAutoexportExpenseYearValue(expenseId: ID!, value: Float!, year: Int!): SetOpexAutoexportExpenseYearValue
+  setOpexCaseExpenseYearValue(caseId: ID!, expenseId: ID!, value: Float!, year: Int!): SetOpexCaseExpenseYearValue
+  setOpexMkos(yearEnd: Int, yearStart: Int): SetOpexMkos
+  setOpexMkosExpenseYearValue(expenseId: ID!, value: Float!, year: Int!): SetOpexMkosExpenseYearValue
+  setOpexSdf(sdf: Boolean): SetOpexSdf
+}
+
+type OpexSdf {
+  sdf: Boolean
+}
+
+type OpexYearValue {
+  value: Float
+  year: Int
+}
+
+type Organization {
+  code: String
+  createdAt: DateTime
+  editedAt: DateTime
+  isDeleted: Boolean
+  name: String
+  vid: ID
+}
+
+type OrganizationUnit {
+  adId: String
+  code: String
+  createdAt: DateTime
+  editedAt: DateTime
+  isDeleted: Boolean
+  name: String
+  organization: Organization
+  parentOu: OrganizationUnit
+  vid: ID
+}
+
+"Процентиль распределения."
+type Percentile {
+  point: Point!
+  "Процентильный ранг (1-99)"
+  rank: Int!
+}
+
+"Точка на графике."
+type Point {
+  x: Float!
+  y: Float!
+}
+
+"Продукт полученный в результате производства основного вида продукции."
+type Product {
+  fareAllow: Boolean
+  id: ID!
+  "Название продукта"
+  name: String
+  "Список связанных цен"
+  prices: [AverageAnnualPriceType]
+  qualityAward: Float
+  yearStart: Int
+}
+
+"Вид продукции. Примеры видов продукции - нефть, газ, газовый конденсат, пнг."
+type ProductType {
+  "Список связанных расчетов"
+  calculations: [Calculation]
+  fareAllow: Boolean
+  id: ID!
+  "Название вида продукции"
+  name: String
+  netback(id: String, netbackType: String): NetbackPriceType
+  "Список продукции"
+  products: [Product]
+  qualityAward: Float
+  qualityDiscount: Float
+  yearEnd: Int
+  yearStart: Int
+}
+
+"""
+
+Мероприятие проекта.
+
+Конфигурируется в рамках проекта в паре с объектом
+"""
+type ProjectActivity {
+  activityType: Activity
+  name: String
+  risk: String
+}
+
+"Проектные данные."
+type ProjectInner {
+  adId: String
+  attendees(orderBy: [AttendeeOrderBy] = [NAME], sortBy: SortType = ASC): [Attendee]
+  attendeesTotal: Int
+  authorOu: OrganizationUnit
+  capex(version: Int): CapexOrError
+  code: String
+  coordinateSystem: String
+  coordinates: String
+  createdAt: DateTime
+  createdBy: User
+  description: String
+  domain: DomainObjectQuery
+  domainSchema: DomainSchema
+  editedAt: DateTime
+  editedBy: User
+  files: [Attachment]
+  filesTotal: Int
+  isDeleted: Boolean
+  isFavorite: Boolean
+  "Данные конструктора логики"
+  logic: Logic
+  macroparameterSet(caption: String, id: String, name: String, version: Int): MacroparameterSetOrError
+  macroparameterSetList(version: Int): MacroparameterSetListOrError
+  myRoles: [ProjectRole]
+  name: String
+  opex(version: Int): OpexOrError
+  recentlyEdited: Boolean!
+  region: Region
+  "Запросы к данным ресурсной базы."
+  resourceBase: ResourceBaseQueries
+  resourceId: String
+  rootEntity: String
+  scenario(version: Int): [ScenarioType]
+  status: ProjectStatusEnum
+  taxEnvironment: TaxEnvironmentType
+  type: ProjectTypeEnum
+  version: Int
+  versions: [Int]!
+  vid: ID
+}
+
+type ProjectListSortingSetting {
+  orderBy: ProjectOrderByEnum
+  sortBy: SortTypeEnum
+}
+
+type ProjectMutation {
+  capex: CapexMutation
+  changeCapexExpense(capexExpenseGroupId: ID!, capexExpenseId: ID!, caption: String, name: String, unit: String, value: Float): ChangeCapexExpense
+  changeCapexExpenseGroup(capexExpenseGroupId: ID!, caption: String, name: String, yearStart: Int, years: Int): ChangeCapexExpenseGroup
+  changeMacroparameter(caption: String, macroparameterGroupId: ID!, macroparameterId: ID!, macroparameterSetId: ID!, name: String, unit: String, value: Float): ChangeMacroparameter
+  changeMacroparameterGroup(caption: String, macroparameterGroupId: ID!, macroparameterSetId: ID!, name: String): ChangeMacroparameterGroup
+  changeMacroparameterSet(allProjects: Boolean, caption: String, category: MacroparameterSetCategory, macroparameterSetId: ID!, name: String, yearStart: Int, years: Int): ChangeMacroparameterSet
+  changeOpexAutoexport(yearEnd: Int, yearStart: Int): ChangeOpexAutoexport
+  changeOpexAutoexportExpense(caption: String, description: String, expenseId: ID!, name: String, unit: String, value: Float): ChangeOpexAutoexportExpense
+  changeOpexCase(caption: String, caseId: ID!, name: String, yearEnd: Int, yearStart: Int): ChangeOpexCase
+  changeOpexCaseExpense(caption: String, caseId: ID!, description: String, expenseId: ID!, name: String, unit: String, value: Float): ChangeOpexCaseExpense
+  changeOpexMkos(yearEnd: Int, yearStart: Int): ChangeOpexMkos
+  changeOpexMkosExpense(caption: String, description: String, expenseId: ID!, name: String, unit: String, value: Float): ChangeOpexMkosExpense
+  clearMacroparameterValue(macroparameterGroupId: ID!, macroparameterId: ID!, macroparameterSetId: ID!): ClearMacroparameterValue
+  createCapex(yearStart: Int, years: Int): CreateCapex
+  createCapexExpense(capexExpenseGroupId: ID, caption: String, name: String, unit: String, value: Float): CreateCapexExpense
+  createCapexExpenseGroup(caption: String, name: String): CreateCapexExpenseGroup
+  createCapexGlobalValue(caption: String, name: String, unit: String, value: Float): CreateCapexGlobalValue
+  createMacroparameter(caption: String, macroparameterGroupId: ID, macroparameterSetId: ID, name: String, unit: String, value: Float): CreateMacroparameter
+  createMacroparameterGroup(caption: String, macroparameterSetId: ID, name: String): CreateMacroparameterGroup
+  createMacroparameterSet(allProjects: Boolean, caption: String, category: MacroparameterSetCategory, name: String, yearStart: Int, years: Int): CreateMacroparameterSet
+  createNetback(netbackName: String!, prices: [AverageAnnualPriceTypeInput], productTypeId: ID!, scenarioId: ID!, units: String, value: Float): CreateNetback
+  createOpexAutoexportExpense(caption: String, description: String, name: String, unit: String, value: Float): CreateOpexAutoexportExpense
+  createOpexCase(caption: String, name: String, yearEnd: Int, yearStart: Int): CreateOpexCase
+  createOpexCaseExpense(caption: String, caseId: ID!, description: String, name: String, unit: String, value: Float): CreateOpexCaseExpense
+  createOpexMkosExpense(caption: String, description: String, name: String, unit: String, value: Float): CreateOpexMkosExpense
+  createProduct(
+    prices: [AverageAnnualPriceTypeInput],
+    productName: String!,
+    productTypeId: ID!,
+    "ID сценария"
+    scenarioId: ID!,
+    units: String
+  ): CreateProduct
+  createProductType(fareAllow: Boolean, productTypeName: String!, qualityAward: Float, qualityDiscount: Float, scenarioId: ID!, yearEnd: Int, yearStart: Int): CreateProductType
+  createScenario(
+    description: String,
+    "Название сценария"
+    name: String!
+  ): ScenarioCreateMutation
+  deleteCapexExpense(capexExpenseGroupId: ID!, capexExpenseId: ID!): DeleteCapexExpense
+  deleteCapexExpenseGroup(capexExpenseGroupId: ID): DeleteCapexExpenseGroup
+  deleteCapexGlobalValue(capexGlobalValueId: ID!): DeleteCapexGlobalValue
+  deleteMacroparameter(macroparameterGroupId: ID, macroparameterId: ID, macroparameterSetId: ID): DeleteMacroparameter
+  deleteMacroparameterGroup(macroparameterGroupId: ID, macroparameterSetId: ID): DeleteMacroparameterGroup
+  deleteMacroparameterSet(macroparameterSetId: ID): DeleteMacroparameterSet
+  deleteNetback(netbackName: String!, productTypeId: ID!, scenarioId: ID!): DeleteNetback
+  deleteOpexAutoexportExpense(expenseId: ID!): DeleteOpexAutoexportExpense
+  deleteOpexCase(caseId: ID!): DeleteOpexCase
+  deleteOpexCaseExpense(caseId: ID!, expenseId: ID!): DeleteOpexCaseExpense
+  deleteOpexMkosExpense(expenseId: ID!): DeleteOpexMkosExpense
+  deleteProduct(
+    productName: String!,
+    productTypeId: ID!,
+    "ID сценария"
+    scenarioId: ID!
+  ): DeleteProduct
+  deleteProductType(productTypeId: ID!, scenarioId: ID!): DeleteProductType
+  deleteScenario(
+    "ID сценария"
+    scenarioId: ID!
+  ): ScenarioDeleteMutation
+  domain: DomainMutations
+  logic: LogicMutations
+  macroparameter: MacroparameterMutation
+  opex: OpexMutation
+  removeOpexAutoexport: Error
+  removeOpexMkos: Error
+  "Запросы к данным ресурсной базы."
+  resourceBase: ResourceBaseMutations
+  scenario: ScenarioMutation
+  setCapexExpenseYearValue(capexExpenseGroupId: ID!, capexExpenseId: ID!, value: Float!, year: Int!): SetCapexExpenseYearValue
+  setMacroparameterYearValue(macroparameterGroupId: ID!, macroparameterId: ID!, macroparameterSetId: ID!, value: Float!, year: Int!): SetMacroparameterYearValue
+  setOpexAutoexport(yearEnd: Int, yearStart: Int): SetOpexAutoexport
+  setOpexAutoexportExpenseYearValue(expenseId: ID!, value: Float!, year: Int!): SetOpexAutoexportExpenseYearValue
+  setOpexCaseExpenseYearValue(caseId: ID!, expenseId: ID!, value: Float!, year: Int!): SetOpexCaseExpenseYearValue
+  setOpexMkos(yearEnd: Int, yearStart: Int): SetOpexMkos
+  setOpexMkosExpenseYearValue(expenseId: ID!, value: Float!, year: Int!): SetOpexMkosExpenseYearValue
+  setOpexSdf(sdf: Boolean): SetOpexSdf
+  updateCapexGlobalValue(capexGlobalValueId: ID!, caption: String, name: String, unit: String, value: Float): UpdateCapexGlobalValue
+  updateNetback(netbackName: String, prices: [AverageAnnualPriceTypeInput], productTypeId: ID!, scenarioId: ID!, units: String, value: Float): UpdateNetback
+  updateProduct(
+    prices: [AverageAnnualPriceTypeInput],
+    productName: String,
+    productTypeId: ID!,
+    "ID сценария"
+    scenarioId: ID!,
+    units: String
+  ): UpdateProduct
+  updateProductType(fareAllow: Boolean, productTypeId: ID!, productTypeName: String, qualityAward: Float, qualityDiscount: Float, scenarioId: ID!, yearEnd: Int, yearStart: Int): UpdateProductType
+  updateScenario(
+    description: String,
+    "Название сценария"
+    name: String,
+    "Виды продукции"
+    productTypes: [ProductTypeInput],
+    "ID сценария"
+    scenarioId: ID!
+  ): ScenarioUpdateMutation
+}
+
+"Пространство имен для работы с проектом."
+type ProjectQueries {
+  "Данные проекта"
+  loadFromDatabase: RBProject
+  "Шаблон структуры проекта"
+  template: RBProject
+  "Валидация структуры проекта перед импортом/экспортом"
+  validateBeforeLoad(project: RBProjectInput!): [DetailError!]
+}
+
+type ProjectRole {
+  code: String
+  createdAt: DateTime
+  defaultAttachmentType: AttachmentType
+  editedAt: DateTime
+  isDeleted: Boolean
+  name: String
+  vid: ID
+}
+
+type ProjectStructure {
+  "Список атрибутов структуры проекта"
+  attributes: [Attribute!]!
+  "Список доменных сущностей структуры проекта"
+  domainEntities: [RBDomainEntity!]!
+  "Список геологических объектов структуры проекта"
+  domainObjects: [DomainObject!]!
+  "Список рисков структуры проекта"
+  risks: [Risk!]!
+}
+
+"""
+
+Model to description object attributes.
+
+Model attributes:
+title - civil attribute name by user native language
+name - technical attribute name
+attr_type - attributes data type, must be mapped to marshmellow types,
+example: Str, Int, RefLink('Model')
+unit - Attributes unit, example: km^2, m^3
+validation_rules - Rules for validation object attribute value
+"""
+type PropertyMeta {
+  attrType: String
+  description: String
+  entity: DomainEntity
+  name: String
+  required: Boolean
+  title: String
+  unit: String
+  validationRules: ValidationRules
+}
+
+type Query {
+  project: ProjectInner
+  "Актуальная версия текущего проекта"
+  version: Int
+}
+
+type RBDomainEntity {
+  "Кодовое обозначение доменной сущности геологического объекта"
+  code: String!
+  "Иконка доменной сущности геологического объекта"
+  icon: RBDomainEntityIcons!
+  "Имя доменной сущности геологического объекта"
+  name: String!
+  visible: Visible!
+}
+
+type RBProject {
+  "Список концепций проекта"
+  conceptions: [Conception!]!
+  "Версия шаблона структуры проекта"
+  version: String!
+}
+
+type Region {
+  code: String
+  country: Country
+  createdAt: DateTime
+  editedAt: DateTime
+  fullName: String
+  isDeleted: Boolean
+  name: String
+  vid: ID
+}
+
+"Мутации данных ресурсной базы."
+type ResourceBaseMutations {
+  calculateProject(projectInput: RBProjectInput!): CalculatedOrError
+  saveProject(projectInput: RBProjectInput!): SavedOrError
+  updateRiskValue(projectStructure: ProjectStructureInput!): UpdateRiskValueResult
+}
+
+"Запросы к данным ресурсной базы."
+type ResourceBaseQueries {
+  "Пространство имен для работы с распределениями."
+  distribution: DistributionQueries
+  "Пространство имен для работы с проектом."
+  project: ProjectQueries
+}
+
+type Result {
+  vid: ID
+}
+
+type Risk {
+  "Кодовое обозначение риска"
+  code: String!
+  "Наименование риска"
+  name: String!
+}
+
+type RiskValue {
+  "Кодовое обозначение риска"
+  code: String!
+  "Значение риска"
+  value: Float
+}
+
+type ScenarioCreateMutation {
+  scenario: ScenarioOrDiffOrError
+}
+
+type ScenarioDeleteMutation {
+  result: UuidOrError
+}
+
+type ScenarioMutation {
+  createNetback(netbackName: String!, prices: [AverageAnnualPriceTypeInput], productTypeId: ID!, scenarioId: ID!, units: String, value: Float): CreateNetback
+  createProduct(
+    prices: [AverageAnnualPriceTypeInput],
+    productName: String!,
+    productTypeId: ID!,
+    "ID сценария"
+    scenarioId: ID!,
+    units: String
+  ): CreateProduct
+  createProductType(fareAllow: Boolean, productTypeName: String!, qualityAward: Float, qualityDiscount: Float, scenarioId: ID!, yearEnd: Int, yearStart: Int): CreateProductType
+  createScenario(
+    description: String,
+    "Название сценария"
+    name: String!
+  ): ScenarioCreateMutation
+  deleteNetback(netbackName: String!, productTypeId: ID!, scenarioId: ID!): DeleteNetback
+  deleteProduct(
+    productName: String!,
+    productTypeId: ID!,
+    "ID сценария"
+    scenarioId: ID!
+  ): DeleteProduct
+  deleteProductType(productTypeId: ID!, scenarioId: ID!): DeleteProductType
+  deleteScenario(
+    "ID сценария"
+    scenarioId: ID!
+  ): ScenarioDeleteMutation
+  updateNetback(netbackName: String, prices: [AverageAnnualPriceTypeInput], productTypeId: ID!, scenarioId: ID!, units: String, value: Float): UpdateNetback
+  updateProduct(
+    prices: [AverageAnnualPriceTypeInput],
+    productName: String,
+    productTypeId: ID!,
+    "ID сценария"
+    scenarioId: ID!,
+    units: String
+  ): UpdateProduct
+  updateProductType(fareAllow: Boolean, productTypeId: ID!, productTypeName: String, qualityAward: Float, qualityDiscount: Float, scenarioId: ID!, yearEnd: Int, yearStart: Int): UpdateProductType
+  updateScenario(
+    description: String,
+    "Название сценария"
+    name: String,
+    "Виды продукции"
+    productTypes: [ProductTypeInput],
+    "ID сценария"
+    scenarioId: ID!
+  ): ScenarioUpdateMutation
+}
+
+"""
+
+Шаг сценария.
+
+Состоит из списка позиций - пар мероприятие-объект.
+"""
+type ScenarioStep {
+  code: String
+  itemList: [ScenarioStepItem]
+  name: String
+  vid: ID
+}
+
+"""
+
+Позиция шага сценария - пара объект-мероприятие.
+
+Опционально содержит исходную группу объектов (в случае если объект был
+добавлен из группы) для определения актуальности позиции в случае динамической группы
+"""
+type ScenarioStepItem {
+  activity: ProjectActivity
+  code: String
+  effectList: [ActivityEffect]
+  object: DomainObjectInterface
+  objectGroup: UUID
+  vid: ID
+}
+
+"Мутации для шагов сценария."
+type ScenarioStepItemMutations {
+  "Создание элемента шага сценария."
+  create(activityVid: UUID!, objectGroupVid: UUID, objectVid: UUID, risk: String, stepVid: UUID!): CreateScenarioStepItem
+  "Удаление элемента шага сценария."
+  delete(stepVid: UUID!, vid: UUID!): DeleteScenarioStepItem
+  effects: ActivityEffectMutations
+  "Изменение элемента шага сценария."
+  update(activityVid: UUID, objectGroupVid: UUID, objectVid: UUID, risk: String, stepVid: UUID!, vid: UUID!): UpdateScenarioStepItem
+}
+
+"Мутации для шагов сценария."
+type ScenarioStepMutations {
+  "Создание шага сценария."
+  create(activity: UUID, name: String, objectGroup: UUID, objects: [UUID]): CreateScenarioStep
+  "Удаление шага сценария."
+  delete(vid: UUID!): DeleteScenarioStep
+  items: ScenarioStepItemMutations
+  "Обновление шага сценария."
+  update(activity: UUID, name: String, objectGroup: UUID, objects: [UUID], vid: UUID!): UpdateScenarioStep
+}
+
+"Сценарий либо для описания стоимостей различных видов продукции по годам."
+type ScenarioType {
+  description: String
+  id: ID
+  name: String
+  netback: [NetbackPriceType]
+  "Виды продукции"
+  productTypesList: [ProductType]
+}
+
+type ScenarioUpdateMutation {
+  scenario: ScenarioOrDiffOrError
+}
+
+type SetCapexExpenseYearValue {
+  capexExpense: CapexExpenseOrDiffOrError
+  totalValueByYear: [CapexYearValueType]
+}
+
+type SetMacroparameterYearValue {
+  macroparameter: MacroparameterOrDiffOrError
+}
+
+type SetOpexAutoexport {
+  autoexport: OpexExpenseGroupOrError
+}
+
+type SetOpexAutoexportExpenseYearValue {
+  opexExpense: OpexExpenseOrError
+}
+
+type SetOpexCaseExpenseYearValue {
+  opexExpense: OpexExpenseOrError
+  totalValueByYear: [OpexYearValue]
+}
+
+type SetOpexMkos {
+  mkos: OpexExpenseGroupOrError
+}
+
+type SetOpexMkosExpenseYearValue {
+  opexExpense: OpexExpenseOrError
+}
+
+type SetOpexSdf {
+  opexSdf: OpexSdfOrError
+}
+
+"Ошибка данных таблицы с информацией о расположении строк или ячеек повлекших ошибку."
+type TableError implements RBErrorInterface {
+  "Код ошибки, соответствующий человекочитаемому сообщению об ошибке"
+  code: RBErrorCodes!
+  "Идентификатор сущности в колонке."
+  columnKey: String
+  "Сообщение об ошибке. Отображается в случае отсутствия соответствующего коду человекочитаемого сообщения на клиенте"
+  message: String!
+  "Индекс строки таблицы, повлекшей ошибку"
+  row: Int
+  "Имя таблицы, содержащей строки или ячейки, повлекшие ошибку"
+  tableName: TableNames!
+}
+
+type TableErrors {
+  errors: [TableError!]!
+}
+
+type TaxDnsProfileType {
+  caption: String
+  id: String
+  name: String
+  unit: String
+  value: [DnsProfileYearValueType]
+}
+
+type TaxEnvironmentType {
+  currentTaxMode: CurrentTaxMode
+  dns: DnsType
+  ndd: NddType
+  yearStart: Int
+  years: Int
+}
+
+type UpdateActivityEffect {
+  result: ActivityEffect
+}
+
+type UpdateCanvasNode {
+  result: CanvasNode
+}
+
+type UpdateCapexGlobalValue {
+  capexGlobalValue: CapexGlobalValueOrDiffOrError
+}
+
+type UpdateDomainGroupResult {
+  formula: String
+  name: String
+  ok: Boolean
+  vids: [UUID]
+}
+
+type UpdateNetback {
+  netback: NetbackPriceOrDiffOrError
+}
+
+type UpdateProduct {
+  product: ProductOrDiffOrError
+}
+
+type UpdateProductType {
+  productType: ProductTypeOrDiffOrError
+}
+
+"Contains remote and local versions of  project if versions are not equal."
+type UpdateProjectInnerDiff {
+  message: String
+  remoteProject: ProjectInner
+}
+
+"Обновление шага сценария."
+type UpdateScenarioStep {
+  result: ScenarioStep
+}
+
+"Изменение элемента шага сценария."
+type UpdateScenarioStepItem {
+  result: ScenarioStepItem
+}
+
+type User {
+  adId: String
+  code: String
+  createdAt: DateTime
+  customSettings: UserCustomSettings
+  editedAt: DateTime
+  favoriteProjects: [ID]
+  firstName: String
+  groups: [UserGroup]
+  isDeleted: Boolean
+  lastName: String
+  login: String
+  name: String
+  organizationUnits: [OrganizationUnit]
+  patronym: String
+  role: String
+  vid: ID
+}
+
+type UserCustomSettings {
+  projectList: ProjectListSortingSetting
+}
+
+type UserGroup {
+  code: String
+  createdAt: DateTime
+  editedAt: DateTime
+  isDeleted: Boolean
+  name: String
+  project: ID
+  vid: ID
+}
+
+"""
+
+Validation Rules.
+
+Todo:
+1. Develop valudation rule syntax
+2. Realize validate value by valudation rules
+"""
+type ValidationRules {
+  rules: [String]
+}
+
+type Visible {
+  "Отображения/Скрытие уровня иерархии в расчетах"
+  calc: Boolean!
+  "Отображения/Скрытие уровня иерархии в таблице"
+  table: Boolean!
+  "Отображения/Скрытие уровня иерархии в дереве"
+  tree: Boolean!
+}
+
+type VisibleValue {
+  "Ранг процентиля"
+  rank: Float!
+  "Процентиль"
+  value: Float
+}
+
+type YearValue {
+  yearValue: Float
+}
+
+enum AttendeeOrderBy {
+  FIRST_NAME
+  LAST_NAME
+  NAME
+  PATRONYM
+  ROLE
+}
+
+enum AttendeeStatus {
+  ACTIVE
+  INACTIVE
+}
+
+"An enumeration."
+enum CurrentTaxMode {
+  NDD
+  NDS
+}
+
+"Способы задания распределений."
+enum DistributionDefinitionTypes {
+  "Через альфа, бета, минимум и максимум"
+  ALPHA_BETA_MIN_MAX
+  "Через арифметическое среднее и два процентиля"
+  ARMEAN_TWO_PERCENTILES
+  "Константа"
+  CONSTANT
+  "Через четыре процентиля"
+  FOUR_PERCENTILES
+  "Через расположение, арифметическое среднее и арифметическое стандартное отклонение"
+  LOCATION_ARMEAN_ARSD
+  "Через расположение, арифметическое среднее и один процентиль"
+  LOCATION_ARMEAN_ONE_PERCENTILE
+  "Через расположение, геометрическое среднее и геометрическое стандартное отклонение"
+  LOCATION_GEOMMEAN_GEOMSD
+  "Через расположение, логарифмическое среднее и логарифмическое стандартное отклонение"
+  LOCATION_LOGMEAN_LOGSD
+  "Через расположение, логарифмическое среднее и один процентиль"
+  LOCATION_LOGMEAN_ONE_PERCENTILE
+  "Через расположение и два процентиля"
+  LOCATION_TWO_PERCENTILES
+  "Через логарифмическое среднее и два процентиля"
+  LOGMEAN_TWO_PERCENTILES
+  "Через среднее и один процентиль"
+  MEAN_ONE_PERCENTILE
+  "Через среднее и стандартное отклонение"
+  MEAN_SD
+  "Через минимум и максимум"
+  MIN_MAX
+  "Через минимум, максимум и два процентиля"
+  MIN_MAX_TWO_PERCENTILES
+  "Через наиболее вероятное, минимум и максимум"
+  MODE_MIN_MAX
+  "Через наиболее вероятное и два процентиля"
+  MODE_TWO_PERCENTILES
+  "Вероятность успеха"
+  PROBABILITY
+  "Через три процентиля"
+  THREE_PERCENTILES
+  "Через два процентиля"
+  TWO_PERCENTILES
+}
+
+"Тип параметра задания распределения."
+enum DistributionParameterTypes {
+  "Параметр расположения Альфа"
+  ALPHA
+  "Арифметическое среднее"
+  ARMEAN
+  "Арифметическое стандартное отклонение"
+  ARSD
+  "Параметр расположения Бэта"
+  BETA
+  "Константа"
+  CONSTANT
+  "Геометрическое среднее"
+  GEOMMEAN
+  "Геометрическое стандартное отклонение"
+  GEOMSD
+  "Расположение"
+  LOCATION
+  "Логарифмическое среднее"
+  LOGMEAN
+  "Логарифмическое стандартное отклонение"
+  LOGSD
+  "Максимум"
+  MAX
+  "Среднее"
+  MEAN
+  "Минимум"
+  MIN
+  "Наиболее вероятное"
+  MODE
+  "Вероятность"
+  PROBABILITY
+  "Первый квантильный ранг"
+  Q1_RANK
+  "Значение первого квантиля"
+  Q1_VALUE
+  "Второй квантильный ранг"
+  Q2_RANK
+  "Значение второго квантиля"
+  Q2_VALUE
+  "Третий квантильный ранг"
+  Q3_RANK
+  "Значение третьего квантиля"
+  Q3_VALUE
+  "Четвертый квантильный ранг"
+  Q4_RANK
+  "Значение четвертого квантиля"
+  Q4_VALUE
+  "Стандартное отклонение"
+  SD
+}
+
+"Типы распределений."
+enum DistributionTypes {
+  "Распределение Бернулли"
+  BERNOULLI
+  "Бета распределение"
+  BETA
+  "Константа"
+  CONSTANT
+  "Логнормальное распределение"
+  LOGNORMAL
+  "Нормальное распределение"
+  NORMAL
+  "ПЕРТ распределение"
+  PERT
+  "Треугольное распределение"
+  TRIANGULAR
+  "Равномерное распределение"
+  UNIFORM
+}
+
+"Error codes list."
+enum ErrorCodesEnum {
+  "Проект нельзя возвращать в статус заготовки."
+  CANNOT_BRING_BLANK_BACK
+  "Отсутствует роль"
+  EMPTY_ATTENDEE_ROLE
+  "Ошибка"
+  ERROR
+  "Некорректная версия проекта"
+  INCORRECT_PROJECT_VERSION
+  "Некорректный формат UUID"
+  INCORRECT_UUID
+  "Неверный номер страницы"
+  INVALID_PAGE_NUMBER
+  "Неверный размер страницы"
+  INVALID_PAGE_SIZE
+  "Удаляемый участник не найден в проекте "
+  NO_ATTENDEE_TO_REMOVE
+  "Пользователь не обладает правами для совершения операции"
+  NO_RIGHTS
+  "Объект не найден"
+  OBJECT_NOT_FOUND
+  "Участник проекта уже обладет данной ролью"
+  PROJECT_ATTENDEE_ALREADY_HAS_ROLE
+  "Участник проекта не найден"
+  PROJECT_ATTENDEE_NOT_FOUND
+  "Рольу участника проекта не найдена"
+  PROJECT_ATTENDEE_USER_ROLE_NOT_FOUND
+  "Невозможно добавить участника с дублирующимися ролями."
+  PROJECT_ATTENDEE_USER_WITH_DUPLICATE_ROLES
+  "Невозможно сохранить проект - не найден менеджер проекта"
+  PROJECT_MANAGER_NOT_FOUND
+  "Проект с таким именем уже существует"
+  PROJECT_NAME_ALREADY_EXISTS
+  "Проект не найден"
+  PROJECT_NOT_FOUND
+  "Ошибка при обновлении проекта"
+  PROJECT_UPDATE_ERROR
+  "Расхождение версий проекта"
+  PROJECT_VERSION_DIFF_ERROR
+  "Объект справочника не найден"
+  REFERENCE_ITEM_NOT_FOUND
+  "Ошибка валидации"
+  VALIDATION
+}
+
+"Список категорий геологического объекта."
+enum GeoObjectCategories {
+  RESERVES
+  RESOURCES
+}
+
+"An enumeration."
+enum IncomeTaxBase {
+  WITHOUT_TRANSITION
+  WITH_TRANSITION
+}
+
+"An enumeration."
+enum MacroparameterSetCategory {
+  SET_CATEGORY_NOMINAL
+  SET_CATEGORY_REAL
+}
+
+"An enumeration."
+enum ProjectOrderByEnum {
+  CREATED_AT
+  CREATED_BY
+  DESCRIPTION
+  EDITED_AT
+  EDITED_BY
+  IS_FAVORITE
+  NAME
+  REGION
+}
+
+"An enumeration."
+enum ProjectStatusEnum {
+  BLANK
+  UNPUBLISHED
+}
+
+"An enumeration."
+enum ProjectTypeEnum {
+  GEO
+}
+
+"Список иконок доменной сущности геологического объекта."
+enum RBDomainEntityIcons {
+  FIELD_ICON
+  FORMATION_ICON
+  LICENSING_ROUND_ICON
+  OIL_POOL_ICON
+  WELL_ICON
+}
+
+"Список кодов ошибок приложения."
+enum RBErrorCodes {
+  "Для старта расчётов заполните ячейку таблицы"
+  CELL_VALUE_IS_NULL
+  "В концепции отсутствует поле \"вероятность\""
+  CONCEPTION_PROBABILITY_IS_NONE
+  "Значения доверительного интервала отрицательны"
+  CONFIDENCE_INTERVAL_IS_NEGATIVE
+  "Распределение не может быть восстановлено"
+  DISTRIBUTION_CANNOT_BE_RESTORED
+  "Некорректная зависимость параметров распределения"
+  DISTRIBUTION_PARAMETERS_INCORRECT_RELATION
+  "Параметр распределения выходит за границы допустимых значений"
+  DISTRIBUTION_PARAMETER_OUT_OF_RANGE
+  "Дублируются имена колонок"
+  DUPLICATING_COLUMNS
+  "Найдены концепции с не уникальными наименованиями"
+  DUPLICATING_CONCEPTIONS_NAMES
+  "В проекте отсутствуют доменные сущности"
+  EMPTY_DOMAIN_ENTITIES
+  "В таблице структуры не может быть одинаковых строк"
+  IDENTICAL_ROW_IN_TABLE_DATA
+  "Версия импортируемого файла не соответствует версии шаблона структуры"
+  INCORRECT_FILE_VERSION
+  "Некорректный порядок рангов процентилей"
+  INCORRECT_ORDER_OF_PERCENTILE_RANKS
+  "Некорректный порядок значений процентилей"
+  INCORRECT_ORDER_OF_PERCENTILE_VALUES
+  "Некорректное значение параметра для этого способа задания"
+  INCORRECT_PARAMETER_VALUE_FOR_DEFINITION
+  "Ошибка в загружаемой структуре"
+  INCORRECT_PROJECT_STRUCTURE
+  "Сумма вероятностей всех концепций не равна 1"
+  INVALID_CONCEPTIONS_PROBABILITIES_SUM
+  "Вероятность может иметь значение в пределах 0.0 < p <= 1.0"
+  INVALID_PROBABILITY_VALUE
+  "В строке таблицы структуры должна быть заполнена хотя бы одна ячейка"
+  MUST_BE_AT_LEAST_ONE_CELL
+  "Квантиль должен быть больше расположения"
+  QUANTILE_MUST_BE_MORE_THAN_LOCATION
+  "Значение случайной величины отрицательное."
+  RANDOM_VARIABLE_VALUE_IS_NEGATIVE
+  "Для категории 'Запасы' риски не должны быть указаны"
+  RISKS_NOT_APPLICABLE_TO_RESERVES
+  "Параметр version не найден."
+  VERSION_PARAM_NOT_FOUND
+}
+
+enum SortType {
+  ASC
+  DESC
+}
+
+"An enumeration."
+enum SortTypeEnum {
+  ASC
+  DESC
+}
+
+"Имена таблиц в структуре проекта."
+enum TableNames {
+  ATTRIBUTES
+  CONCEPTIONS
+  DOMAIN_ENTITIES
+  RISKS
+}
+
+input AttributeInput {
+  "Кодовое обозначение подсчётного параметра"
+  code: String!
+  "Имя подсчётного параметра"
+  name: String!
+  "Сокращенное имя или обозначение подсчётного параметра"
+  shortName: String!
+  "Единицы измерения подсчётного параметра"
+  units: String!
+}
+
+input AttributeValueInput {
+  "Кодовое обозначение подсчётного параметра"
+  code: String!
+  distribution: DistributionInput
+}
+
+"Значение цены относительно года."
+input AverageAnnualPriceInput {
+  "Цена"
+  price: Float!
+  "Единицы измерения"
+  units: String
+  "Год"
+  year: Int!
+}
+
+input AverageAnnualPriceTypeInput {
+  "Цена"
+  price: Float
+  "Год"
+  year: Int
+}
+
+input ConceptionInput {
+  "Описание концепции"
+  description: String!
+  "Наименование концепции"
+  name: String!
+  "Вероятность концепции"
+  probability: Float
+  structure: ProjectStructureInput!
+}
+
+"Параметры распределения."
+input DistributionInput {
+  "Способ задания распределения"
+  definition: DistributionDefinitionTypes!
+  "Верхняя граница усечения"
+  maxBound: Float
+  "Нижняя граница усечения"
+  minBound: Float
+  "Параметры распределения"
+  parameters: [DistributionParameterInput]!
+  "Тип распределения"
+  type: DistributionTypes!
+}
+
+"Параметр способа задания распределения."
+input DistributionParameterInput {
+  "Тип параметра распределения"
+  type: DistributionParameterTypes!
+  value: Float!
+}
+
+input DomainObjectInput {
+  "Список значений атрибутов геологического объекта"
+  attributeValues: [AttributeValueInput!]!
+  "Иерархия геологического объекта в структуре проекта"
+  domainObjectPath: [DomainObjectPathLevelInput!]!
+  "Категория геологического объекта"
+  geoObjectCategory: GeoObjectCategories!
+  "Список рисков геологического объекта"
+  risksValues: [RiskValueInput!]!
+  "Отображения/Скрытие объекта в таблице"
+  visible: Boolean!
+}
+
+input DomainObjectPathLevelInput {
+  "Кодовое обозначение уровня иерархии геологического объекта"
+  code: String!
+  "Название уровня иерархии геологического объекта"
+  value: String
+}
+
+"Значение цены реализации относительно года."
+input NetbackPriceInput {
+  "Название"
+  name: String!
+  "Тип нэтбэка (ДНС или НДД)"
+  netbackType: String!
+  "Цены"
+  prices: [AverageAnnualPriceInput]!
+}
+
+input ProductInput {
+  "Название продукта"
+  name: String!
+  "Список связанных цен"
+  prices: [AverageAnnualPriceInput]!
+}
+
+input ProductTypeInput {
+  "Название вида продукции"
+  name: String!
+  "Цена реализации"
+  netback: NetbackPriceInput
+  "Список продукции"
+  products: [ProductInput]
+}
+
+input ProjectStructureInput {
+  "Список атрибутов структуры проекта"
+  attributes: [AttributeInput!]!
+  "Список доменных сущностей структуры проекта"
+  domainEntities: [RBDomainEntityInput!]!
+  "Список геологических объектов структуры проекта"
+  domainObjects: [DomainObjectInput!]!
+  "Список рисков структуры проекта"
+  risks: [RiskInput!]!
+}
+
+input RBDomainEntityInput {
+  "Кодовое обозначение доменной сущности геологического объекта"
+  code: String!
+  "Иконка доменной сущности геологического объекта"
+  icon: RBDomainEntityIcons!
+  "Имя доменной сущности геологического объекта"
+  name: String!
+  visible: VisibleInput!
+}
+
+input RBProjectInput {
+  "Список концепций проекта"
+  conceptions: [ConceptionInput!]!
+  "Версия шаблона структуры проекта"
+  version: String!
+}
+
+input RiskInput {
+  "Кодовое обозначение риска"
+  code: String!
+  "Наименование риска"
+  name: String!
+}
+
+input RiskValueInput {
+  "Кодовое обозначение риска"
+  code: String!
+  "Значение риска"
+  value: Float
+}
+
+input VisibleInput {
+  "Отображения/Скрытие уровня иерархии в расчетах"
+  calc: Boolean!
+  "Отображения/Скрытие уровня иерархии в таблице"
+  table: Boolean!
+  "Отображения/Скрытие уровня иерархии в дереве"
+  tree: Boolean!
+}
+
+
+"""
+The `DateTime` scalar type represents a DateTime
+value as specified by
+[iso8601](https://en.wikipedia.org/wiki/ISO_8601).
+"""
+scalar DateTime
+
+"""
+Leverages the internal Python implmeentation of UUID (uuid.UUID) to provide native UUID objects
+in fields, resolvers and input.
+"""
+scalar UUID
+
+scalar DictType
