@@ -1,27 +1,63 @@
-import React from 'react';
-import { Root } from '@gpn-prototypes/vega-ui';
-
-import { AppView } from './AppView';
-import { cnApp } from './cn-app';
+import React, { useState } from 'react';
+import { ApolloClient, NormalizedCacheObject } from '@apollo/client';
+import { Root, useMount } from '@gpn-prototypes/vega-ui';
+import classNames from 'classnames';
+import ErrorBoundary from '@app/components/ErrorBoundary';
+import { Providers } from '@app/components/Providers';
+import projectService from '@app/services/ProjectService';
+import { CurrentProject, Identity, ShellToolkit } from '@app/types';
 
 import './App.css';
+import RbResultPage from "@app/pages/RbResult/RbResultPage";
 
-import { Providers } from '@app/react-context';
-import {ShellToolkit} from "@app/types";
+const getInitProps = async ({
+                              currentProject,
+                              graphqlClient,
+                              identity,
+                            }: Partial<ShellToolkit>): Promise<Required<ShellToolkit>> =>
+  new Promise<ShellToolkit>((resolve) => {
+    if (currentProject && graphqlClient && identity)
+      resolve({ currentProject, identity, graphqlClient });
+  });
 
-
-export const App: React.FC<ShellToolkit> = (props) => {
+const App: React.FC<Partial<ShellToolkit>> = (props) => {
   const { graphqlClient, identity, currentProject } = props;
+  const [isLoading, setIsLoading] = useState(true);
+
+  useMount(() => {
+    const init = async () => {
+      try {
+        const initProps = await getInitProps(props);
+        projectService.init({
+          client: initProps.graphqlClient,
+          project: initProps.currentProject,
+          identity: initProps.identity,
+        });
+      } catch (e) {
+        throw Error('Service has been thrown error at initialized step');
+      }
+    };
+
+    init().finally(() => setIsLoading(false));
+  });
 
   return (
-    <Root
-      initialPortals={[{ name: 'modalRoot' }]}
-      defaultTheme="dark"
-      className={cnApp('App-Wrapper').toString()}
-    >
-      <Providers currentProject={currentProject} graphqlClient={graphqlClient} identity={identity}>
-        <AppView />
-      </Providers>
-    </Root>
+    <React.StrictMode>
+      <ErrorBoundary>
+        <Root defaultTheme="dark" className={classNames('RB-App-Wrapper')}>
+          <Providers
+            currentProject={currentProject as CurrentProject}
+            graphqlClient={graphqlClient as ApolloClient<NormalizedCacheObject>}
+            identity={identity as Identity}
+          >
+            <div className={classNames('RB-App')}>
+              {!isLoading && <RbResultPage />}
+            </div>
+          </Providers>
+        </Root>
+      </ErrorBoundary>
+    </React.StrictMode>
   );
 };
+
+export default App;

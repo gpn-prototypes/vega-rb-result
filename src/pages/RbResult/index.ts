@@ -1,3 +1,3 @@
-import ResultPage from './ResultPage';
+import RbResultPage from './RbResultPage';
 
-export default ResultPage;
+export default RbResultPage;
