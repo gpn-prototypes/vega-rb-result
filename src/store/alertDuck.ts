@@ -1,4 +1,4 @@
-import { ofAction } from 'operators/ofAction';
+import { ofAction } from '@app/operators/ofAction';
 import { Epic } from 'redux-observable';
 import { of } from 'rxjs';
 import { delay, mergeMap } from 'rxjs/operators';

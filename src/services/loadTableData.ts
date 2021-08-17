@@ -1,8 +1,8 @@
 import { Dispatch } from 'react';
-import { ProjectStructure } from 'generated/graphql';
-import projectService from 'services/ProjectService';
-import tableDuck from 'store/tableDuck';
-import { unpackTableData } from 'utils';
+import { ProjectStructure } from '@app/generated/graphql';
+import projectService from '@app/services/ProjectService';
+import tableDuck from '@app/store/tableDuck';
+import { unpackTableData } from '@app/utils';
 
 const initAction = (template: ProjectStructure, version: number) =>
   tableDuck.actions.initState(unpackTableData(template, version));

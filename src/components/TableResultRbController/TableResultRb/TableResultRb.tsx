@@ -34,7 +34,7 @@ const columns = [
   },
 ];
 
-const TableResultRb = () => {
+export const TableResultRb = () => {
   const [sortSetting, setSortSetting] = useState<SortByProps<any> | null>(null);
 
   const rows = data

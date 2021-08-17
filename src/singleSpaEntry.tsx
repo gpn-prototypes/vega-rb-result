@@ -4,7 +4,7 @@ import singleSpaReact from 'single-spa-react';
 
 import './set-public-path';
 
-import { App } from './App/App';
+import App from './App/App';
 
 const lifecycles = singleSpaReact({
   React,

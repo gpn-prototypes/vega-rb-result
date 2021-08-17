@@ -1,26 +1,12 @@
 import {
   ApolloClient,
-  FetchResult,
   NormalizedCacheObject,
 } from '@apollo/client';
-import { DistributionChartData } from 'components/DistributionSettings/types';
-import { GridCollection } from 'components/ExcelTable/types';
 import {
-  CommonError,
-  DistributionDefinitionError,
-  Error,
   ProjectStructure,
   RbProject,
-  ValidationError,
 } from '@app/generated/graphql';
 import { CurrentProject, Identity } from '@app/types';
-
-export interface DistributionResponse {
-  distributionChart?: DistributionChartData;
-  errors?: DistributionDefinitionError[];
-}
-
-export type DistributionError = DistributionDefinitionError | CommonError;
 
 export type ProjectServiceProps = {
   client: ApolloClient<NormalizedCacheObject>;
@@ -51,23 +37,15 @@ export interface IProjectService {
 
   version: number;
 
-  calculationSettings: CalculationSettings;
-
   init(initialProps: ProjectServiceProps): IProjectService;
 
   getStructure(): Promise<ProjectStructure>;
-
-  saveProject(table: GridCollection): Promise<FetchResult>;
 
   getTableTemplate(): Promise<ProjectStructure>;
 
   getCalculationArchive(fileId: string): Promise<CalculationResponse>;
 
   getCalculationSettings(): Promise<void>;
-
-  saveCalculationSettings(
-    data: CalculationSettings,
-  ): Promise<Error | ValidationError | null>;
 
   getProjectName(): Promise<string>;
 

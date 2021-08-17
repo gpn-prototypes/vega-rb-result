@@ -1,8 +1,8 @@
 import { combineEpics } from 'redux-observable';
-import alertDuck from 'store/alertDuck';
-import errorsDuck from 'store/errorsDuck';
-import projectDuck from 'store/projectDuck';
-import tableDuck from 'store/tableDuck';
+import alertDuck from '@app/store/alertDuck';
+import errorsDuck from '"@app/store/errorsDuck';
+import projectDuck from '@app/store/projectDuck';
+import tableDuck from '@app/store/tableDuck';
 
 export default combineEpics(
   ...Object.values(alertDuck.epics),

@@ -5,15 +5,12 @@ import {
 } from '@apollo/client';
 import { FetchPolicy } from '@apollo/client/core/watchQueryOptions';
 import { GET_RECENTLY_EDITED } from '@app/components/CompetitiveAccess/queries';
-import { GridCollection } from 'components/ExcelTable/types';
 import {
   CalculatedOrError,
-  DefaultPercentilesEnum,
   DistributionDefinitionError,
   DistributionInput,
   DistributionParameter,
   Error as CommonError,
-  MethodTypeEnum,
   Mutation,
   ProjectInner,
   ProjectStructure,
@@ -33,7 +30,6 @@ import {
 import {
   CachedProjectData,
   CalculationResponse,
-  CalculationSettings,
   DistributionResponse,
   IProjectService,
   ProjectServiceProps,
@@ -87,16 +83,6 @@ function throwError(message: string): never {
   throw new Error(`[RB/ProjectService]: ${message}`);
 }
 
-export const defaultCalculationSettings: CalculationSettings = {
-  method: MethodTypeEnum.MonteCarlo,
-  iterationNumber: 10000,
-  percentiles: [
-    DefaultPercentilesEnum.P90,
-    DefaultPercentilesEnum.P50,
-    DefaultPercentilesEnum.P10,
-  ],
-};
-
 class ProjectService implements IProjectService {
   #abortController: AbortController | undefined;
 
@@ -111,8 +97,6 @@ class ProjectService implements IProjectService {
   #projectShell: CurrentProject | undefined;
 
   #diffErrorTypename = 'UpdateProjectInnerDiff';
-
-  #calculationSettings: CalculationSettings = defaultCalculationSettings;
 
   get abortController(): AbortController {
     if (this.#abortController === undefined)
@@ -139,10 +123,6 @@ class ProjectService implements IProjectService {
 
   get project(): ConcurrentProject {
     return this.#project as ConcurrentProject;
-  }
-
-  get calculationSettings(): CalculationSettings {
-    return this.#calculationSettings;
   }
 
   static getDistributionValue({
@@ -196,33 +176,6 @@ class ProjectService implements IProjectService {
     }
 
     return structure;
-  }
-
-  async saveProject(table: GridCollection): Promise<FetchResult> {
-    const structure = await this.getStructure();
-    const currentStructure = packTableData(table, structure);
-    const CONCEPTION_NAME = 'conception_1';
-    this.#abortController = new AbortController();
-
-    return this.client.mutate<Mutation>({
-      mutation: SAVE_PROJECT,
-      context: {
-        uri: getGraphqlUri(this.projectId),
-        projectDiffResolving: await this.getDiffResolvingConfig(),
-        fetchOptions: {
-          signal: this.#abortController.signal,
-        },
-      },
-      variables: {
-        projectInput: wrapConception({
-          name: CONCEPTION_NAME,
-          description: '',
-          probability: 1,
-          structure: currentStructure,
-        }),
-        version: this.version,
-      },
-    });
   }
 
   async getTableTemplate(): Promise<ProjectStructure> {

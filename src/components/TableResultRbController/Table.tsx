@@ -1,25 +1,17 @@
 import React, { useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Loader, useMount } from '@gpn-prototypes/vega-ui';
-import { ExcelTable, RowsToUpdate } from 'components/ExcelTable';
-import { TableEntities } from 'components/ExcelTable/enums';
-import {
-  GridColumn,
-  GridRow,
-  OnRowClickArgs,
-  SelectedCell,
-} from 'components/ExcelTable/types';
 import { useGetError } from '@app/hooks';
 import { flow, set, uniq } from 'lodash/fp';
 import { loadTableData } from '@app/services/loadTableData';
 import tableDuck from '@app/store/tableDuck';
 import treeFilterDuck from '@app/store/treeDuck';
 import { RootState } from '@app/store/types';
-import { Nullable } from '@app/types';
 import { rowIsFulfilled } from '@app/utils/rowIsFullFilled';
+import {TableResultRb} from "@app/components/TableResultRbController/TableResultRb/TableResultRb";
 
 interface IProps {
-  onSelect?: (data: Nullable<SelectedCell>) => void;
+  onSelect?: (data: any) => void;
 }
 
 export const Table: React.FC<IProps> = ({ onSelect = (): void => {} }) => {
@@ -63,8 +55,8 @@ export const Table: React.FC<IProps> = ({ onSelect = (): void => {} }) => {
   ]);
 
   const getNewRows = (
-    rows: GridRow[],
-    updatedRows: GridRow[],
+    rows: any[],
+    updatedRows: any[],
     keys: string[],
     parentRowKey: string,
     isFilterActive: boolean,
@@ -77,7 +69,7 @@ export const Table: React.FC<IProps> = ({ onSelect = (): void => {} }) => {
       );
 
       const updateRowIdx = updatedRows.findIndex(
-        (updatedRow: GridRow) => updatedRow.key!.value === row.key!.value,
+        (updatedRow: any) => updatedRow.key!.value === row.key!.value,
       );
 
       if (updateRowIdx !== -1) {
@@ -93,8 +85,8 @@ export const Table: React.FC<IProps> = ({ onSelect = (): void => {} }) => {
   };
 
   const handleSetRows = (
-    data: GridRow[],
-    rowsToUpdate?: RowsToUpdate,
+    data: any[],
+    rowsToUpdate?: any,
   ): void => {
     const updatedRows = data.filter((value) =>
       rowsToUpdate?.rowsKeys?.includes(value.key!.value as string),
@@ -118,7 +110,7 @@ export const Table: React.FC<IProps> = ({ onSelect = (): void => {} }) => {
     if (isTreeFilterActive) {
       const ids = reduxTableData.rows.reduce<number[]>((prev, curr, idx) => {
         const item = updatedRows.find(
-          (updatedRow: GridRow) => updatedRow.id === curr.id,
+          (updatedRow: any) => updatedRow.id === curr.id,
         );
 
         if (item) {
@@ -137,11 +129,11 @@ export const Table: React.FC<IProps> = ({ onSelect = (): void => {} }) => {
     }
   };
 
-  const handleSetColumns = (data: GridColumn[]): void => {
+  const handleSetColumns = (data: any[]): void => {
     dispatch(tableDuck.actions.updateColumns(data));
   };
 
-  const handleRowClick = ({ rowIdx, row, column }: OnRowClickArgs): void => {
+  const handleRowClick = ({ rowIdx, row, column }: any): void => {
     if (column.type === TableEntities.CALC_PARAM) {
       onSelect({ rowIdx, row, column });
     } else {
@@ -161,7 +153,7 @@ export const Table: React.FC<IProps> = ({ onSelect = (): void => {} }) => {
   return isLoading ? (
     <Loader />
   ) : (
-    <ExcelTable
+    <TableResultRb
       data={reduxTableData}
       filteredDataKeys={filteredDataKeys}
       errors={errors}

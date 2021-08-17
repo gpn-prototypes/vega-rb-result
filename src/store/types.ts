@@ -1,9 +1,3 @@
-import { TableEntities } from 'components/ExcelTable/enums';
-import {
-  ColumnErrors,
-  GridCollection,
-  GridColumn,
-} from 'components/ExcelTable/types';
 import { Param } from '@app/model/Param';
 import { IProjectService } from '@app/services/types';
 
@@ -36,24 +30,24 @@ export interface NormalizedState<T> {
   };
 }
 
-export type ErrorsState = NormalizedState<ColumnErrors>;
+export type ErrorsState = NormalizedState<any>;
 
 export interface RootState {
   alert: AlertState;
   project: ProjectState;
-  table: GridCollection;
+  table: any;
   tree: TreeState;
   competitiveAccess: CompetitiveAccess;
   errors: ErrorsState;
 }
 
 export type TypedColumnsList = {
-  columns: GridColumn[];
-  type: TableEntities;
+  columns: any[];
+  type: any;
 };
 
 export type NormalizedErrors = {
-  errors: ColumnErrors;
+  errors: any;
   id: string;
 };
 

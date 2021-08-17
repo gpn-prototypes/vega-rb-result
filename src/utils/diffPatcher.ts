@@ -1,4 +1,4 @@
-import type { Config as DiffPatcherConfig } from 'jsondiffpatch';
+import { Config as DiffPatcherConfig } from 'jsondiffpatch';
 import * as jsonDiffPatch from 'jsondiffpatch';
 
 export const getDiffPatcher = (): jsonDiffPatch.DiffPatcher => {

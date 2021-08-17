@@ -11,6 +11,8 @@
     "jsx": "react",
     "target": "es5",
     "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
     "paths": {
       "@app/*": ["./src/*"]
     }
