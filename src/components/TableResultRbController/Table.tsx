@@ -9,9 +9,12 @@ import treeFilterDuck from '@app/store/treeDuck';
 import { RootState } from '@app/store/types';
 import { rowIsFulfilled } from '@app/utils/rowIsFullFilled';
 import {TableResultRb} from "@app/components/TableResultRbController/TableResultRb/TableResultRb";
+import {GridColumn, GridRow, OnRowClickArgs, RowsToUpdate, SelectedCell} from "@app/types/typesTable";
+import {TableEntities} from "@app/types/enumsTable";
+import {Nullable} from "@app/types";
 
 interface IProps {
-  onSelect?: (data: any) => void;
+  onSelect?: (data: Nullable<SelectedCell>) => void;
 }
 
 export const Table: React.FC<IProps> = ({ onSelect = (): void => {} }) => {
@@ -55,8 +58,8 @@ export const Table: React.FC<IProps> = ({ onSelect = (): void => {} }) => {
   ]);
 
   const getNewRows = (
-    rows: any[],
-    updatedRows: any[],
+    rows: GridRow[],
+    updatedRows: GridRow[],
     keys: string[],
     parentRowKey: string,
     isFilterActive: boolean,
@@ -69,14 +72,14 @@ export const Table: React.FC<IProps> = ({ onSelect = (): void => {} }) => {
       );
 
       const updateRowIdx = updatedRows.findIndex(
-        (updatedRow: any) => updatedRow.key!.value === row.key!.value,
+        (updatedRow: GridRow) => updatedRow.key!.value === row.key!.value,
       );
 
       if (updateRowIdx !== -1) {
         return isFilterActive && parentRowsIdx !== -1
           ? flow(
-              ...keys.map((key) => set([key], tableRows[parentRowsIdx][key])),
-            )(updatedRows[updateRowIdx])
+            ...keys.map((key) => set([key], tableRows[parentRowsIdx][key])),
+          )(updatedRows[updateRowIdx])
           : updatedRows[updateRowIdx];
       }
 
@@ -85,8 +88,8 @@ export const Table: React.FC<IProps> = ({ onSelect = (): void => {} }) => {
   };
 
   const handleSetRows = (
-    data: any[],
-    rowsToUpdate?: any,
+    data: GridRow[],
+    rowsToUpdate?: RowsToUpdate,
   ): void => {
     const updatedRows = data.filter((value) =>
       rowsToUpdate?.rowsKeys?.includes(value.key!.value as string),
@@ -110,7 +113,7 @@ export const Table: React.FC<IProps> = ({ onSelect = (): void => {} }) => {
     if (isTreeFilterActive) {
       const ids = reduxTableData.rows.reduce<number[]>((prev, curr, idx) => {
         const item = updatedRows.find(
-          (updatedRow: any) => updatedRow.id === curr.id,
+          (updatedRow: GridRow) => updatedRow.id === curr.id,
         );
 
         if (item) {
@@ -129,11 +132,11 @@ export const Table: React.FC<IProps> = ({ onSelect = (): void => {} }) => {
     }
   };
 
-  const handleSetColumns = (data: any[]): void => {
+  const handleSetColumns = (data: GridColumn[]): void => {
     dispatch(tableDuck.actions.updateColumns(data));
   };
 
-  const handleRowClick = ({ rowIdx, row, column }: any): void => {
+  const handleRowClick = ({ rowIdx, row, column }: OnRowClickArgs): void => {
     if (column.type === TableEntities.CALC_PARAM) {
       onSelect({ rowIdx, row, column });
     } else {

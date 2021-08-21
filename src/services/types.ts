@@ -14,14 +14,6 @@ export type ProjectServiceProps = {
   identity?: Identity;
 };
 
-export type CalculationResponse = { filename: string; data: Blob };
-
-export type CalculationSettings = {
-  method: string | null;
-  iterationNumber: number | null;
-  percentiles: string[] | null;
-};
-
 export type CachedProjectData = {
   version: number;
   structure: ProjectStructure;
@@ -40,12 +32,6 @@ export interface IProjectService {
   init(initialProps: ProjectServiceProps): IProjectService;
 
   getStructure(): Promise<ProjectStructure>;
-
-  getTableTemplate(): Promise<ProjectStructure>;
-
-  getCalculationArchive(fileId: string): Promise<CalculationResponse>;
-
-  getCalculationSettings(): Promise<void>;
 
   getProjectName(): Promise<string>;
 

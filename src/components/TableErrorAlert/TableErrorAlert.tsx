@@ -1,14 +1,14 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Item } from '@consta/uikit/SnackBar';
 import { IconAlert, SnackBar } from '@gpn-prototypes/vega-ui';
-import { ErrorWrapper } from '@app/components/ExcelTable/types';
 import { RbErrorCodes } from '@app/generated/graphql';
 import useGetError from '@app/hooks/useGetError';
 import { defaultTo, get } from 'lodash/fp';
-
+import {ErrorWrapper} from "@app/types/typesTable";
 import { cnTableErrorAlert } from './cn-table-error-alert';
 
 import './TableErrorAlert.css';
+
 
 const errorMessages = {
   [RbErrorCodes.DuplicatingColumns]:

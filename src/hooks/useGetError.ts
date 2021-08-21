@@ -1,10 +1,10 @@
 import { useContext, useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { ColumnErrors } from 'components/ExcelTable/types';
-import { ProjectContext } from 'components/Providers';
-import { TableError } from 'generated/graphql';
+import { ProjectContext } from '@app/components/Providers';
+import { TableError } from '@app/generated/graphql';
 import { get, getOr } from 'lodash/fp';
-import { RootState } from 'store/types';
+import { RootState } from '@app/store/types';
+import {ColumnErrors} from "@app/types/typesTable";
 
 type PropertyPath = string | (string | number)[];
 

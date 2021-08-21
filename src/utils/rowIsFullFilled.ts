@@ -1,6 +1,6 @@
-import { TableEntities } from 'components/ExcelTable/enums';
-import { GridColumn, GridRow } from 'components/ExcelTable/types';
 import { filter, flow, map, some } from 'lodash/fp';
+import {GridColumn, GridRow} from "@app/types/typesTable";
+import {TableEntities} from "@app/types/enumsTable";
 
 export const rowIsFulfilled = (
   row: GridRow,

@@ -135,60 +135,6 @@ export const LOAD_PROJECT = gql`
   ${ResourceBaseProjectFragment}
 `;
 
-export const SAVE_PROJECT = gql`
-  mutation SaveProject($projectInput: RBProjectInput!, $version: Int!) {
-    project(version: $version) {
-      ... on Error {
-        code
-        details
-        message
-        payload
-      }
-      ... on UpdateProjectInnerDiff {
-        ...ResourceBaseDiffFragment
-      }
-      ... on ProjectMutation {
-        resourceBase {
-          saveProject(projectInput: $projectInput) {
-            ... on TableErrors {
-              errors {
-                code
-                message
-                tableName
-                columnKey
-                row
-              }
-            }
-            ... on DistributionDefinitionErrors {
-              errors {
-                code
-                message
-                fields
-              }
-            }
-            ... on Error {
-              code
-              details
-              message
-              payload
-            }
-            ... on ErrorInterface {
-              code
-              details
-              message
-              payload
-            }
-          }
-        }
-      }
-    }
-    version
-    __typename
-  }
-
-  ${ResourceBaseDiffFragment}
-`;
-
 export const GET_TABLE_TEMPLATE = gql`
   query GetTemplate {
     project {

@@ -1,7 +1,8 @@
 import { useSelector } from 'react-redux';
-import { GridColumn } from 'components/ExcelTable/types';
-import { RootState } from 'store/types';
-import { NoopFunction } from 'types';
+
+import { RootState } from '@app/store/types';
+import { NoopFunction } from '@app/types';
+import {GridColumn} from "@app/types/typesTable";
 
 export default function useValidateByColumns<R>(
   validator: NoopFunction<GridColumn[], R>,

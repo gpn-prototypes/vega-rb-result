@@ -1,6 +1,6 @@
 import * as E from 'fp-ts/lib/Either';
 import { PathReporter } from 'io-ts/lib/PathReporter';
-import paramsResponse from 'mocks/params.json';
+import paramsResponse from '@app/mocks/params.json';
 import { Param, ParamArray } from '@app/model/Param';
 import { ProjectID } from '@app/model/Project';
 import { ofAction } from '@app/operators/ofAction';

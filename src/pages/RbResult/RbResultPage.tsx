@@ -15,7 +15,7 @@ import { TableErrorAlert } from '@app/components/TableErrorAlert';
 import projectService from '@app/services/ProjectService';
 import competitiveAccessDuck from '@app/store/competitiveAccessDuck';
 import projectDuck from '@app/store/projectDuck';
-import tableDuck from 'store/tableDuck';
+import tableDuck from '@app/store/tableDuck';
 import { RootState } from '@app/store/types';
 import { Nullable } from '@app/types';
 

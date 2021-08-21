@@ -1,20 +1,42 @@
+//{
+//  "extends": "@gpn-prototypes/frontend-configs/tsconfig",
+//  "shouldExtractLiteralValuesFromEnum": true,
+//  "files": [
+//    "./src/types/assets.d.ts"
+//  ],
+//  "include": ["src/**/*.ts", "src/**/*.tsx"],
+//  "exclude": ["node_modules", "**/dist/**/*"],
+//  "compilerOptions": {
+//    "baseUrl": "./",
+//    "jsx": "react",
+//    "target": "ES2020",
+//    "allowJs": true,
+//    "moduleResolution": "node",
+//    "allowSyntheticDefaultImports": true,
+//    "esModuleInterop": true,
+//    "paths": {
+//      "@app/*": ["./src/*"]
+//    }
+//  }
+//}
 {
   "extends": "@gpn-prototypes/frontend-configs/tsconfig",
-  "shouldExtractLiteralValuesFromEnum": true,
-  "files": [
-    "./src/types/assets.d.ts"
-  ],
-  "include": ["src/**/*.ts", "src/**/*.tsx"],
-  "exclude": ["node_modules", "**/dist/**/*"],
   "compilerOptions": {
-    "baseUrl": "./",
     "jsx": "react",
-    "target": "es5",
+    "target": "ES2020",
+    "allowJs": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
+    "noEmit": true,
+    "baseUrl": "./",
+    "noImplicitAny": false, //TODO delete - need to refactorß
     "paths": {
       "@app/*": ["./src/*"]
     }
-  }
+  },
+  "include": ["src"]
 }

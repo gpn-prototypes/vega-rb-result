@@ -4,8 +4,8 @@ import { Text, Tree } from '@gpn-prototypes/vega-ui';
 import { Resource as ResourceIcon } from 'assets/icons/components';
 import { GridColumn, GridRow, TableEntities } from 'components/ExcelTable';
 
-import treeFilterDuck from 'store/treeDuck';
-import { RootState } from 'store/types';
+import treeFilterDuck from '@app/store/treeDuck';
+import { RootState } from '@app/store/types';
 
 import './TreeEditor.css';
 import {getNodeListFromTableData, searchInTree} from "@app/components/TreeEditor/helpers";

@@ -1,10 +1,4 @@
-import { TableEntities } from 'components/ExcelTable/enums';
 import GridColumnEntity from 'components/ExcelTable/Models/GridColumnEntity';
-import {
-  GridCollection,
-  GridColumn,
-  GridRow,
-} from 'components/ExcelTable/types';
 import {
   ProjectStructure,
   ProjectStructureInput,
@@ -15,6 +9,8 @@ import { CalculationParam, GeoCategory, Risk, TableStructures } from '@app/types
 
 import { omitTypename } from './omitTypename';
 import { constructRows } from './unpackingData';
+import {GridCollection, GridColumn, GridRow} from "@app/types/typesTable";
+import {TableEntities} from "@app/types/enumsTable";
 
 const getCalculationColumn = (
   prev: GridColumn[],

@@ -1,22 +1,14 @@
-import {
-  GridCell,
-  GridCollection,
-  GridColumn,
-  GridRow,
-} from 'components/ExcelTable/types';
 import { cloneDeep, isEqual, set } from 'lodash/fp';
 import { ofAction } from '@app/operators/ofAction';
 import { Epic } from 'redux-observable';
-import { Observable, of } from 'rxjs';
-import { catchError, debounceTime, map, switchMap } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 import actionCreatorFactory, { AnyAction } from 'typescript-fsa';
 import { reducerWithInitialState } from 'typescript-fsa-reducers';
-import { packTableData, unpackTableData } from 'utils';
-import { getDiffPatcher } from '@app/utils/diffPatcher';
 import { getRowId } from '@app/utils/getRowId';
 
 import errorsDuck from './errorsDuck';
-import { EpicDependencies, RootState, TypedColumnsList } from './types';
+import { RootState, TypedColumnsList } from './types';
+import {GridCell, GridCollection, GridColumn, GridRow} from "@app/types/typesTable";
 
 const factory = actionCreatorFactory('table');
 
@@ -84,92 +76,6 @@ const reducer = reducerWithInitialState<GridCollection>(initialState)
 
     return set(['rows', rowIdx, columnKey], cellData, state);
   });
-
-const diffPatcher = getDiffPatcher();
-
-export const saveToStorageEpic: Epic<
-  AnyAction,
-  AnyAction,
-  RootState,
-  EpicDependencies
-> = (action$, state$, { projectService }) =>
-  action$.pipe(
-    ofAction(
-      actions.updateColumns,
-      actions.updateRows,
-      actions.updateCell,
-      actions.updateColumnsByType,
-    ),
-    debounceTime(1500),
-    switchMap(() => {
-      const saveProject$ = new Observable<AnyAction>((observer) => {
-        const localTableState = {
-          ...JSON.parse(JSON.stringify(state$.value.table)),
-          version: projectService.version,
-        };
-        if (!isEqual(localTableState, initialState)) {
-          projectService
-            .saveProject(localTableState)
-            .then(async () => {
-              const {
-                structure: cachedData,
-              } = await projectService.getCachedRbData();
-
-              if (cachedData) {
-                const structure = await projectService.getStructure();
-                const localData = packTableData(localTableState, structure);
-                const currentData = packTableData(
-                  state$.value.table,
-                  structure,
-                );
-                const diff = diffPatcher.diff(cachedData, localData);
-                if (diff) {
-                  const localChanges = diffPatcher.diff(localData, currentData);
-                  if (localChanges) {
-                    const updatedData = diffPatcher.patch(
-                      cloneDeep(cachedData),
-                      localChanges,
-                    );
-                    observer.next(
-                      actions.initState(
-                        unpackTableData(updatedData, projectService.version),
-                      ),
-                    );
-                  } else {
-                    observer.next(
-                      actions.initState(
-                        unpackTableData(cachedData, projectService.version),
-                      ),
-                    );
-                  }
-                }
-              }
-              observer.complete();
-            })
-            .catch((error) => observer.error(error));
-        }
-
-        return function unsubscribe() {
-          projectService.abortController.abort();
-        };
-      });
-
-      return saveProject$.pipe(
-        catchError((error) => {
-          // eslint-disable-next-line no-console
-          console.error(
-            'Critical exception by saving project to the server',
-            error,
-          );
-          return of({
-            type: actions.exceptionThrew.type,
-            payload: error.xhr?.response,
-            error: true,
-          });
-        }),
-      );
-    }),
-  );
 
 export const updateCell: Epic<AnyAction, AnyAction, RootState> = (
   action$,

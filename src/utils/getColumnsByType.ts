@@ -1,5 +1,5 @@
-import { TableEntities } from 'components/ExcelTable/enums';
-import { GridColumn } from 'components/ExcelTable/types';
+import {GridColumn} from "@app/types/typesTable";
+import {TableEntities} from "@app/types/enumsTable";
 
 export const getColumnsByType = (
   list: GridColumn[],

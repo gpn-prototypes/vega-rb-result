@@ -1,12 +1,12 @@
 import { TreeItem } from '@gpn-prototypes/vega-ui';
 import arrayToTree from 'array-to-tree';
-import { TableEntities } from 'components/ExcelTable/enums';
-import { GridColumn, GridRow } from 'components/ExcelTable/types';
 import { get, groupBy, mergeWith } from 'lodash/fp';
-import { getRowId } from 'utils/getRowId';
+import { getRowId } from '@app/utils/getRowId';
 import { v4 as uuid } from 'uuid';
 
 import { CellPosition, TreeItemData } from './types';
+import {GridColumn, GridRow} from "@app/types/typesTable";
+import {TableEntities} from "@app/types/enumsTable";
 
 const getTreeNodeItem = (
   row: GridRow,

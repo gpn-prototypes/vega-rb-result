@@ -1,15 +1,15 @@
 import { useContext } from 'react';
 import { useDispatch } from 'react-redux';
-import { ColumnErrors, GridColumn } from 'components/ExcelTable/types';
-import { getSameColumnKeys } from 'components/ExcelTable/utils';
-import { ProjectContext } from 'components/Providers/ProjectProvider';
-import { RbErrorCodes } from 'generated/graphql';
+import { getSameColumnKeys } from '@app/components/ExcelTable/utils';
+import { ProjectContext } from '@app/components/Providers/ProjectProvider';
+import { RbErrorCodes } from '@app/generated/graphql';
 import { unset } from 'lodash/fp';
-import errorsDuck from 'store/errorsDuck';
-import { NormalizedErrors } from 'store/types';
+import errorsDuck from '@app/store/errorsDuck';
+import { NormalizedErrors } from '@app/store/types';
 import { Action } from 'typescript-fsa';
 
 import useGetError from './useGetError';
+import {ColumnErrors, GridColumn} from "@app/types/typesTable";
 
 type UseUpdateErrors = (
   column: GridColumn,
