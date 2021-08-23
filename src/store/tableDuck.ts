@@ -1,4 +1,4 @@
-import { cloneDeep, isEqual, set } from 'lodash/fp';
+import { set } from 'lodash/fp';
 import { ofAction } from '@app/operators/ofAction';
 import { Epic } from 'redux-observable';
 import { map } from 'rxjs/operators';
@@ -97,5 +97,5 @@ export const updateCell: Epic<AnyAction, AnyAction, RootState> = (
 export default {
   reducer,
   actions,
-  epics: [saveToStorageEpic, updateCell],
+  epics: [updateCell],
 };

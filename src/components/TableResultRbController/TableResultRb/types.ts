@@ -1,4 +1,7 @@
-type Column = {
+class FieldValue {
+}
+
+export type Column = {
   title: React.ReactNode;
   accessor: string;
   align?: 'left';
@@ -12,18 +15,18 @@ type Column = {
   renderCell?: (row: Row) => React.ReactNode;
 };
 
-type Row = {
+export type Row = {
   [key: string]: FieldValue;
   id: string;
 };
 
-type FilterComponentProps = {
+export type FilterComponentProps = {
   onConfirm: (value: any) => void;
   onCancel: () => void;
   filterValue?: any
 } & Record<string, unknown>;
 
-type Filter = {
+export type Filter = {
   id: string;
   name: string;
   field: string;
@@ -35,8 +38,8 @@ type Filter = {
   }
 });
 
-type OnRowHover = ({ id, e }: { id: string | undefined; e: React.MouseEvent }) => void;
-
-type LazyLoad = { maxVisibleRows?: number; scrollableEl?: HTMLDivElement / Window; }
+// type OnRowHover = ({ id, e }: { id: string | undefined; e: React.MouseEvent }) => void;
+//
+// type LazyLoad = { maxVisibleRows?: number; scrollableEl?: HTMLDivElement / Window; }
 // maxVisibleRows - количество строк
 // scrollableEl - элемент с onScroll listener

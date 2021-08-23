@@ -33,9 +33,9 @@ export interface IProjectService {
 
   getStructure(): Promise<ProjectStructure>;
 
+  getTableTemplate(): Promise<ProjectStructure>;
+
   getProjectName(): Promise<string>;
 
   getResourceBaseData(): Promise<RbProject>;
-
-  getCachedRbData(): Promise<CachedProjectData>;
 }

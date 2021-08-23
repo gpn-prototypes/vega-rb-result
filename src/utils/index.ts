@@ -1,4 +1,3 @@
-import { assembleErrors } from './assembleErrors';
 import { mockTableRows } from './fakerGenerators';
 import { isCalculationParam, isTemplateCategory } from './guards';
 import { isEmpty } from './isEmpty';
@@ -14,7 +13,6 @@ export {
   isTemplateCategory,
   noop,
   isEmpty,
-  assembleErrors,
   roundTo,
   omitTypename,
 };

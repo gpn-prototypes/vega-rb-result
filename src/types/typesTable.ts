@@ -65,6 +65,8 @@ export interface GridRow {
 }
 
 export interface GridColumn extends Column<GridRow> {
+  key: string;
+  name?: string;
   type?: TableEntities;
   code?: string;
   decimalPlace?: number;
