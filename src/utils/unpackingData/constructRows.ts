@@ -1,4 +1,3 @@
-import { entitiesOptions } from 'components/ExcelTable/utils/getEditor';
 import {
   DomainObject,
   DomainObjectPathLevel,
@@ -11,7 +10,7 @@ import { SpecialColumns } from '@app/model/Table';
 import { v4 as uuid } from 'uuid';
 
 import { collectValues, collectValuesWithDistribution } from './collectors';
-import {GridRow} from "@app/types/typesTable";
+import {entitiesOptions, GridRow} from "@app/types/typesTable";
 
 function generateEmptyRows(count: number): Array<GridRow> {
   const getOrderNumber = (index: number) => {

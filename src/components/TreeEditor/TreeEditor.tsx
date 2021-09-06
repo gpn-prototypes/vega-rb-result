@@ -1,8 +1,7 @@
 import React, { PropsWithChildren, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Text, Tree } from '@gpn-prototypes/vega-ui';
-import { Resource as ResourceIcon } from 'assets/icons/components';
-import { GridColumn, GridRow, TableEntities } from 'components/ExcelTable';
+import { Resource as ResourceIcon } from '@app/assets/icons/components';
 
 import treeFilterDuck from '@app/store/treeDuck';
 import { RootState } from '@app/store/types';
@@ -12,6 +11,8 @@ import {getNodeListFromTableData, searchInTree} from "@app/components/TreeEditor
 import {TargetData} from "@app/components/TreeEditor/types";
 import {cnTreeEditor} from "@app/components/TreeEditor/cn-tree-editor";
 import {getColumnsByType} from "@app/utils/getColumnsByType";
+import {GridColumn, GridRow} from "@app/types/typesTable";
+import {TableEntities} from "@app/types/enumsTable";
 
 const icons = {
   'blue-line': <ResourceIcon color="#00eeaa" />,

@@ -1,6 +1,5 @@
 import { useContext } from 'react';
 import { useDispatch } from 'react-redux';
-import { getSameColumnKeys } from '@app/components/ExcelTable/utils';
 import { ProjectContext } from '@app/components/Providers/ProjectProvider';
 import { RbErrorCodes } from '@app/generated/graphql';
 import { unset } from 'lodash/fp';
@@ -10,6 +9,7 @@ import { Action } from 'typescript-fsa';
 
 import useGetError from './useGetError';
 import {ColumnErrors, GridColumn} from "@app/types/typesTable";
+import {getSameColumnKeys} from "@app/utils/getSameColumnKeys";
 
 type UseUpdateErrors = (
   column: GridColumn,

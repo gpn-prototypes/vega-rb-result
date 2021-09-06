@@ -3,19 +3,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
   SplitPanes,
   useInterval,
-  useSidebar,
 } from '@gpn-prototypes/vega-ui';
-import {
-  CategoryIcon,
-  GridColumn,
-  SelectedCell,
-  TableEntities,
-} from 'components/ExcelTable';
 import { TableErrorAlert } from '@app/components/TableErrorAlert';
 import projectService from '@app/services/ProjectService';
 import competitiveAccessDuck from '@app/store/competitiveAccessDuck';
 import projectDuck from '@app/store/projectDuck';
-import tableDuck from '@app/store/tableDuck';
+//import tableDuck from '@app/store/tableDuck';
 import { RootState } from '@app/store/types';
 import { Nullable } from '@app/types';
 
@@ -26,7 +19,7 @@ import style from './RbResultPage.css';
 
 const RbResultPage: React.FC = () => {
   const dispatch = useDispatch();
-  const [selectedCell, setSelectedCell] = useState<Nullable<SelectedCell>>(
+  const [setSelectedCell] = useState<Nullable<any>>(
     null,
   );
   const treeEditorRef = useRef<HTMLDivElement>(null);
@@ -43,16 +36,6 @@ const RbResultPage: React.FC = () => {
   const isRecentlyEdited = useSelector(
     ({ competitiveAccess }: RootState) => competitiveAccess.isRecentlyEdited,
   );
-
-  const {
-    state: { isOpen },
-    close: handleClose,
-    open: handleOpen,
-  } = useSidebar({
-    isOpen: false,
-    isMinimized: false,
-  });
-
 
   useEffect(() => {
     projectService

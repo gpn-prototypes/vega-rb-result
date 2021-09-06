@@ -17,6 +17,75 @@ import {
 } from '@app/generated/graphql';
 import {CategoryIcon, TableEntities, VisibleKeys} from "@app/types/enumsTable";
 
+export class OptionEntity implements DropDownOption {
+  private readonly _id: GeoObjectCategories;
+
+  private readonly _value: GeoObjectCategories;
+
+  text: string;
+
+  constructor(id: GeoObjectCategories, text: string) {
+    this._id = id;
+    this._value = id;
+    this.text = text;
+  }
+
+  get id(): GeoObjectCategories {
+    return this._id;
+  }
+
+  get value(): GeoObjectCategories {
+    return this._value;
+  }
+
+  toString(): string {
+    return this.text;
+  }
+}
+
+export const entitiesOptions = {
+  RESOURCE: new OptionEntity(GeoObjectCategories.Resources, 'Ресурсы'),
+  RESERVES: new OptionEntity(GeoObjectCategories.Reserves, 'Запасы'),
+};
+
+interface EditorOptions {
+  editOnClick: boolean;
+}
+
+export class GridColumnEntity implements GridColumn {
+  readonly key: string;
+
+  name: string;
+
+  type: TableEntities;
+
+  decimalPlace: number | undefined;
+
+  visible: VisibilityProperties;
+
+  editorOptions: EditorOptions | undefined;
+
+  constructor(
+    key: string,
+    name = '',
+    type: TableEntities = TableEntities.NONE,
+    visible = {
+      calc: true,
+      table: true,
+      tree: true,
+    },
+    decimalPlace?: number,
+    editorOptions?: EditorOptions,
+  ) {
+    this.key = key;
+    this.name = name;
+    this.type = type;
+    this.visible = visible;
+    this.decimalPlace = decimalPlace;
+    this.editorOptions = editorOptions;
+  }
+}
+
 export type ErrorWrapper = { [index: string]: TableError };
 
 export type ColumnErrors = { [index: string]: ErrorWrapper };
