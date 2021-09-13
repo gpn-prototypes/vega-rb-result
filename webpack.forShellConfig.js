@@ -2,6 +2,7 @@ const webpackMerge = require('webpack-merge');
 const singleSpaDefaults = require('webpack-config-single-spa-react-ts');
 const ImportMapPlugin = require('webpack-import-map-plugin');
 const { getAppConfig } = require('./app-config');
+const path = require('path');
 
 const { projectName } = getAppConfig();
 
@@ -33,7 +34,19 @@ module.exports = (webpackConfigEnv) => {
             },
           ],
         },
+        {
+          test: /\.svg$/,
+          use: [
+            '@svgr/webpack',
+            'url-loader'
+          ]
+        }
       ],
+    },
+    resolve: {
+      alias: {
+        '@app': path.resolve(__dirname, 'src'),
+      }
     },
     plugins: [
       new ImportMapPlugin({
