@@ -44,13 +44,13 @@ const App: React.FC<Partial<ShellToolkit>> = (props) => {
   return (
     <React.StrictMode>
       <ErrorBoundary>
-        <Root defaultTheme="dark" className={classNames('RB-App-Wrapper')}>
+        <Root defaultTheme="dark" className={classNames('RB-Result-App-Wrapper')}>
           <Providers
             currentProject={currentProject as CurrentProject}
             graphqlClient={graphqlClient as ApolloClient<NormalizedCacheObject>}
             identity={identity as Identity}
           >
-            <div className={classNames('RB-App')}>
+            <div className={classNames('RB-Result-App')}>
               {!isLoading && <RbResultPage />}
             </div>
           </Providers>
