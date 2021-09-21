@@ -211,6 +211,7 @@ class ProjectService implements IProjectService {
       const isTemplateProject = Boolean(
         data.project.resourceBase?.project?.template,
       );
+      // @ts-ignore TODO - refactor after work with data
       this.projectMod = isTemplateProject
         ? {
             ...data.project,

@@ -1,29 +1,9 @@
-//{
-//  "extends": "@gpn-prototypes/frontend-configs/tsconfig",
-//  "shouldExtractLiteralValuesFromEnum": true,
-//  "files": [
-//    "./src/types/assets.d.ts"
-//  ],
-//  "include": ["src/**/*.ts", "src/**/*.tsx"],
-//  "exclude": ["node_modules", "**/dist/**/*"],
-//  "compilerOptions": {
-//    "baseUrl": "./",
-//    "jsx": "react",
-//    "target": "ES2020",
-//    "allowJs": true,
-//    "moduleResolution": "node",
-//    "allowSyntheticDefaultImports": true,
-//    "esModuleInterop": true,
-//    "paths": {
-//      "@app/*": ["./src/*"]
-//    }
-//  }
-//}
 {
   "extends": "@gpn-prototypes/frontend-configs/tsconfig",
+  //  "include": ["src"]
   "compilerOptions": {
     "jsx": "react",
-    "target": "ES2020",
+    "target": "ES2018",
     "allowJs": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
@@ -31,7 +11,7 @@
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
-    "noEmit": true,
+    "noEmit": false,
     "baseUrl": "./",
     "noImplicitAny": false, //TODO delete - need to refactorß
     "paths": {
