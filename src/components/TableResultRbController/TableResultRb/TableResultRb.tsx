@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Table, SortByProps } from '@consta/uikit/Table';
+import {Table} from "@consta/uikit/Table";
+import {SortByProps} from "@consta/uikit/__internal__/cjs-src/components/Table/filtering";
 
 //TODO REFACTOR & REASEARCH consta Table
 const data = [

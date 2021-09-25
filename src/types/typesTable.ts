@@ -1,4 +1,5 @@
 import React, { ComponentType, ReactText } from 'react';
+//TODO delete react-data-grid (copy from rb, used as sample)
 import {
   CalculatedColumn,
   CellRendererProps,

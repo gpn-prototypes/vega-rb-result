@@ -35,8 +35,9 @@
   },
   "dependencies": {
     "@apollo/client": "^3.3.11",
-    "@consta/uikit": "^3.4.0",
-    "@gpn-prototypes/vega-ui": "3.1.11",
+    "//": "@consta/uikit: ^3.4.0 TODO самая свежая version несовместима с текущей vega-ui (3.3.1)",
+    "@consta/uikit": "1.11.12",
+    "@gpn-prototypes/vega-ui": "3.3.1",
     "@graphql-codegen/cli": "1.16.3",
     "@graphql-codegen/introspection": "1.16.3",
     "@graphql-codegen/typescript": "^1.16.3",
