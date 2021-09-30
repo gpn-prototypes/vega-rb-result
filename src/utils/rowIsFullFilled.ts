@@ -1,15 +1,15 @@
 import { filter, flow, map, some } from 'lodash/fp';
-import {GridColumn, GridRow} from "@app/types/typesTable";
-import {TableEntities} from "@app/types/enumsTable";
+import { TableEntities } from "@app/types/enumsTable";
+import { Column, Row } from '@app/components/TableResultRbController/TableResultRb/types';
 
-export const rowIsFulfilled = (
-  row: GridRow,
-  columns: GridColumn[],
+export const rowIsFulfilled = <T = any>(
+  row: Row<T>,
+  columns: Column<Row>[],
   tableEntity: TableEntities = TableEntities.GEO_CATEGORY,
 ): boolean =>
   flow(
     filter(({ type }) => type === tableEntity),
-    map(({ key, name }: GridColumn) => ({
+    map(({ key, name }: Column<Row>) => ({
       key,
       name,
     })),

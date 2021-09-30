@@ -4,25 +4,17 @@ import {
   GeoObjectCategories,
   ProjectStructure,
   RbDomainEntity,
-  RiskValue,
 } from '@app/generated/graphql';
 import { SpecialColumns } from '@app/model/Table';
 import { v4 as uuid } from 'uuid';
 
-import { collectValues, collectValuesWithDistribution } from './collectors';
-import {entitiesOptions, GridRow} from "@app/types/typesTable";
+import { entitiesOptions } from '@app/types/typesTable';
+import { Row } from '../../components/TableResultRbController/TableResultRb/types';
 
-function generateEmptyRows(count: number): Array<GridRow> {
-  const getOrderNumber = (index: number) => {
-    return count === 2 ? index + 1 : Math.abs(count - 2 - index - 1);
-  };
-
-  return Array.from({ length: count }, (val, index) => ({
-    id: {
-      value: getOrderNumber(index),
-    },
-    key: { value: uuid() },
-  }));
+interface DefaultRows {
+  id: string;
+  key: string;
+  // [geoCategory: SpecialColumns]: OptionEntity;
 }
 
 function getGeoObjectCategoryValue(category: GeoObjectCategories) {
@@ -34,50 +26,44 @@ function getGeoObjectCategoryValue(category: GeoObjectCategories) {
 function prepareRows(
   domainEntities: RbDomainEntity[],
   domainObjects: DomainObject[],
-): GridRow[] {
+): Row<DefaultRows>[] {
   return domainObjects.map(
     (
       {
         vid,
         domainObjectPath,
         geoObjectCategory,
-        attributeValues,
-        risksValues,
       },
       idx,
     ) => {
-      const id = { value: idx + 1 };
-      const key = { value: vid || uuid() };
+      const id = (idx + 1).toString();
+      const key = vid || uuid();
       const geoObjectCategoryValue = getGeoObjectCategoryValue(
         geoObjectCategory,
       );
-      const domainEntitiesList = collectValues<DomainObjectPathLevel>(
-        domainObjectPath,
-      );
-      const attributesList = collectValuesWithDistribution(attributeValues);
-      const risksList = collectValues<RiskValue>(risksValues);
+
+      const domainEntitiesRows = {}
+
+      domainObjectPath.forEach((path: DomainObjectPathLevel) => {
+        domainEntitiesRows[path.code] = path.value;
+      });
 
       return {
         id,
         key,
         [SpecialColumns.GEO_CATEGORY]: geoObjectCategoryValue,
-        ...domainEntitiesList,
-        ...attributesList,
-        ...risksList,
+        ...domainEntitiesRows,
       };
     },
   );
 }
 
-function constructRows({
+function constructRows<T = any>({
   domainEntities = [],
   domainObjects = [],
-}: ProjectStructure): GridRow[] {
-  const rowsCount = 2 - domainObjects.length;
-
+}: ProjectStructure): Row<any>[] {
   return [
     ...prepareRows(domainEntities, domainObjects),
-    ...generateEmptyRows(rowsCount),
   ];
 }
 

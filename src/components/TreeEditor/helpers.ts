@@ -1,18 +1,17 @@
 import { TreeItem } from '@gpn-prototypes/vega-ui';
 import arrayToTree from 'array-to-tree';
-import { get, groupBy, mergeWith } from 'lodash/fp';
-import { getRowId } from '@app/utils/getRowId';
+import { get, mergeWith, groupBy } from 'lodash/fp';
 import { v4 as uuid } from 'uuid';
-
+import { Column, Row } from '../TableResultRbController/TableResultRb/types';
 import { CellPosition, TreeItemData } from './types';
-import {GridColumn, GridRow} from "@app/types/typesTable";
-import {TableEntities} from "@app/types/enumsTable";
+import { TableEntities } from "@app/types/enumsTable";
+import { getRowId } from '@app/utils/getRowId';
 
-const getTreeNodeItem = (
-  row: GridRow,
+const getTreeNodeItem = <T = any>(
+  row: Row<T>,
   rowIdx: number,
-  columnKey: string,
   columnIdx: number,
+  columnKey?: string,
   nodes?: TreeItem<TreeItemData>[],
 ): TreeItem<TreeItemData> => {
   const isRoot = columnIdx === 0;
@@ -34,7 +33,7 @@ const getTreeNodeItem = (
         ),
       )?.id;
 
-  const name = row[columnKey]?.value ? row[columnKey]?.value : '? (заглушка)';
+  const name = row[columnKey || '']?.value ? row[columnKey || '']?.value : '? (заглушка)';
 
   return {
     name: name as string,
@@ -109,16 +108,16 @@ export function mergeObjectsInUnique<T>(array: T[], properties: string[]): T[] {
   return Array.from(newArray.values());
 }
 
-export function getNodeListFromTableData(
+export function getNodeListFromTableData<T>(
   data: {
-    columns: GridColumn[];
-    rows: GridRow[];
+    columns: Column<Row<T>>[];
+    rows: Row<T>[];
   },
   projectName: string,
 ): TreeItem<TreeItemData>[] {
   const { rows, columns } = data;
 
-  const structureColumnsKeys = columns
+  const structurecolumnKeys = columns
     .filter(
       ({ type, visible }) =>
         type === TableEntities.GEO_CATEGORY && visible?.tree,
@@ -129,16 +128,16 @@ export function getNodeListFromTableData(
     }));
 
   const filledRows = rows.filter((row) =>
-    structureColumnsKeys.some(({ key }) => key !== 'id' && row[key]),
+    structurecolumnKeys.some(({ key }) => key !== 'id' && row[key || '']),
   );
   const nodes: TreeItem<TreeItemData>[] = [];
 
-  structureColumnsKeys.forEach(({ key: columnKey }, columnIdx) => {
+  structurecolumnKeys.forEach(({ key: columnKey }, columnIdx) => {
     if (columnIdx === 0) {
       const map = groupBy(
         (item) => item.name,
         filledRows.map((row) =>
-          getTreeNodeItem(row, getRowId(row), columnKey, columnIdx),
+          getTreeNodeItem(row, getRowId(row), columnIdx, columnKey),
         ),
       );
       const items = Object.keys(map)
@@ -153,10 +152,10 @@ export function getNodeListFromTableData(
       nodes.push(...items);
     } else {
       const items = filledRows.map((row) =>
-        getTreeNodeItem(row, getRowId(row), columnKey, columnIdx, nodes),
+        getTreeNodeItem(row, getRowId(row), columnIdx, columnKey, nodes),
       );
 
-      if (structureColumnsKeys.length - 1 === columnIdx) {
+      if (structurecolumnKeys.length - 1 === columnIdx) {
         nodes.push(...items);
       } else {
         nodes.push(

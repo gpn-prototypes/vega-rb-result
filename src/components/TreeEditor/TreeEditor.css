@@ -17,6 +17,7 @@
     &.is-open {
       padding-left: var(--space-s);
       padding-bottom: var(--space-2xs);
+      padding-top: var(--space-2xs);
 
       width: 100%;
 
@@ -24,5 +25,19 @@
 
       transform: none;
     }
+  }
+}
+
+.tree-editor {
+  &__header {
+    display: flex;
+    justify-content: 'space-between';
+    font-size: 12px;
+    line-height: 100%;
+  }
+
+  &__header-icons {
+    display: flex;
+    justify-content: 'space-between';
   }
 }

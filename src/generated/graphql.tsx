@@ -833,7 +833,7 @@ export type ConceptionInput = {
 
 export type ProjectStructureInput = {
   /** Список доменных сущностей структуры проекта */
-  domainEntities: Array<RbDomainEntityInput>;
+  domainEntities: Array<RbResultDomainEntityInput>;
   /** Список атрибутов структуры проекта */
   attributes: Array<AttributeInput>;
   /** Список рисков структуры проекта */
@@ -842,7 +842,9 @@ export type ProjectStructureInput = {
   domainObjects: Array<DomainObjectInput>;
 };
 
-export type RbDomainEntityInput = {
+/** TODO: Реализовать интерфейс с полноценными сущностью domain entities */
+/** TODO: Сейчас тут интерфейс от RB */
+export type RbResultDomainEntityInput = {
   /** Кодовое обозначение доменной сущности геологического объекта */
   code: Scalars['String'];
   /** Имя доменной сущности геологического объекта */

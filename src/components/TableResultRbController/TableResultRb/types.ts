@@ -1,24 +1,15 @@
-class FieldValue {
-}
+import { TableEntities } from '@app/types/enumsTable';
+import { VisibilityProperties } from '@app/types/typesTable';
+import { TableRow, TableColumn } from '@consta/uikit/Table';
 
-export type Column = {
-  title: React.ReactNode;
-  accessor: string;
-  align?: 'left';
-  center;
-  right;
-  withoutPadding?: boolean;
-  width?: number;
-  sortable?: boolean;
-  sortByField?: string;
-  sortFn?: (a: FieldValue, b: FieldValue) => number;
-  renderCell?: (row: Row) => React.ReactNode;
+export type Column<T = any> = TableColumn<Row<T>> & {
+  visible?: VisibilityProperties;
+  type?: TableEntities;
+  name?: string;
+  key?: string;
 };
 
-export type Row = {
-  [key: string]: FieldValue;
-  id: string;
-};
+export type Row<T = any> = TableRow & T;
 
 export type FilterComponentProps = {
   onConfirm: (value: any) => void;

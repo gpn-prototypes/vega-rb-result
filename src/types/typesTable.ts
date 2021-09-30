@@ -1,22 +1,14 @@
-import React, { ComponentType, ReactText } from 'react';
-//TODO delete react-data-grid (copy from rb, used as sample)
-import {
-  CalculatedColumn,
-  CellRendererProps,
-  Column,
-  EditorProps as CommonEditorProps,
-  FormatterProps,
-  HeaderRendererProps as BaseHeaderRendererProps,
-} from 'react-data-grid';
+import React, { ReactText } from 'react';
 import {
   DistributionDefinitionTypes,
   DistributionParameterTypes,
   DistributionTypes,
   GeoObjectCategories,
-  RbErrorInterface,
+  RbResultDomainEntityInput,
   TableError,
 } from '@app/generated/graphql';
-import {CategoryIcon, TableEntities, VisibleKeys} from "@app/types/enumsTable";
+import { TableEntities, VisibleKeys } from '@app/types/enumsTable';
+import { Column, Row } from '@app/components/TableResultRbController/TableResultRb/types';
 
 export class OptionEntity implements DropDownOption {
   private readonly _id: GeoObjectCategories;
@@ -49,52 +41,14 @@ export const entitiesOptions = {
   RESERVES: new OptionEntity(GeoObjectCategories.Reserves, 'Запасы'),
 };
 
-interface EditorOptions {
-  editOnClick: boolean;
-}
-
-export class GridColumnEntity implements GridColumn {
-  readonly key: string;
-
-  name: string;
-
-  type: TableEntities;
-
-  decimalPlace: number | undefined;
-
-  visible: VisibilityProperties;
-
-  editorOptions: EditorOptions | undefined;
-
-  constructor(
-    key: string,
-    name = '',
-    type: TableEntities = TableEntities.NONE,
-    visible = {
-      calc: true,
-      table: true,
-      tree: true,
-    },
-    decimalPlace?: number,
-    editorOptions?: EditorOptions,
-  ) {
-    this.key = key;
-    this.name = name;
-    this.type = type;
-    this.visible = visible;
-    this.decimalPlace = decimalPlace;
-    this.editorOptions = editorOptions;
-  }
-}
-
 export type ErrorWrapper = { [index: string]: TableError };
 
 export type ColumnErrors = { [index: string]: ErrorWrapper };
 
-export type SelectedCell = {
+export type SelectedCell<T = any> = {
   rowIdx: number;
   row: GridRow;
-  column: GridColumn;
+  column: Column<T>;
 };
 
 export type VisibilityProperties = {
@@ -134,26 +88,9 @@ export interface GridRow {
   [columnKey: string]: GridCellProperties | undefined;
 }
 
-export interface GridColumn extends Column<GridRow> {
-  key: string;
-  name?: string;
-  type?: TableEntities;
-  code?: string;
-  decimalPlace?: number;
-  icon?: CategoryIcon;
-  hasIcon?: boolean;
-  isRenaming?: boolean;
-  before?: JSX.Element;
-  headerId?: string;
-  notRemovable?: boolean;
-  visible?: VisibilityProperties;
-  cellRenderer?: React.ComponentType<CellRendererProps<GridRow>>;
-  error?: RbErrorInterface;
-}
-
 export interface GridCollection {
-  columns: GridColumn[];
-  rows: GridRow[];
+  columns: Column<RbResultDomainEntityInput>[];
+  rows: Row<RbResultDomainEntityInput>[];
   version: number;
 }
 
@@ -180,55 +117,22 @@ export type ContextHandler<T extends ContextBody> = (
   { key }: T,
 ) => void;
 
-export type BaseProps = {
-  formatter: ComponentType<FormatterProps<GridRow>>;
-  headerRenderer: ComponentType<BaseHeaderRendererProps<GridRow>>;
-};
-
-export type UniColumn = CalculatedColumn<GridRow> & GridColumn;
-
 export interface DropdownOption {
   id: string;
   value: string;
   text: string;
 }
 
-export interface DropDownEditorProps
-  extends CommonEditorProps<GridRow | undefined> {
-  options: { [index: string]: DropdownOption };
-}
-
-type EditorProps = CommonEditorProps<GridRow | undefined> | DropDownEditorProps;
-
-export type EditorResult = {
-  editor?: ComponentType<EditorProps>;
-};
-
-export type ColumnProperties = Partial<
-  Record<keyof GridColumn, string | number | boolean>
->;
-
-export type SetColumnProperties = (
-  key: string,
-  properties: ColumnProperties,
-) => void;
-
-export interface HeaderRendererProps extends BaseHeaderRendererProps<GridRow> {
-  column: UniColumn;
-  setColumnProps: SetColumnProperties;
-  handleColumnsReorder: (sourceKey: string, targetKey: string) => void;
-}
-
-export interface OnRowClickArgs {
+export interface OnRowClickArgs<T = any> {
   rowIdx: number;
   row: GridRow;
-  column: UniColumn;
+  column: Column<T>;
 }
 
 export type OnRowClick = (args: OnRowClickArgs) => void;
 
-export interface RowsToUpdate {
-  column?: CalculatedColumn<GridRow>;
+export interface RowsToUpdate<T = any> {
+  column?: Column<T>;
   rowsKeys?: string[];
 }
 

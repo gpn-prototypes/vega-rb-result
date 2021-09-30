@@ -1,5 +1,6 @@
 import { Param } from '@app/model/Param';
 import { IProjectService } from '@app/services/types';
+import { GridCollection } from '@app/types/typesTable';
 
 export interface CompetitiveAccess {
   isRecentlyEdited: boolean;
@@ -35,7 +36,7 @@ export type ErrorsState = NormalizedState<any>;
 export interface RootState {
   alert: AlertState;
   project: ProjectState;
-  table: any;
+  table: GridCollection;
   tree: TreeState;
   competitiveAccess: CompetitiveAccess;
   errors: ErrorsState;

@@ -6,10 +6,6 @@
   flex: 1;
 }
 
-.Tabs {
-  padding: var(--space-xs);
-}
-
 .Header {
   padding: var(--space-xs) var(--space-m);
 

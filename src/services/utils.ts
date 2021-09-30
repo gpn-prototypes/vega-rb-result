@@ -1,9 +1,9 @@
 import { ConceptionInput, RbProjectInput } from '@app/generated/graphql';
 
-const baseApiUrl = process.env.BASE_API_URL;
+export const getBaseApiUrl = (): string => process.env.BASE_API_URL || '';
 
 export const getGraphqlUri = (projectId: string): string =>
-  `${baseApiUrl}/graphql/${projectId}`;
+  `${getBaseApiUrl()}/graphql/${projectId}`;
 
 export const wrapConception = (conception: ConceptionInput): RbProjectInput => {
   return {

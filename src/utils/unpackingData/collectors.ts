@@ -8,7 +8,8 @@ import {
 import { get, has, reduce, set } from 'lodash/fp';
 import { NoopFunction, Nullable } from '@app/types';
 import { omitTypename } from '@app/utils/omitTypename';
-import {GridCellArguments, GridCellProperties, GridRow} from "@app/types/typesTable";
+import { GridCellArguments, GridCellProperties } from '@app/types/typesTable';
+import { Row } from '@app/components/TableResultRbController/TableResultRb/types';
 
 interface IData {
   code: string;
@@ -33,20 +34,20 @@ function collector<T extends { code: string }>(
   valuesList: T[],
   consumer: NoopFunction<T, GridCellProperties | undefined>,
 ) {
-  return reduce<T, GridRow>(
-    (prev, curr) => set<GridRow>([curr.code], consumer(curr), prev),
+  return reduce<T, Row>(
+    (prev, curr) => set<Row>([curr.code], consumer(curr), prev),
     {},
     valuesList,
   );
 }
 
-function collectValues<T extends IData>(values: T[]): GridRow {
+function collectValues<T extends IData>(values: T[]): Row {
   return collector<T>(values, ({ value }) => {
     return value ? { value } : undefined;
   });
 }
 
-function collectValuesWithDistribution(values: AttributeValue[]): GridRow {
+function collectValuesWithDistribution(values: AttributeValue[]): Row {
   const consumer = ({
     visibleValue,
     distribution,

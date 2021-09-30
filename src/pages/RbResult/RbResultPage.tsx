@@ -8,9 +8,7 @@ import { TableErrorAlert } from '@app/components/TableErrorAlert';
 import projectService from '@app/services/ProjectService';
 import competitiveAccessDuck from '@app/store/competitiveAccessDuck';
 import projectDuck from '@app/store/projectDuck';
-//import tableDuck from '@app/store/tableDuck';
 import { RootState } from '@app/store/types';
-import { Nullable } from '@app/types';
 
 import Table from '@app/components/TableResultRbController';
 import TreeEditor from '@app/components/TreeEditor';
@@ -19,9 +17,6 @@ import style from './RbResultPage.css';
 
 const RbResultPage: React.FC = () => {
   const dispatch = useDispatch();
-  const [setSelectedCell] = useState<Nullable<any>>(
-    null,
-  );
   const treeEditorRef = useRef<HTMLDivElement>(null);
   const [isShownTree, setIsShownTree] = useState(true);
 
@@ -64,7 +59,7 @@ const RbResultPage: React.FC = () => {
       <SplitPanes split="vertical" onResize={handleResize}>
         <SplitPanes.Pane
           aria-label="tree"
-          initialSize="180px"
+          initialSize="240px"
           min="24px"
           max="240px"
         >
@@ -78,7 +73,7 @@ const RbResultPage: React.FC = () => {
         <SplitPanes.Pane aria-label="table">
           <div className={style.Content}>
             <div className={style.LeftPanel}>
-              <Table onSelect={setSelectedCell} />
+              <Table />
             </div>
           </div>
         </SplitPanes.Pane>

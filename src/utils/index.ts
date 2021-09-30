@@ -4,11 +4,9 @@ import { isEmpty } from './isEmpty';
 import { noop } from './noop';
 import { omitTypename } from './omitTypename';
 import { roundTo } from './roundTo';
-import { unpackTableData } from './unpackTableData';
 
 export {
   mockTableRows,
-  unpackTableData,
   isCalculationParam,
   isTemplateCategory,
   noop,

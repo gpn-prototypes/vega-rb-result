@@ -1,7 +1,7 @@
-import {GridColumn} from "@app/types/typesTable";
-import {TableEntities} from "@app/types/enumsTable";
+import { TableEntities } from "@app/types/enumsTable";
+import { Column, Row } from '@app/components/TableResultRbController/TableResultRb/types';
 
 export const getColumnsByType = (
-  list: GridColumn[],
+  list: Column<Row>[],
   type: TableEntities,
-): GridColumn[] => list.filter((column: GridColumn) => column.type === type);
+): Column<Row>[] => list.filter((column: Column<Row>) => column.type === type);
