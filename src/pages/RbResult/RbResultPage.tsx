@@ -59,7 +59,7 @@ const RbResultPage: React.FC = () => {
       <SplitPanes split="vertical" onResize={handleResize}>
         <SplitPanes.Pane
           aria-label="tree"
-          initialSize="240px"
+          initialSize="180px"
           min="24px"
           max="240px"
         >

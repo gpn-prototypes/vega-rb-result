@@ -31,9 +31,10 @@
 .tree-editor {
   &__header {
     display: flex;
-    justify-content: 'space-between';
+    justify-content: space-between;
     font-size: 12px;
     line-height: 100%;
+    width: 100%;
   }
 
   &__header-icons {
