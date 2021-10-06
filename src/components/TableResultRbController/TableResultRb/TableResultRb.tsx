@@ -1,5 +1,5 @@
-import React from 'react';
-import { Table } from "@consta/uikit/Table";
+import React, { useMemo } from 'react';
+import { Table } from '@consta/uikit/Table';
 import { Column, Row } from './types';
 import { RbResultDomainEntityInput } from '@app/generated/graphql';
 
@@ -23,5 +23,23 @@ export const TableResultRb: React.FC<Props> = ({ rows, columns }) => {
   //   });
 
   // return <Table rows={rows} columns={columns} onSortBy={setSortSetting} />;
-  return <Table rows={rows} columns={columns} />;
+
+  const preparedColumns = useMemo(() => {
+    return columns.map((column) => ({
+      ...column,
+      mergeCells: true,
+    }));
+  }, [columns]);
+
+  return (
+    <Table
+      rows={rows}
+      columns={preparedColumns}
+      verticalAlign="center"
+      size="s"
+      borderBetweenColumns
+      borderBetweenRows
+      isResizable
+    />
+  );
 };

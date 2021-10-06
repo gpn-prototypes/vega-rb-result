@@ -1,9 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  SplitPanes,
-  useInterval,
-} from '@gpn-prototypes/vega-ui';
+import { SplitPanes, useInterval } from '@gpn-prototypes/vega-ui';
 import { TableErrorAlert } from '@app/components/TableErrorAlert';
 import projectService from '@app/services/ProjectService';
 import competitiveAccessDuck from '@app/store/competitiveAccessDuck';
@@ -12,6 +9,7 @@ import { RootState } from '@app/store/types';
 
 import Table from '@app/components/TableResultRbController';
 import TreeEditor from '@app/components/TreeEditor';
+import { IS_PROJECT_RECENTLY_EDITED_INTERVAL_IN_MS } from '@app/common/consts';
 
 import style from './RbResultPage.css';
 
@@ -38,9 +36,9 @@ const RbResultPage: React.FC = () => {
       .then((projectName) =>
         dispatch(projectDuck.actions.updateProjectName(projectName)),
       );
-  }, [dispatch]);
+  }, []);
 
-  useInterval(30000, () => {
+  useInterval(IS_PROJECT_RECENTLY_EDITED_INTERVAL_IN_MS, () => {
     projectService
       .getProjectRecentlyEdited()
       .then((recentlyEdited) => {
@@ -70,7 +68,7 @@ const RbResultPage: React.FC = () => {
             ref={treeEditorRef}
           />
         </SplitPanes.Pane>
-        <SplitPanes.Pane aria-label="table">
+        <SplitPanes.Pane aria-label="table" initialSize="600px">
           <div className={style.Content}>
             <div className={style.LeftPanel}>
               <Table />
@@ -84,4 +82,3 @@ const RbResultPage: React.FC = () => {
 };
 
 export default RbResultPage;
-
