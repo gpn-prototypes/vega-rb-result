@@ -2,7 +2,7 @@ import React, { PropsWithChildren, useMemo } from 'react';
 import { Text, Tree } from '@gpn-prototypes/vega-ui';
 
 import './TreeEditor.css';
-import { cnTreeEditor } from "@app/components/TreeEditor/cn-tree-editor";
+import { cnTreeEditor } from '@app/components/TreeEditor/cn-tree-editor';
 import { Column, Row } from '../TableResultRbController/TableResultRb/types';
 import SvgSearch from '@app/assets/icons/components/Search';
 import SvgMoreVertical from '@app/assets/icons/components/MoreVertical';
@@ -33,15 +33,19 @@ export default React.forwardRef<HTMLDivElement, StructureTreeEditorProps>(
     ref,
   ): React.ReactElement {
     const dispatch = useDispatch();
+
     const projectName = useSelector(({ project }: RootState) => project.name);
+
     const tree = useMemo(
       () => getNodeListFromTableData({ rows, columns }, projectName),
       [rows, columns, projectName],
     );
+
     const domainEntitiesColumns = useMemo(
       () => getColumnsByType(columns, TableEntities.GEO_CATEGORY),
       [columns],
     );
+
     const onSelect = (selectedItems: TargetData[]) => {
       if (selectedItems.length) {
         const node = searchInTree(tree, selectedItems[0].id);
@@ -50,13 +54,14 @@ export default React.forwardRef<HTMLDivElement, StructureTreeEditorProps>(
           const rowsIds = node.data.position.map(({ rowIdx }) => rowIdx);
           dispatch(
             treeFilterDuck.actions.setFilter({
-              columnKeys: domainEntitiesColumns
-                .filter(
-                  (_, idx) =>
-                    columnIdx >= idx &&
-                    idx !== domainEntitiesColumns.length - 1,
-                )
-                .map(({ key }) => key || '') || '',
+              columnKeys:
+                domainEntitiesColumns
+                  .filter(
+                    (_, idx) =>
+                      columnIdx >= idx &&
+                      idx !== domainEntitiesColumns.length - 1,
+                  )
+                  .map(({ key }) => key || '') || '',
               rowsIdx: rowsIds,
             }),
           );
@@ -67,6 +72,7 @@ export default React.forwardRef<HTMLDivElement, StructureTreeEditorProps>(
         dispatch(treeFilterDuck.actions.resetState());
       }
     };
+
     return (
       <div className={cnTreeEditor()} ref={ref}>
         <div className="tree-editor__header">

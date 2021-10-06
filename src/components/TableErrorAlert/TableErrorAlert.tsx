@@ -4,11 +4,10 @@ import { IconAlert, SnackBar } from '@gpn-prototypes/vega-ui';
 import { RbErrorCodes } from '@app/generated/graphql';
 import useGetError from '@app/hooks/useGetError';
 import { defaultTo, get } from 'lodash/fp';
-import {ErrorWrapper} from "@app/types/typesTable";
+import { ErrorWrapper } from '@app/types/typesTable';
 import { cnTableErrorAlert } from './cn-table-error-alert';
 
 import './TableErrorAlert.css';
-
 
 const errorMessages = {
   [RbErrorCodes.DuplicatingColumns]:

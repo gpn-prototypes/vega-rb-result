@@ -7,6 +7,7 @@ export type Column<T = any> = TableColumn<Row<T>> & {
   type?: TableEntities;
   name?: string;
   key?: string;
+  mergeCells?: boolean;
 };
 
 export type Row<T = any> = TableRow & T;

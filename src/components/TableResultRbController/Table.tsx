@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 import { Loader, useMount } from '@gpn-prototypes/vega-ui';
-import { TableResultRb } from "@app/components/TableResultRbController/TableResultRb/TableResultRb";
+import { TableResultRb } from '@app/components/TableResultRbController/TableResultRb/TableResultRb';
 import { loadTableData } from '@app/services/loadTableData';
 import { useDispatch, useSelector } from 'react-redux';
 import tableDuck from '@app/store/tableDuck';
 import { RootState } from '@app/store/types';
 
-interface IProps {
-}
+interface IProps {}
 
 export const Table: React.FC<IProps> = () => {
   const dispatch = useDispatch();
@@ -28,6 +27,9 @@ export const Table: React.FC<IProps> = () => {
   return isLoading ? (
     <Loader />
   ) : (
-    <TableResultRb columns={reduxTableData.columns} rows={reduxTableData.rows} />
+    <TableResultRb
+      columns={reduxTableData.columns}
+      rows={reduxTableData.rows}
+    />
   );
 };
