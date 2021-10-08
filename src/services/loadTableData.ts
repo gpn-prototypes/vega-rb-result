@@ -12,6 +12,7 @@ export async function loadTableData(
 ): Promise<void> {
   const projectVersion = projectService.version;
   const resourceBaseData = await projectService.getResourceBaseData();
+
   const dispatchOnInit = (structure: ProjectStructure) =>
     dispatch(initAction(structure, projectVersion));
 

@@ -1,10 +1,21 @@
 import {
-  ProjectStructure, ProjectStructureInput, RbResultDomainEntityInput,
+  ProjectStructure,
+  ProjectStructureInput,
+  RbResultDomainEntityInput,
 } from '../generated/graphql';
 import { GridCollection } from '../types/typesTable';
-import { Column, Row } from '../components/TableResultRbController/TableResultRb/types';
+import {
+  Column,
+  Row,
+} from '../components/TableResultRbController/TableResultRb/types';
 import { constructRows } from './unpackingData';
-  
+import {
+  data,
+  IAttribute,
+  IData,
+  IDomainEntity,
+} from '@app/mocks/resultRbTable';
+
 // const getCalculationColumn = (
 //   prev: Column[],
 //   { code, shortName, units, decimalPlace }: CalculationParam,
@@ -74,13 +85,20 @@ function constructColumns({
     return column;
   });
 }
-  
+
 export function unpackTableData(
   projectStructure: ProjectStructure,
   version: number,
 ): GridCollection {
-  const columns: Column<RbResultDomainEntityInput>[] = constructColumns(projectStructure);
-  const rows: Row<RbResultDomainEntityInput>[] = constructRows(projectStructure);
+  console.log(projectStructure);
+  const columns: Column<RbResultDomainEntityInput>[] = prepareColumns(data);
+  const rows: Row<RbResultDomainEntityInput>[] = prepareRows(data);
+  // const columns: Column<RbResultDomainEntityInput>[] = constructColumns(projectStructure);
+  // const rows: Row<RbResultDomainEntityInput>[] =
+  //   constructRows(projectStructure);
+
+  console.log('columns', columns);
+  console.log('rows', rows);
 
   return {
     columns,
@@ -88,3 +106,71 @@ export function unpackTableData(
     version,
   };
 }
+
+export const prepareColumns = (
+  data: IData,
+): Column<RbResultDomainEntityInput>[] => {
+  const { domainEntities, attributes } = data;
+
+  const preparedEntities = domainEntities.map((domainEntity: IDomainEntity) => {
+    const column: Column<RbResultDomainEntityInput> = {
+      title: domainEntity.name,
+      accessor: domainEntity.code as keyof IDomainEntity,
+      sortable: true,
+    };
+
+    return column;
+  });
+
+  const preparedAttributes = attributes.map((attribute: IAttribute) => {
+    const column: Column<RbResultDomainEntityInput> = {
+      title: [attribute.shortName, attribute.units].join(', '),
+      accessor: attribute.code as keyof IDomainEntity,
+      sortable: true,
+    };
+
+    return column;
+  });
+
+  return [...preparedEntities, ...preparedAttributes];
+};
+
+export const prepareRows = ({ domainObjects }: IData): Row<any>[] => {
+  let rowNumber = 1;
+
+  const preparedRows: any[] = [];
+
+  domainObjects.forEach((domainObject) => {
+    let addRowsNum = 0;
+
+    let row: any[] = [];
+
+    domainObject.attributeValues.forEach((attrVal) => {
+      attrVal.percentiles.forEach((percentile, percIndex) => {
+        if (!row[percIndex]) {
+          row[percIndex] = {};
+        }
+
+        row[percIndex].id = rowNumber + percIndex;
+        row[percIndex][attrVal.code] = attrVal.values[percIndex];
+
+        domainObject.parents.forEach((parent) => {
+          row[percIndex][parent.code] = parent.name;
+        });
+
+        // preparedRows.push({
+        //   id: rowNumber + percIndex,
+        //   [attrVal.code]: attrVal.values[percIndex],
+        //   ...domainObject.parents.map((parent) => ({ [parent.code]: parent.name })).flat(1),
+        // });
+      });
+
+      addRowsNum = attrVal.percentiles.length;
+    });
+
+    preparedRows.push(...row);
+    rowNumber += addRowsNum;
+  });
+
+  return [...preparedRows];
+};
