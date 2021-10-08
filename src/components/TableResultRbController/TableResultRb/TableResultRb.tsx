@@ -1,11 +1,11 @@
 import React, { useMemo } from 'react';
 import { Table } from '@consta/uikit/Table';
 import { Column, Row } from './types';
-import { RbResultDomainEntityInput } from '@app/generated/graphql';
+import { RbDomainEntityInput } from '@app/generated/graphql';
 
 interface Props {
-  rows: Row<RbResultDomainEntityInput>[];
-  columns: Column<RbResultDomainEntityInput>[];
+  rows: Row<RbDomainEntityInput>[];
+  columns: Column<RbDomainEntityInput>[];
 }
 
 export const TableResultRb: React.FC<Props> = ({ rows, columns }) => {
@@ -37,6 +37,7 @@ export const TableResultRb: React.FC<Props> = ({ rows, columns }) => {
       columns={preparedColumns}
       verticalAlign="center"
       size="s"
+      zebraStriped="odd"
       borderBetweenColumns
       borderBetweenRows
       isResizable

@@ -78,6 +78,7 @@ const RbResultPage: React.FC = () => {
                 value={fluidType}
                 items={FLUID_TYPES}
                 name="FluidTypesChoiceGroup"
+                size="xs"
                 multiple={false}
                 getLabel={(item) => item}
                 onChange={({ value }) => setFluidType(value)}

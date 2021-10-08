@@ -19,7 +19,7 @@
   },
   "scripts": {
     "build": "cross-env NODE_ENV=production webpack --progress --config ./webpack.forShellConfig.js",
-    "gen:codegen:dev": "graphql-codegen --config codegen.yml",
+    "gen:codegen:dev": "dotenv -c local -- graphql-codegen --config codegen.yml",
     "dev": "cross-env NODE_ENV=development webpack-dev-server --open --mode development",
     "dev-in-shell": "cross-env NODE_ENV=development webpack-dev-server --open --mode development  --config ./webpack.forShellConfig.js",
     "test": "jest",
@@ -40,11 +40,13 @@
     "@gpn-prototypes/vega-ui": "3.3.1",
     "@graphql-codegen/cli": "1.16.3",
     "@graphql-codegen/introspection": "1.16.3",
-    "@graphql-codegen/typescript": "^1.16.3",
-    "@graphql-codegen/typescript-operations": "1.16.3",
+    "@graphql-codegen/typescript": "1.22.0",
+    "@graphql-codegen/typescript-operations": "1.17.16",
     "@graphql-codegen/typescript-react-apollo": "1.16.3",
     "bem-cn": "^3.0.1",
     "classnames": "^2.3.1",
+    "dotenv-cli": "^4.0.0",
+    "dotenv-expand": "^5.1.0",
     "graphql": "^15.4.0",
     "monet": "^0.9.1",
     "react": "^16.14.0",
@@ -80,7 +82,7 @@
     "commitizen": "^4.2.1",
     "cross-env": "^7.0.2",
     "cz-customizable": "^6.3.0",
-    "dotenv": "^8.2.0",
+    "dotenv": "^10.0.0",
     "eslint": "^7.13.0",
     "eslint-config-react-app": "^6.0.0",
     "eslint-import-resolver-alias": "^1.1.2",
@@ -116,6 +118,12 @@
     "webpack-config-single-spa-ts": "^1.12.0",
     "webpack-dev-server": "^3.11.2",
     "webpack-import-map-plugin": "^1.0.0-alpha0",
-    "webpack-merge": "^4.2.2"
+    "webpack-merge": "^4.2.2",
+    "@graphql-codegen/typescript-react-apollo": "3.1.4",
+    "@graphql-codegen/typescript": "2.2.2",
+    "@graphql-codegen/typescript-operations": "2.1.6",
+    "@graphql-codegen/typescript-graphql-files-modules": "2.1.0",
+    "@graphql-codegen/introspection": "2.1.0",
+    "@graphql-codegen/cli": "2.2.0"
   }
 }

@@ -1,7 +1,8 @@
 import {
   ProjectStructure,
+  ResultProjectStructure,
   ProjectStructureInput,
-  RbResultDomainEntityInput,
+  RbDomainEntityInput,
 } from '../generated/graphql';
 import { GridCollection } from '../types/typesTable';
 import {
@@ -73,12 +74,12 @@ function constructColumns({
   domainEntities = [],
   attributes = [],
   risks = [],
-}: ProjectStructureInput): Column<RbResultDomainEntityInput>[] {
+}: ProjectStructureInput): Column<RbDomainEntityInput>[] {
   /** TODO: Доработать логикой */
-  return domainEntities.map((domainEntity: RbResultDomainEntityInput) => {
-    const column: Column<RbResultDomainEntityInput> = {
+  return domainEntities.map((domainEntity: RbDomainEntityInput) => {
+    const column: Column<RbDomainEntityInput> = {
       title: domainEntity.name,
-      accessor: domainEntity.code as keyof RbResultDomainEntityInput,
+      accessor: domainEntity.code as keyof RbDomainEntityInput,
       sortable: true,
     };
 
@@ -87,12 +88,12 @@ function constructColumns({
 }
 
 export function unpackTableData(
-  projectStructure: ProjectStructure,
+  projectStructure: ResultProjectStructure,
   version: number,
 ): GridCollection {
   console.log(projectStructure);
-  const columns: Column<RbResultDomainEntityInput>[] = prepareColumns(data);
-  const rows: Row<RbResultDomainEntityInput>[] = prepareRows(data);
+  const columns: Column<RbDomainEntityInput>[] = prepareColumns(projectStructure);
+  const rows: Row<RbDomainEntityInput>[] = prepareRows(projectStructure);
   // const columns: Column<RbResultDomainEntityInput>[] = constructColumns(projectStructure);
   // const rows: Row<RbResultDomainEntityInput>[] =
   //   constructRows(projectStructure);
@@ -108,12 +109,12 @@ export function unpackTableData(
 }
 
 export const prepareColumns = (
-  data: IData,
-): Column<RbResultDomainEntityInput>[] => {
+  data: ResultProjectStructure,
+): Column<RbDomainEntityInput>[] => {
   const { domainEntities, attributes } = data;
 
   const preparedEntities = domainEntities.map((domainEntity: IDomainEntity) => {
-    const column: Column<RbResultDomainEntityInput> = {
+    const column: Column<RbDomainEntityInput> = {
       title: domainEntity.name,
       accessor: domainEntity.code as keyof IDomainEntity,
       sortable: true,
@@ -123,7 +124,7 @@ export const prepareColumns = (
   });
 
   const preparedAttributes = attributes.map((attribute: IAttribute) => {
-    const column: Column<RbResultDomainEntityInput> = {
+    const column: Column<RbDomainEntityInput> = {
       title: [attribute.shortName, attribute.units].join(', '),
       accessor: attribute.code as keyof IDomainEntity,
       sortable: true,
@@ -135,7 +136,7 @@ export const prepareColumns = (
   return [...preparedEntities, ...preparedAttributes];
 };
 
-export const prepareRows = ({ domainObjects }: IData): Row<any>[] => {
+export const prepareRows = ({ domainObjects }: ResultProjectStructure): Row<any>[] => {
   let rowNumber = 1;
 
   const preparedRows: any[] = [];

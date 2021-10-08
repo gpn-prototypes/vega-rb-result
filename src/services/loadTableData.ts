@@ -1,10 +1,10 @@
 import { Dispatch } from 'react';
-import { ProjectStructure } from '@app/generated/graphql';
+import { ResultProjectStructure } from '@app/generated/graphql';
 import projectService from '@app/services/ProjectService';
 import tableDuck from '@app/store/tableDuck';
 import { unpackTableData } from '../utils/unpackTableData';
 
-const initAction = (template: ProjectStructure, version: number) =>
+const initAction = (template: ResultProjectStructure, version: number) =>
   tableDuck.actions.initState(unpackTableData(template, version));
 
 export async function loadTableData(
@@ -13,14 +13,15 @@ export async function loadTableData(
   const projectVersion = projectService.version;
   const resourceBaseData = await projectService.getResourceBaseData();
 
-  const dispatchOnInit = (structure: ProjectStructure) =>
+  const dispatchOnInit = (structure: ResultProjectStructure) =>
     dispatch(initAction(structure, projectVersion));
 
   if (resourceBaseData) {
-    const { structure } = resourceBaseData.conceptions[0];
-    dispatchOnInit(structure);
+    console.log('its true');
+    dispatchOnInit(resourceBaseData);
   } else if (resourceBaseData === null) {
     const structureTemplate = await projectService.getTableTemplate();
-    dispatchOnInit(structureTemplate);
+    // TODO: uncommnet
+    // dispatchOnInit(structureTemplate);
   }
 }

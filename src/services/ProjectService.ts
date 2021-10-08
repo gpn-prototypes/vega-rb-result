@@ -9,7 +9,7 @@ import {
   ProjectInner,
   ProjectStructure,
   Query,
-  RbProject,
+  ResultProjectStructure,
 } from '@app/generated/graphql';
 import { get, getOr } from 'lodash/fp';
 import { None } from 'monet';
@@ -17,6 +17,7 @@ import {
   GET_PROJECT_NAME,
   GET_TABLE_TEMPLATE,
   LOAD_PROJECT,
+  GET_TABLE_RESULT_RB,
 } from '@app/components/TableResultRbController/queries';
 import {
   IProjectService,
@@ -173,22 +174,26 @@ class ProjectService implements IProjectService {
     return responseData.project.name;
   }
 
-  async getResourceBaseData(): Promise<RbProject> {
+  async getResourceBaseData(): Promise<ResultProjectStructure> {
     const { data: responseData } = await this.client
       .watchQuery<Query>({
-        query: LOAD_PROJECT,
+        query: GET_TABLE_RESULT_RB,
         context: {
           uri: getGraphqlUri(this.projectId),
         },
-        fetchPolicy: this.fetchPolicyMod,
+        fetchPolicy: 'no-cache',
       })
       .result();
 
+      console.log('works?');
+
     this.trySetupWorkingProject(responseData);
 
+    console.log('works!', responseData);
+
     return getOr(
-      None<RbProject>(),
-      ['project', 'resourceBase', 'project', 'loadFromDatabase'],
+      None<ResultProjectStructure>(),
+      ['project', 'rbResult', 'result', 'template'],
       responseData,
     );
   }
@@ -209,17 +214,17 @@ class ProjectService implements IProjectService {
     if (ProjectService.isProject(data.project)) {
       // ProjectService.assertRequiredFields(data.project);
       const isTemplateProject = Boolean(
-        data.project.resourceBase?.project?.template,
+        data.project.rbResult?.result?.template,
       );
       // @ts-ignore TODO - refactor after work with data
       this.projectMod = isTemplateProject
         ? {
             ...data.project,
-            resourceBase: {
-              ...data.project.resourceBase,
-              project: {
-                ...data.project.resourceBase?.project,
-                loadFromDatabase: data.project.resourceBase?.project?.template,
+            rbResult: {
+              ...data.project.rbResult,
+              result: {
+                ...data.project.rbResult?.result,
+                template: data.project.rbResult?.result?.template,
               },
             },
           }

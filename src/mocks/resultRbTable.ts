@@ -39,7 +39,6 @@ export interface IData {
   domainObjects: IDomainObject[];
 }
 
-
 //
 //
 //
@@ -64,6 +63,12 @@ export const data: IData = {
     },
   ],
   attributes: [
+    // types.Attribute(
+    //     code="GAS", name="Газ", short_name="Г", units=""
+    // ),
+    // types.Attribute(
+    //     code="RESOURCE", name="Pесурс", short_name="P", units=""
+    // ),
     {
       code: 'PERCENTILE',
       name: 'Процентиль',
@@ -336,6 +341,11 @@ export const data: IData = {
         shortName: 'P',
       },
       attributeValues: [
+        {
+          code: 'PERCENTILE',
+          percentiles: [90, 50, 10],
+          values: [90, 50, 10],
+        },
         {
           code: 'NGZ_NGR',
           percentiles: [90, 50, 10],

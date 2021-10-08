@@ -4,7 +4,7 @@ import {
 } from '@apollo/client';
 import {
   ProjectStructure,
-  RbProject,
+  ResultProjectStructure,
 } from '@app/generated/graphql';
 import { CurrentProject, Identity } from '@app/types';
 
@@ -37,5 +37,5 @@ export interface IProjectService {
 
   getProjectName(): Promise<string>;
 
-  getResourceBaseData(): Promise<RbProject>;
+  getResourceBaseData(): Promise<ResultProjectStructure>;
 }
