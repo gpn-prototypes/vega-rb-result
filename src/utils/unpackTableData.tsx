@@ -87,7 +87,6 @@ export function unpackTableData(
   projectStructure: ResultProjectStructure,
   version: number,
 ): GridCollection {
-  console.log(projectStructure);
   const columns: Column<RbDomainEntityInput>[] = prepareColumns(projectStructure);
   const rows: Row<RbDomainEntityInput>[] = prepareRows(projectStructure);
   // const columns: Column<RbResultDomainEntityInput>[] = constructColumns(projectStructure);
@@ -121,7 +120,7 @@ export const prepareColumns = (
 
   const preparedAttributes = attributes.map((attribute: ResultAttribute) => {
     const column: Column<RbDomainEntityInput> = {
-      title: [attribute.shortName, attribute.units].join(', '),
+      title: [attribute.shortName, attribute.units || null].join(', '),
       accessor: attribute.code as keyof RbDomainEntityInput,
       sortable: true,
     };
@@ -140,6 +139,7 @@ export const prepareRows = ({ domainObjects }: ResultProjectStructure): Row<any>
   domainObjects.forEach((domainObject) => {
     let addRowsNum = 0;
 
+    // Row - structure of three small rows
     let row: any[] = [];
 
     domainObject.attributeValues.forEach((attrVal) => {
@@ -154,12 +154,6 @@ export const prepareRows = ({ domainObjects }: ResultProjectStructure): Row<any>
         domainObject.parents.forEach((parent) => {
           row[percIndex][parent.code] = parent.name;
         });
-
-        // preparedRows.push({
-        //   id: rowNumber + percIndex,
-        //   [attrVal.code]: attrVal.values[percIndex],
-        //   ...domainObject.parents.map((parent) => ({ [parent.code]: parent.name })).flat(1),
-        // });
       });
 
       addRowsNum = attrVal.percentiles.length;

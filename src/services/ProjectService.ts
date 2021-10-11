@@ -185,11 +185,7 @@ class ProjectService implements IProjectService {
       })
       .result();
 
-      console.log('works?');
-
     this.trySetupWorkingProject(responseData);
-
-    console.log('works!', responseData);
 
     return getOr(
       None<ResultProjectStructure>(),

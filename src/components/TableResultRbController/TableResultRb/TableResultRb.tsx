@@ -39,7 +39,7 @@ export const TableResultRb: React.FC<Props> = ({ rows, columns }) => {
       columns={preparedColumns}
       verticalAlign="center"
       size="s"
-      zebraStriped="odd"
+      zebraStriped="even"
       className="TableResultRb"
       borderBetweenColumns
       borderBetweenRows

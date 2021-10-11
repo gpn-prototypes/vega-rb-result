@@ -17,7 +17,6 @@ export async function loadTableData(
     dispatch(initAction(structure, projectVersion));
 
   if (resourceBaseData) {
-    console.log('its true');
     dispatchOnInit(resourceBaseData);
   } else if (resourceBaseData === null) {
     const structureTemplate = await projectService.getTableTemplate();
