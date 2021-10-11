@@ -14,9 +14,9 @@
   align-items: center;
 }
 
-.Content {
+.content {
   overflow-x: auto;
-  padding: 0 16px;
+  padding: 0 var(--size-text-m);
 }
 
 .ButtonStructure {
@@ -38,5 +38,5 @@
 }
 
 .FluidTypesChoiceGroup {
-  margin: 8px 0;
+  margin: var(--size-text-2xs) 0;
 }

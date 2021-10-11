@@ -1,5 +1,4 @@
 import {
-  ProjectStructure,
   ResultProjectStructure,
   ProjectStructureInput,
   RbDomainEntityInput,
@@ -11,7 +10,6 @@ import {
   Column,
   Row,
 } from '../components/TableResultRbController/TableResultRb/types';
-import { constructRows } from './unpackingData';
 
 // const getCalculationColumn = (
 //   prev: Column[],
@@ -87,14 +85,9 @@ export function unpackTableData(
   projectStructure: ResultProjectStructure,
   version: number,
 ): GridCollection {
-  const columns: Column<RbDomainEntityInput>[] = prepareColumns(projectStructure);
+  const columns: Column<RbDomainEntityInput>[] =
+    prepareColumns(projectStructure);
   const rows: Row<RbDomainEntityInput>[] = prepareRows(projectStructure);
-  // const columns: Column<RbResultDomainEntityInput>[] = constructColumns(projectStructure);
-  // const rows: Row<RbResultDomainEntityInput>[] =
-  //   constructRows(projectStructure);
-
-  console.log('columns', columns);
-  console.log('rows', rows);
 
   return {
     columns,
@@ -108,21 +101,24 @@ export const prepareColumns = (
 ): Column<RbDomainEntityInput>[] => {
   const { domainEntities, attributes } = data;
 
-  const preparedEntities = domainEntities.map((domainEntity: ResultDomainEntity) => {
-    const column: Column<RbDomainEntityInput> = {
-      title: domainEntity.name,
-      accessor: domainEntity.code as keyof RbDomainEntityInput,
-      sortable: true,
-    };
+  const preparedEntities = domainEntities.map(
+    (domainEntity: ResultDomainEntity) => {
+      const column: Column<RbDomainEntityInput> = {
+        title: domainEntity.name,
+        accessor: domainEntity.code as keyof RbDomainEntityInput,
+        sortable: true,
+        mergeCells: true,
+      };
 
-    return column;
-  });
+      return column;
+    },
+  );
 
   const preparedAttributes = attributes.map((attribute: ResultAttribute) => {
     const column: Column<RbDomainEntityInput> = {
-      title: [attribute.shortName, attribute.units || null].join(', '),
+      title: [attribute.shortName, attribute.units].filter(Boolean).join(', '),
       accessor: attribute.code as keyof RbDomainEntityInput,
-      sortable: true,
+      align: 'right',
     };
 
     return column;
@@ -131,29 +127,36 @@ export const prepareColumns = (
   return [...preparedEntities, ...preparedAttributes];
 };
 
-export const prepareRows = ({ domainObjects }: ResultProjectStructure): Row<any>[] => {
+export const prepareRows = ({
+  domainObjects,
+}: ResultProjectStructure): Row<RbDomainEntityInput>[] => {
   let rowNumber = 1;
 
-  const preparedRows: any[] = [];
+  const preparedRows: Row<RbDomainEntityInput>[] = [];
 
   domainObjects.forEach((domainObject) => {
     let addRowsNum = 0;
 
     // Row - structure of three small rows
-    let row: any[] = [];
+    let row: Row<RbDomainEntityInput>[] = [];
 
     domainObject.attributeValues.forEach((attrVal) => {
       attrVal.percentiles.forEach((percentile, percIndex) => {
         if (!row[percIndex]) {
-          row[percIndex] = {};
+          row[percIndex] = {} as Row<RbDomainEntityInput>;
         }
 
-        row[percIndex].id = rowNumber + percIndex;
+        row[percIndex].id = (rowNumber + percIndex).toString();
         row[percIndex][attrVal.code] = attrVal.values[percIndex];
 
         domainObject.parents.forEach((parent) => {
           row[percIndex][parent.code] = parent.name;
         });
+
+        row[percIndex][domainObject.geoCategory.code] =
+          domainObject.geoCategory.shortName;
+        row[percIndex][domainObject.geoType.code] =
+          domainObject.geoType.shortName;
       });
 
       addRowsNum = attrVal.percentiles.length;

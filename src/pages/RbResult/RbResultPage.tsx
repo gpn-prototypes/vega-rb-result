@@ -59,7 +59,7 @@ const RbResultPage: React.FC = () => {
   });
 
   return (
-    <div className="SchemePage">
+    <div>
       <SplitPanes split="vertical" onResize={handleResize}>
         <SplitPanes.Pane
           aria-label="tree"
@@ -75,7 +75,7 @@ const RbResultPage: React.FC = () => {
           />
         </SplitPanes.Pane>
         <SplitPanes.Pane aria-label="table" initialSize="600px">
-          <div className="Content">
+          <div className="content">
             <div>
               <ChoiceGroup
                 value={fluidType}

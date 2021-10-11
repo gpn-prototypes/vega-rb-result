@@ -26,17 +26,10 @@ export const TableResultRb: React.FC<Props> = ({ rows, columns }) => {
 
   // return <Table rows={rows} columns={columns} onSortBy={setSortSetting} />;
 
-  const preparedColumns = useMemo(() => {
-    return columns.map((column) => ({
-      ...column,
-      mergeCells: true,
-    }));
-  }, [columns]);
-
   return (
     <Table
       rows={rows}
-      columns={preparedColumns}
+      columns={columns}
       verticalAlign="center"
       size="s"
       zebraStriped="even"
