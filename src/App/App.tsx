@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { ApolloClient, NormalizedCacheObject } from '@apollo/client';
 import { Root, useMount } from '@gpn-prototypes/vega-ui';
-import classNames from 'classnames';
 import ErrorBoundary from '@app/components/ErrorBoundary';
 import { Providers } from '@app/components/Providers';
 import projectService from '@app/services/ProjectService';

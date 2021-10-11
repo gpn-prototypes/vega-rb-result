@@ -16,7 +16,6 @@ import { None } from 'monet';
 import {
   GET_PROJECT_NAME,
   GET_TABLE_TEMPLATE,
-  LOAD_PROJECT,
   GET_TABLE_RESULT_RB,
 } from '@app/components/TableResultRbController/queries';
 import {

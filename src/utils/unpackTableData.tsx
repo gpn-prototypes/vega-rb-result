@@ -1,6 +1,5 @@
 import {
   ResultProjectStructure,
-  ProjectStructureInput,
   RbDomainEntityInput,
   ResultDomainEntity,
   ResultAttribute,
@@ -64,22 +63,22 @@ import {
 //   }, []);
 // }
 
-function constructColumns({
-  domainEntities = [],
-  attributes = [],
-  risks = [],
-}: ProjectStructureInput): Column<RbDomainEntityInput>[] {
-  /** TODO: Доработать логикой */
-  return domainEntities.map((domainEntity: RbDomainEntityInput) => {
-    const column: Column<RbDomainEntityInput> = {
-      title: domainEntity.name,
-      accessor: domainEntity.code as keyof RbDomainEntityInput,
-      sortable: true,
-    };
+// function constructColumns({
+//   domainEntities = [],
+//   attributes = [],
+//   risks = [],
+// }: ProjectStructureInput): Column<RbDomainEntityInput>[] {
+//   /** TODO: Доработать логикой */
+//   return domainEntities.map((domainEntity: RbDomainEntityInput) => {
+//     const column: Column<RbDomainEntityInput> = {
+//       title: domainEntity.name,
+//       accessor: domainEntity.code as keyof RbDomainEntityInput,
+//       sortable: true,
+//     };
 
-    return column;
-  });
-}
+//     return column;
+//   });
+// }
 
 export function unpackTableData(
   projectStructure: ResultProjectStructure,

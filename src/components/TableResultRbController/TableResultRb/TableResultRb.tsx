@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Table } from '@consta/uikit/Table';
 import { Column, Row } from './types';
 import { RbDomainEntityInput } from '@app/generated/graphql';
