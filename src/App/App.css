@@ -13,3 +13,7 @@
 
   background: var(--color-bg-default);
 }
+
+.RB-Result-App-Wrapper {
+  overflow-x: hidden;
+}

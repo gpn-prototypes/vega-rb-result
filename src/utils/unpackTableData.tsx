@@ -3,6 +3,8 @@ import {
   ResultProjectStructure,
   ProjectStructureInput,
   RbDomainEntityInput,
+  ResultDomainEntity,
+  ResultAttribute,
 } from '../generated/graphql';
 import { GridCollection } from '../types/typesTable';
 import {
@@ -10,12 +12,6 @@ import {
   Row,
 } from '../components/TableResultRbController/TableResultRb/types';
 import { constructRows } from './unpackingData';
-import {
-  data,
-  IAttribute,
-  IData,
-  IDomainEntity,
-} from '@app/mocks/resultRbTable';
 
 // const getCalculationColumn = (
 //   prev: Column[],
@@ -113,20 +109,20 @@ export const prepareColumns = (
 ): Column<RbDomainEntityInput>[] => {
   const { domainEntities, attributes } = data;
 
-  const preparedEntities = domainEntities.map((domainEntity: IDomainEntity) => {
+  const preparedEntities = domainEntities.map((domainEntity: ResultDomainEntity) => {
     const column: Column<RbDomainEntityInput> = {
       title: domainEntity.name,
-      accessor: domainEntity.code as keyof IDomainEntity,
+      accessor: domainEntity.code as keyof RbDomainEntityInput,
       sortable: true,
     };
 
     return column;
   });
 
-  const preparedAttributes = attributes.map((attribute: IAttribute) => {
+  const preparedAttributes = attributes.map((attribute: ResultAttribute) => {
     const column: Column<RbDomainEntityInput> = {
       title: [attribute.shortName, attribute.units].join(', '),
-      accessor: attribute.code as keyof IDomainEntity,
+      accessor: attribute.code as keyof RbDomainEntityInput,
       sortable: true,
     };
 

@@ -9,11 +9,14 @@ import { RootState } from '@app/store/types';
 
 import Table from '@app/components/TableResultRbController';
 import TreeEditor from '@app/components/TreeEditor';
-import { FLUID_TYPES, IS_PROJECT_RECENTLY_EDITED_INTERVAL_IN_MS } from '@app/common/consts';
+import {
+  FLUID_TYPES,
+  IS_PROJECT_RECENTLY_EDITED_INTERVAL_IN_MS,
+} from '@app/common/consts';
 import { EFluidType } from '@app/common/enums';
 import { ChoiceGroup } from '@consta/uikit/ChoiceGroup';
 
-import style from './RbResultPage.css';
+import './RbResultPage.css';
 
 const RbResultPage: React.FC = () => {
   const dispatch = useDispatch();
@@ -56,7 +59,7 @@ const RbResultPage: React.FC = () => {
   });
 
   return (
-    <div className={style.SchemePage}>
+    <div className="SchemePage">
       <SplitPanes split="vertical" onResize={handleResize}>
         <SplitPanes.Pane
           aria-label="tree"
@@ -72,12 +75,13 @@ const RbResultPage: React.FC = () => {
           />
         </SplitPanes.Pane>
         <SplitPanes.Pane aria-label="table" initialSize="600px">
-          <div className={style.Content}>
-            <div className={style.LeftPanel}>
-              <ChoiceGroup 
+          <div className="Content">
+            <div>
+              <ChoiceGroup
                 value={fluidType}
                 items={FLUID_TYPES}
                 name="FluidTypesChoiceGroup"
+                className="FluidTypesChoiceGroup"
                 size="xs"
                 multiple={false}
                 getLabel={(item) => item}

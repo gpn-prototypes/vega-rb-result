@@ -3,6 +3,8 @@ import { Table } from '@consta/uikit/Table';
 import { Column, Row } from './types';
 import { RbDomainEntityInput } from '@app/generated/graphql';
 
+import './TableResultRb.css';
+
 interface Props {
   rows: Row<RbDomainEntityInput>[];
   columns: Column<RbDomainEntityInput>[];
@@ -38,6 +40,7 @@ export const TableResultRb: React.FC<Props> = ({ rows, columns }) => {
       verticalAlign="center"
       size="s"
       zebraStriped="odd"
+      className="TableResultRb"
       borderBetweenColumns
       borderBetweenRows
       isResizable
