@@ -13,3 +13,9 @@
 
   background: var(--color-bg-default);
 }
+
+.rb-result-app {
+  &__wrapper {
+    overflow-x: hidden;
+  }
+}

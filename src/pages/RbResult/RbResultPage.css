@@ -14,11 +14,9 @@
   align-items: center;
 }
 
-.Content {
-  display: flex;
-  flex: 1;
-
-  justify-content: space-between;
+.content {
+  overflow-x: auto;
+  padding: 0 var(--size-text-m);
 }
 
 .ButtonStructure {
@@ -29,13 +27,6 @@
   margin-right: var(--space-s);
 }
 
-.LeftPanel {
-  display: flex;
-
-  border: none;
-  flex: 1;
-}
-
 .RightPanel {
   padding: var(--space-s);
 
@@ -44,4 +35,8 @@
   max-width: 400px;
   height: 100%;
   max-height: calc(100vh - 100px);
+}
+
+.FluidTypesChoiceGroup {
+  margin: var(--size-text-2xs) 0;
 }

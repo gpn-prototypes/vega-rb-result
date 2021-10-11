@@ -1,11 +1,13 @@
 import React, { useMemo } from 'react';
 import { Table } from '@consta/uikit/Table';
 import { Column, Row } from './types';
-import { RbResultDomainEntityInput } from '@app/generated/graphql';
+import { RbDomainEntityInput } from '@app/generated/graphql';
+
+import './TableResultRb.css';
 
 interface Props {
-  rows: Row<RbResultDomainEntityInput>[];
-  columns: Column<RbResultDomainEntityInput>[];
+  rows: Row<RbDomainEntityInput>[];
+  columns: Column<RbDomainEntityInput>[];
 }
 
 export const TableResultRb: React.FC<Props> = ({ rows, columns }) => {
@@ -24,19 +26,14 @@ export const TableResultRb: React.FC<Props> = ({ rows, columns }) => {
 
   // return <Table rows={rows} columns={columns} onSortBy={setSortSetting} />;
 
-  const preparedColumns = useMemo(() => {
-    return columns.map((column) => ({
-      ...column,
-      mergeCells: true,
-    }));
-  }, [columns]);
-
   return (
     <Table
       rows={rows}
-      columns={preparedColumns}
+      columns={columns}
       verticalAlign="center"
       size="s"
+      zebraStriped="even"
+      className="TableResultRb"
       borderBetweenColumns
       borderBetweenRows
       isResizable

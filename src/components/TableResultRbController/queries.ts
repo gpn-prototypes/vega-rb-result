@@ -152,3 +152,45 @@ export const GET_TABLE_TEMPLATE = gql`
 
   ${ResourceBaseTableFragment}
 `;
+
+export const GET_TABLE_RESULT_RB = gql`
+  query GetTableResultRb {
+    project {
+      rbResult {
+        result {
+          template(projectId: "project_id") {
+            domainEntities {
+              code
+              name
+            }
+            attributes {
+              code
+              name
+              shortName
+              units
+            }
+            domainObjects {
+              parents {
+                code
+                name
+              }
+              geoType {
+                code
+                shortName
+              }
+              geoCategory {
+                code
+                shortName
+              }
+              attributeValues {
+                code
+                percentiles
+                values
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;

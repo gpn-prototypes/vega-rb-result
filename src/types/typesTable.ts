@@ -4,7 +4,7 @@ import {
   DistributionParameterTypes,
   DistributionTypes,
   GeoObjectCategories,
-  RbResultDomainEntityInput,
+  RbDomainEntityInput,
   TableError,
 } from '@app/generated/graphql';
 import { TableEntities, VisibleKeys } from '@app/types/enumsTable';
@@ -89,8 +89,8 @@ export interface GridRow {
 }
 
 export interface GridCollection {
-  columns: Column<RbResultDomainEntityInput>[];
-  rows: Row<RbResultDomainEntityInput>[];
+  columns: Column<RbDomainEntityInput>[];
+  rows: Row<RbDomainEntityInput>[];
   version: number;
 }
 

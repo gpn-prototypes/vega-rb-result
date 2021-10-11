@@ -6,15 +6,15 @@ import ErrorBoundary from '@app/components/ErrorBoundary';
 import { Providers } from '@app/components/Providers';
 import projectService from '@app/services/ProjectService';
 import { CurrentProject, Identity, ShellToolkit } from '@app/types';
+import RbResultPage from '@app/pages/RbResult/RbResultPage';
 
 import './App.css';
-import RbResultPage from "@app/pages/RbResult/RbResultPage";
 
 const getInitProps = async ({
-                              currentProject,
-                              graphqlClient,
-                              identity,
-                            }: Partial<ShellToolkit>): Promise<Required<ShellToolkit>> =>
+  currentProject,
+  graphqlClient,
+  identity,
+}: Partial<ShellToolkit>): Promise<Required<ShellToolkit>> =>
   new Promise<ShellToolkit>((resolve) => {
     if (currentProject && graphqlClient && identity)
       resolve({ currentProject, identity, graphqlClient });
@@ -44,13 +44,13 @@ const App: React.FC<Partial<ShellToolkit>> = (props) => {
   return (
     <React.StrictMode>
       <ErrorBoundary>
-        <Root defaultTheme="dark" className={classNames('RB-Result-App-Wrapper')}>
+        <Root defaultTheme="dark" className="rb-result-app__wrapper">
           <Providers
             currentProject={currentProject as CurrentProject}
             graphqlClient={graphqlClient as ApolloClient<NormalizedCacheObject>}
             identity={identity as Identity}
           >
-            <div className={classNames('RB-Result-App')}>
+            <div className="rb-result-app">
               {!isLoading && <RbResultPage />}
             </div>
           </Providers>
