@@ -1,2 +1,28 @@
 .TableResultRb {
 }
+
+.table {
+    .TableCell_isHeader {
+        font-size: var(--size-text-xs);
+        font-weight: 400;
+        color: var(--color-typo-primary);
+        text-transform: inherit;
+    }
+
+    .TableCell:not(.TableCell_isHeader) {
+        font-size: var(--font-size);
+        line-height: var(--row-height);
+    }
+
+    ._all {
+        font-weight: bold;
+    }
+
+    ._no-right-border {
+        border-left: 0!important;
+    }
+
+    ._active {
+      background-color: var(--color-bg-stripe)!important;
+    }
+}

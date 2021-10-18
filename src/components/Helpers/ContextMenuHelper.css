@@ -1,0 +1,15 @@
+.vertical {
+  display: flex;
+
+  &__title {
+    font-size: 16px;
+    line-height: 120%;
+    color: var(--color-typo-primary);
+    display: flex;
+    cursor: pointer;
+  }
+
+  &__more {
+    margin-left: var(--space-s);
+  }
+}

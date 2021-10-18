@@ -28,6 +28,8 @@ module.exports = (webpackConfigEnv) => {
   return webpackMerge.smart(defaultConfig, {
     // modify the webpack config however you'd like to by adding to this object
     entry: ['./src/singleSpaEntry.tsx'],
+    mode: 'development',
+    devtool: 'source-map',
     module: {
       rules: [
         {

@@ -4,8 +4,8 @@ import { get, mergeWith, groupBy } from 'lodash/fp';
 import { v4 as uuid } from 'uuid';
 import { Column, Row } from '../TableResultRbController/TableResultRb/types';
 import { CellPosition, TreeItemData } from './types';
-import { TableEntities } from "@app/types/enumsTable";
 import { getRowId } from '@app/utils/getRowId';
+import { RbDomainEntityInput } from '@app/generated/graphql';
 
 const getTreeNodeItem = <T = any>(
   row: Row<T>,
@@ -33,7 +33,7 @@ const getTreeNodeItem = <T = any>(
         ),
       )?.id;
 
-  const name = row[columnKey || '']?.value ? row[columnKey || '']?.value : '? (заглушка)';
+  const name = row[columnKey || ''] || '? (заглушка)';
 
   return {
     name: name as string,
@@ -110,26 +110,32 @@ export function mergeObjectsInUnique<T>(array: T[], properties: string[]): T[] {
 
 export function getNodeListFromTableData<T>(
   data: {
-    columns: Column<Row<T>>[];
-    rows: Row<T>[];
+    columns: Column<RbDomainEntityInput>[];
+    rows: Row<RbDomainEntityInput>[];
   },
   projectName: string,
 ): TreeItem<TreeItemData>[] {
   const { rows, columns } = data;
 
   const structurecolumnKeys = columns
-    .filter(
-      ({ type, visible }) =>
-        type === TableEntities.GEO_CATEGORY && visible?.tree,
-    )
-    .map(({ key, name }) => ({
-      key,
-      name,
+    .filter(({ visible }) => visible?.tree)
+    // .filter(
+    //   ({ type, visible }) =>
+    //     type === TableEntities.GEO_CATEGORY && visible?.tree,
+    // )
+    .map(({ accessor, title }) => ({
+      key: accessor,
+      name: title,
     }));
 
-  const filledRows = rows.filter((row) =>
-    structurecolumnKeys.some(({ key }) => key !== 'id' && row[key || '']),
-  );
+  const filledRows = rows.filter((row) => {
+    if (row.isAll) {
+      return false;
+    }
+
+    return structurecolumnKeys.some(({ key, name }) => key !== 'id' && row[key || '']);
+  });
+  
   const nodes: TreeItem<TreeItemData>[] = [];
 
   structurecolumnKeys.forEach(({ key: columnKey }, columnIdx) => {
@@ -152,11 +158,36 @@ export function getNodeListFromTableData<T>(
       nodes.push(...items);
     } else {
       const items = filledRows.map((row) =>
-        getTreeNodeItem(row, getRowId(row), columnIdx, columnKey, nodes),
-      );
+          getTreeNodeItem(row, getRowId(row), columnIdx, columnKey, nodes),
+        );
 
       if (structurecolumnKeys.length - 1 === columnIdx) {
-        nodes.push(...items);
+        const groupByParent = groupBy(
+          (item) => item.parentId,
+          filledRows.map((row) =>
+            getTreeNodeItem(row, getRowId(row), columnIdx, columnKey, nodes),
+          ),
+        );
+
+        const groupByNameByParent = Object.keys(groupByParent).map((key: string) => {
+          return groupBy(
+            (item) => item.name,
+            groupByParent[key],
+          )
+        });
+        
+        const mappedData = groupByNameByParent.map((grouped) => {
+          return Object.keys(grouped)
+            .map((key) =>
+              grouped[key].reduce(
+                (prev, curr) => mergeWith(mergeCustomizer, prev, curr),
+                {},
+              ),
+            )
+            .flat(1) as TreeItem<TreeItemData>[];
+        }).flat(1) as TreeItem<TreeItemData>[];
+
+        nodes.push(...mappedData);
       } else {
         nodes.push(
           ...mergeObjectsInUnique<TreeItem<TreeItemData>>(items, [

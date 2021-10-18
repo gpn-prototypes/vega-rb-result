@@ -1,1 +1,1 @@
-export const getRowId = (row: any): number => (row.id?.value as number) - 1;
+export const getRowId = (row: any): number => (row.id as number) - 1;

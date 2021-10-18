@@ -1,19 +1,16 @@
 import React, { PropsWithChildren, useMemo } from 'react';
-import { Text, Tree } from '@gpn-prototypes/vega-ui';
+import { Text, Tree, useMount } from '@gpn-prototypes/vega-ui';
 
 import './TreeEditor.css';
 import { cnTreeEditor } from '@app/components/TreeEditor/cn-tree-editor';
 import { Column, Row } from '../TableResultRbController/TableResultRb/types';
-import SvgSearch from '@app/assets/icons/components/Search';
-import SvgMoreVertical from '@app/assets/icons/components/MoreVertical';
 import SvgResource from '@app/assets/icons/components/Resource';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@app/store/types';
 import { getNodeListFromTableData, searchInTree } from './helpers';
-import { getColumnsByType } from '@app/utils/getColumnsByType';
-import { TableEntities } from '@app/types/enumsTable';
 import { TargetData } from './types';
 import treeFilterDuck from '@app/store/treeDuck';
+import { RbDomainEntityInput } from '@app/generated/graphql';
 
 const icons = {
   'blue-line': <SvgResource color="#00eeaa" />,
@@ -22,7 +19,7 @@ const icons = {
 };
 
 interface StructureTreeEditorProps<T = any> {
-  columns: Column<T>[];
+  columns: Column<RbDomainEntityInput>[];
   rows: Row<T>[];
   isOpen: boolean;
 }
@@ -34,6 +31,12 @@ export default React.forwardRef<HTMLDivElement, StructureTreeEditorProps>(
   ): React.ReactElement {
     const dispatch = useDispatch();
 
+    useMount(() => {
+      return () => {
+        dispatch(treeFilterDuck.actions.resetState());
+      };
+    });
+
     const projectName = useSelector(({ project }: RootState) => project.name);
 
     const tree = useMemo(
@@ -41,12 +44,8 @@ export default React.forwardRef<HTMLDivElement, StructureTreeEditorProps>(
       [rows, columns, projectName],
     );
 
-    const domainEntitiesColumns = useMemo(
-      () => getColumnsByType(columns, TableEntities.GEO_CATEGORY),
-      [columns],
-    );
-
     const onSelect = (selectedItems: TargetData[]) => {
+      console.log('selectedItems', selectedItems)
       if (selectedItems.length) {
         const node = searchInTree(tree, selectedItems[0].id);
         if (node && node.data) {
@@ -55,13 +54,13 @@ export default React.forwardRef<HTMLDivElement, StructureTreeEditorProps>(
           dispatch(
             treeFilterDuck.actions.setFilter({
               columnKeys:
-                domainEntitiesColumns
+                columns
                   .filter(
                     (_, idx) =>
                       columnIdx >= idx &&
-                      idx !== domainEntitiesColumns.length - 1,
+                      idx !== columns.length - 1,
                   )
-                  .map(({ key }) => key || '') || '',
+                  .map(({ accessor }) => accessor || '') || '',
               rowsIdx: rowsIds,
             }),
           );
@@ -86,13 +85,13 @@ export default React.forwardRef<HTMLDivElement, StructureTreeEditorProps>(
             Дерево проекта
           </Text>
 
-          <div className="tree-editor__header-icons">
+          {/* WIP */}
+          {/* <div className="tree-editor__header-icons">
             <SvgSearch onClick={() => alert('Search clicked')} />
             <SvgMoreVertical onClick={() => alert('More clicked')} />
-          </div>
+          </div> */}
         </div>
         <div className={cnTreeEditor('Content').state({ open: isOpen })}>
-          {/* TODO: Необходимо обновить формат древа, под новую таблицу */}
           <Tree
             nodeList={tree}
             icons={icons}

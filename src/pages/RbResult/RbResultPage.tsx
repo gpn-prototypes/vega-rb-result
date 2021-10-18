@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { SplitPanes, useInterval } from '@gpn-prototypes/vega-ui';
+import { ChoiceGroup, SplitPanes, useInterval } from '@gpn-prototypes/vega-ui';
 import { TableErrorAlert } from '@app/components/TableErrorAlert';
 import projectService from '@app/services/ProjectService';
 import competitiveAccessDuck from '@app/store/competitiveAccessDuck';
@@ -13,10 +13,12 @@ import {
   FLUID_TYPES,
   IS_PROJECT_RECENTLY_EDITED_INTERVAL_IN_MS,
 } from '@app/common/consts';
-import { EFluidType } from '@app/common/enums';
-import { ChoiceGroup } from '@consta/uikit/ChoiceGroup';
 
 import './RbResultPage.css';
+import { HistogramComponent } from '@app/components/Histograms/HistogramComponent';
+import { SensitiveAnalysisComponent } from '@app/components/SensitiveAnalysis/SensitiveAnalysisComponent';
+import { EFluidType } from '@app/common/enums';
+import tableDuck from '@app/store/tableDuck';
 
 const RbResultPage: React.FC = () => {
   const dispatch = useDispatch();
@@ -29,6 +31,12 @@ const RbResultPage: React.FC = () => {
       setIsShownTree(Number(treeEditorRef?.current?.clientWidth) > 120);
     }
   };
+
+  const handleChangeFluidType = (type: EFluidType) => {
+    dispatch(tableDuck.actions.setFluidType(type));
+
+    setFluidType(type);
+  }
 
   const data = useSelector(({ table }: RootState) => table);
 
@@ -67,14 +75,14 @@ const RbResultPage: React.FC = () => {
           min="24px"
           max="240px"
         >
-          <TreeEditor
+          {data.columns && <TreeEditor
             rows={data.rows}
             columns={data.columns}
             isOpen={isShownTree}
             ref={treeEditorRef}
-          />
+          />}
         </SplitPanes.Pane>
-        <SplitPanes.Pane aria-label="table" initialSize="600px">
+        <SplitPanes.Pane aria-label="table">
           <div className="content">
             <div>
               <ChoiceGroup
@@ -82,12 +90,22 @@ const RbResultPage: React.FC = () => {
                 items={FLUID_TYPES}
                 name="FluidTypesChoiceGroup"
                 className="FluidTypesChoiceGroup"
-                size="xs"
+                size="m"
                 multiple={false}
                 getLabel={(item) => item}
-                onChange={({ value }) => setFluidType(value)}
+                onChange={({ value }) => handleChangeFluidType(value)}
               />
               <Table />
+            </div>
+
+            <div className="result__graphs">
+              {(data && data?.columns?.length > 0) && <div>
+                <HistogramComponent table={data}></HistogramComponent>
+              </div>}
+
+              <div className="result__analysis">
+                <SensitiveAnalysisComponent table={data} />
+              </div>
             </div>
           </div>
         </SplitPanes.Pane>

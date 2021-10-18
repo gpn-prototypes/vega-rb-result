@@ -40,3 +40,14 @@
 .FluidTypesChoiceGroup {
   margin: var(--size-text-2xs) 0;
 }
+
+.result {
+  &__graphs {
+    display: flex;
+    margin-top: var(--space-l);
+  }
+
+  &__analysis {
+    margin-right: var(--space-2xl);
+  }
+}

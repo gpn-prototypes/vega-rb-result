@@ -9,7 +9,9 @@ import {
   ProjectInner,
   ProjectStructure,
   Query,
+  ResultHistogramsStructure,
   ResultProjectStructure,
+  SensitivityAnalysisStructure,
 } from '@app/generated/graphql';
 import { get, getOr } from 'lodash/fp';
 import { None } from 'monet';
@@ -17,6 +19,8 @@ import {
   GET_PROJECT_NAME,
   GET_TABLE_TEMPLATE,
   GET_TABLE_RESULT_RB,
+  GET_HISTOGRAM_RESULT_RB,
+  GET_SENSITIVE_ANALYSIS_RESULT_RB,
 } from '@app/components/TableResultRbController/queries';
 import {
   IProjectService,
@@ -189,6 +193,55 @@ class ProjectService implements IProjectService {
     return getOr(
       None<ResultProjectStructure>(),
       ['project', 'rbResult', 'result', 'template'],
+      responseData,
+    );
+  }
+
+  async getHistogramData(domainEntityCodes: string[], domainEntityNames: string[]): Promise<ResultHistogramsStructure> {
+    const { data: responseData } = await this.client
+      .watchQuery<Query>({
+        query: GET_HISTOGRAM_RESULT_RB,
+        context: {
+          uri: getGraphqlUri(this.projectId),
+        },
+        variables: {
+          projectId: this.projectId,
+          domainEntityCodes,
+          domainEntityNames
+        },
+        fetchPolicy: 'no-cache',
+      })
+      .result();
+
+    this.trySetupWorkingProject(responseData);
+
+    return getOr(
+      None<ResultHistogramsStructure>(),
+      ['project', 'rbResult', 'histograms'],
+      responseData,
+    );
+  }
+
+  async getSensitiveAnalysisData(domainEntityNames: string[]): Promise<SensitivityAnalysisStructure> {
+    const { data: responseData } = await this.client
+      .watchQuery<Query>({
+        query: GET_SENSITIVE_ANALYSIS_RESULT_RB,
+        context: {
+          uri: getGraphqlUri(this.projectId),
+        },
+        variables: {
+          projectId: this.projectId,
+          domainEntityNames,
+        },
+        fetchPolicy: 'no-cache',
+      })
+      .result();
+
+    this.trySetupWorkingProject(responseData);
+
+    return getOr(
+      None<ResultHistogramsStructure>(),
+      ['project', 'rbResult', 'histograms'],
       responseData,
     );
   }

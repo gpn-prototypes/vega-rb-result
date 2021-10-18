@@ -2033,6 +2033,7 @@ export type Parent = {
   __typename?: 'Parent';
   code: Scalars['String'];
   name: Scalars['String'];
+  isTotal: boolean;
 };
 
 /** Процентиль распределения. */
@@ -2962,6 +2963,7 @@ export type ResultAttribute = {
   name: Scalars['String'];
   shortName: Scalars['String'];
   units: Scalars['String'];
+  visible: Visible;
 };
 
 export type ResultAttributeValue = {
@@ -2975,6 +2977,7 @@ export type ResultDomainEntity = {
   __typename?: 'ResultDomainEntity';
   code: Scalars['String'];
   name: Scalars['String'];
+  visible: Visible;
 };
 
 export type ResultDomainObject = {
@@ -2990,6 +2993,30 @@ export type ResultProjectStructure = {
   domainEntities: Array<ResultDomainEntity>;
   attributes: Array<ResultAttribute>;
   domainObjects: Array<ResultDomainObject>;
+};
+
+export type Histogram = {
+  percentiles: number[];
+  sample: number[];
+  numberOfIterationBin: number[];
+  subtitle: string;
+  title: string;
+};
+
+export type ResultHistogramsStructure = {
+  __typename?: 'HistogramsResult';
+  getHistograms: {
+    histograms: Array<Histogram>;
+  }
+};
+
+export type SensitivityAnalysisStructure = {
+  __typename?: 'HistogramResultQuery';
+  getSensitivityAnalysis: {
+    names: Array<string>;
+    percentiles: Array<Array<number>>;
+    sample: Array<number>;
+  }
 };
 
 export type ResultTableQuery = {

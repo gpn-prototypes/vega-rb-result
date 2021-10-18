@@ -153,36 +153,77 @@ export const GET_TABLE_TEMPLATE = gql`
   ${ResourceBaseTableFragment}
 `;
 
+export const GET_HISTOGRAM_RESULT_RB = gql`
+  query GetTableResultRb($projectId: ID!, $domainEntityCodes: [ID!], $domainEntityNames: [String!]) {
+    project {
+      rbResult {
+        histograms{
+          getHistograms(projectId: $projectId, domainEntityCodes: $domainEntityCodes, domainEntityNames: $domainEntityNames){
+            histograms{
+              title
+              subtitle
+              percentiles
+              sample
+              numberOfIterationBin
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const GET_SENSITIVE_ANALYSIS_RESULT_RB = gql`
+  query GetTableResultRb($projectId: ID!, $domainEntityNames: [String!]) {
+    project {
+      rbResult {
+        histograms{
+          getSensitivityAnalysis(projectId: $projectId, domainEntityNames: $domainEntityNames) {
+            title
+            names
+            sample
+            percentiles
+            zeroPoint
+          }
+        }
+      }
+    }
+  }
+`;
+
 export const GET_TABLE_RESULT_RB = gql`
   query GetTableResultRb {
     project {
       rbResult {
-        result {
+        result{
           template(projectId: "project_id") {
-            domainEntities {
+            domainEntities{
               code
               name
+              visible{
+                calc
+                table
+                tree
+              }
             }
-            attributes {
+            attributes{
               code
               name
               shortName
               units
+              visible{
+                calc
+                table
+                tree
+              }
             }
-            domainObjects {
-              parents {
+            domainObjects{
+              parents{
                 code
                 name
+                isTotal
               }
-              geoType {
-                code
-                shortName
-              }
-              geoCategory {
-                code
-                shortName
-              }
-              attributeValues {
+              attributeValues{
                 code
                 percentiles
                 values

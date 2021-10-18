@@ -1,8 +1,11 @@
+import React from 'react';
 import {
   ResultProjectStructure,
   RbDomainEntityInput,
   ResultDomainEntity,
   ResultAttribute,
+  Parent,
+  ResultAttributeValue,
 } from '../generated/graphql';
 import { GridCollection } from '../types/typesTable';
 import {
@@ -95,18 +98,45 @@ export function unpackTableData(
   };
 }
 
+/** Подготовка колонок */
 export const prepareColumns = (
   data: ResultProjectStructure,
 ): Column<RbDomainEntityInput>[] => {
   const { domainEntities, attributes } = data;
 
+  const getClass = (row: Row<RbDomainEntityInput>, domainEntity: ResultDomainEntity | ResultAttribute): string => {
+    let baseClass = row.isAll ? '_all' : '';
+
+    // if (row.isAll && row[domainEntity.code] === undefined) {
+    //   baseClass += ' _no-right';
+    // }
+
+    return baseClass;
+  }
+
   const preparedEntities = domainEntities.map(
-    (domainEntity: ResultDomainEntity) => {
+    (domainEntity: ResultDomainEntity, index: number) => {
       const column: Column<RbDomainEntityInput> = {
         title: domainEntity.name,
         accessor: domainEntity.code as keyof RbDomainEntityInput,
-        sortable: true,
         mergeCells: true,
+        isResizable: true,
+        visible: domainEntity?.visible,
+        renderCell: (row: Row<RbDomainEntityInput>) => {
+          /** Заполняем коды и названия с учетом родителей, нужно для отправки данных в отображение гистограм */
+          const codeWithParents = index === 0
+            ? domainEntity.code
+            : domainEntities.slice(0, index + 1).map((entity: ResultDomainEntity) => entity.code).join(',');
+          const nameWithParents = index === 0
+            ? row[domainEntity.code]
+            : domainEntities.slice(0, index + 1).map((entity: ResultDomainEntity) => row[entity.code]).join(',');
+
+          return <div
+            className={getClass(row, domainEntity)}
+            data-code={codeWithParents}
+            data-name={nameWithParents}
+          >{row[domainEntity.code] || ''}</div>;
+        },
       };
 
       return column;
@@ -117,7 +147,20 @@ export const prepareColumns = (
     const column: Column<RbDomainEntityInput> = {
       title: [attribute.shortName, attribute.units].filter(Boolean).join(', '),
       accessor: attribute.code as keyof RbDomainEntityInput,
-      align: 'right',
+      mergeCells: true,
+      align: attribute.code === 'PERCENTILE' ? 'left' : 'right',
+      isResizable: true,
+      renderCell: (row: Row<RbDomainEntityInput>) => {
+        /** Заполняем коды и названия с учетом родителей, нужно для отправки данных в отображение гистограм */
+        const codeWithParents = domainEntities.map((entity: ResultDomainEntity) => entity.code).join(',');
+        const nameWithParents = domainEntities.map((entity: ResultDomainEntity) => row[entity.code]).join(',');
+
+        return <div
+          className={getClass(row, attribute)} id={attribute.code}
+          data-code={codeWithParents}
+          data-name={nameWithParents}
+        >{row[attribute.code] || ''}</div>;
+      },
     };
 
     return column;
@@ -126,8 +169,10 @@ export const prepareColumns = (
   return [...preparedEntities, ...preparedAttributes];
 };
 
+/** Подгтовка ячеек */
 export const prepareRows = ({
   domainObjects,
+  attributes,
 }: ResultProjectStructure): Row<RbDomainEntityInput>[] => {
   let rowNumber = 1;
 
@@ -138,27 +183,37 @@ export const prepareRows = ({
 
     // Row - structure of three small rows
     let row: Row<RbDomainEntityInput>[] = [];
+    let isAllEmited = false;
 
-    domainObject.attributeValues.forEach((attrVal) => {
-      attrVal.percentiles.forEach((percentile, percIndex) => {
+    domainObject.attributeValues.forEach((attributeValue: ResultAttributeValue, attributeIndex: number) => {
+      attributeValue.percentiles.forEach((percentile, percIndex) => {
+        /** Проверяем, есть ли элемент, и если нет - создаем */
         if (!row[percIndex]) {
           row[percIndex] = {} as Row<RbDomainEntityInput>;
         }
 
+        /** Устанавливаем необходимые данные для ячеек */
         row[percIndex].id = (rowNumber + percIndex).toString();
-        row[percIndex][attrVal.code] = attrVal.values[percIndex];
 
+        /** Установка значения по коду */
+        row[percIndex][attributeValue.code] = attributeValue.values[percIndex];
+
+        /** Устанавливаем кастомные флаги, для того чтобы менять отображение таблицы */
+        if (isHasParentAll(domainObject.parents)) {
+          if (isAllEmited) {
+            row[percIndex].isAll = true;
+          }
+
+          isAllEmited = true;
+        }
+
+        /** Пробегаемся по родителям и устанавливаем как значение ячейки, в таблице они объединятся */
         domainObject.parents.forEach((parent) => {
           row[percIndex][parent.code] = parent.name;
         });
-
-        row[percIndex][domainObject.geoCategory.code] =
-          domainObject.geoCategory.shortName;
-        row[percIndex][domainObject.geoType.code] =
-          domainObject.geoType.shortName;
       });
 
-      addRowsNum = attrVal.percentiles.length;
+      addRowsNum = attributeValue.percentiles.length;
     });
 
     preparedRows.push(...row);
@@ -167,3 +222,7 @@ export const prepareRows = ({
 
   return [...preparedRows];
 };
+
+function isHasParentAll(parents: Parent[]): boolean {
+  return parents.find((innerParent: Parent) => innerParent.isTotal) !== undefined;
+}

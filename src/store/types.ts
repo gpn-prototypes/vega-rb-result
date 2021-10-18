@@ -1,6 +1,8 @@
 import { Param } from '@app/model/Param';
 import { IProjectService } from '@app/services/types';
 import { GridCollection } from '@app/types/typesTable';
+import { HistogramStore } from './histogramDuck';
+import { SensitiveAnalysisStore } from './sensitiveAnalysisDuck';
 
 export interface CompetitiveAccess {
   isRecentlyEdited: boolean;
@@ -40,6 +42,8 @@ export interface RootState {
   tree: TreeState;
   competitiveAccess: CompetitiveAccess;
   errors: ErrorsState;
+  histograms: HistogramStore;
+  sensitiveAnalysis: SensitiveAnalysisStore;
 }
 
 export type TypedColumnsList = {

@@ -9,9 +9,9 @@ export const rowIsFulfilled = <T = any>(
 ): boolean =>
   flow(
     filter(({ type }) => type === tableEntity),
-    map(({ key, name }: Column<Row>) => ({
-      key,
-      name,
+    map(({ accessor, title }: Column<Row>) => ({
+      key: accessor,
+      name: title,
     })),
     some(({ key }: { key: string }) => Boolean(row[key]?.value)),
   )(columns);

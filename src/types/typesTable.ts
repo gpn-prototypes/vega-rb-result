@@ -9,6 +9,7 @@ import {
 } from '@app/generated/graphql';
 import { TableEntities, VisibleKeys } from '@app/types/enumsTable';
 import { Column, Row } from '@app/components/TableResultRbController/TableResultRb/types';
+import { EFluidType } from '@app/common/enums';
 
 export class OptionEntity implements DropDownOption {
   private readonly _id: GeoObjectCategories;
@@ -88,10 +89,17 @@ export interface GridRow {
   [columnKey: string]: GridCellProperties | undefined;
 }
 
+export interface GridActiveRow {
+  code: string;
+  title: string;
+}
+
 export interface GridCollection {
   columns: Column<RbDomainEntityInput>[];
   rows: Row<RbDomainEntityInput>[];
   version: number;
+  activeRow?: GridActiveRow | undefined;
+  fluidType?: EFluidType;
 }
 
 export interface FilteredGridDataKeys {

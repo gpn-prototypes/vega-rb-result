@@ -1,16 +1,21 @@
-import { TableEntities } from '@app/types/enumsTable';
-import { VisibilityProperties } from '@app/types/typesTable';
-import { TableRow, TableColumn } from '@consta/uikit/Table';
+import { RbDomainEntityInput, Visible } from '@app/generated/graphql';
+import { TableRow } from '@consta/uikit/Table';
 
-export type Column<T = any> = TableColumn<Row<T>> & {
-  visible?: VisibilityProperties;
-  type?: TableEntities;
-  name?: string;
-  key?: string;
+export interface Column<T = any> {
+  sortable?: boolean;
+  accessor: keyof RbDomainEntityInput | 'id';
+  title: string;
+  renderCell?: (row: Row<T>) => React.ReactNode;
   mergeCells?: boolean;
+  isResizable?: boolean;
+  align?: 'left' | 'right';
+  visible?: Visible;
+  width?: number;
 };
 
-export type Row<T = any> = TableRow & T;
+export type Row<T = any> = TableRow & T & {
+  isAll?: boolean;
+};
 
 export type FilterComponentProps = {
   onConfirm: (value: any) => void;
