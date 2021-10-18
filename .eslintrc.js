@@ -3,7 +3,6 @@ const localePrettierConfig = require('./.prettierrc.js');
 module.exports = {
   extends: [
     require.resolve('@gpn-prototypes/frontend-configs/.eslintrc'),
-    'plugin:lodash-fp/recommended',
   ],
   rules: {
     'comma-dangle': 'off',
@@ -29,7 +28,6 @@ module.exports = {
         '@typescript-eslint/no-non-null-assertion': 'off',
         '@typescript-eslint/no-unused-vars': 'off',
         '@typescript-eslint/interface-name-prefix': 'off',
-        'lodash-fp/no-extraneous-function-wrapping': 'off',
       },
       settings: {
         'import/resolver': {
