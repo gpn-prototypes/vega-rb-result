@@ -1,0 +1,46 @@
+.TreeEditor {
+  width: 100%;
+
+  &__Content {
+    display: none;
+
+    &.is-open {
+      display: block;
+    }
+  }
+
+  &__Placeholder {
+    width: 105px;
+
+    transform: rotate(-90deg) translate(-40px, -42px);
+
+    &.is-open {
+      padding-top: var(--space-2xs);
+      padding-left: var(--space-s);
+      padding-bottom: var(--space-2xs);
+
+      width: 100%;
+
+      border-bottom: 1px solid var(--color-bg-secondary);
+
+      transform: none;
+    }
+  }
+}
+
+.tree-editor {
+  &__header {
+    display: flex;
+    justify-content: space-between;
+
+    width: 100%;
+
+    font-size: 12px;
+    line-height: 100%;
+  }
+
+  &__header-icons {
+    display: flex;
+    justify-content: space-between;
+  }
+}

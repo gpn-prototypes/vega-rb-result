@@ -1,0 +1,55 @@
+.RbResultPage {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.Header {
+  padding: var(--space-xs) var(--space-m);
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.content {
+  padding: 0 var(--size-text-m);
+
+  overflow-x: auto;
+}
+
+.ButtonStructure {
+  margin: 0 var(--space-s);
+}
+
+.ButtonData {
+  margin-right: var(--space-s);
+}
+
+.RightPanel {
+  padding: var(--space-s);
+
+  overflow-y: auto;
+
+  max-width: 400px;
+  height: 100%;
+  max-height: calc(100vh - 100px);
+}
+
+.FluidTypesChoiceGroup {
+  margin: var(--size-text-2xs) 0;
+}
+
+.result {
+  &__graphs {
+    margin-top: var(--space-l);
+
+    display: flex;
+  }
+
+  &__analysis {
+    margin-right: var(--space-2xl);
+  }
+}

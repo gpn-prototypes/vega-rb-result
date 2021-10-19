@@ -41,12 +41,14 @@ const commonWebpack = () => {
   }
 
   return {
+    entry: ['./src/App/index.tsx'],
     plugins: [new webpack.DefinePlugin(envKeys)],
     devServer,
     resolve: {
       alias: {
-        '@vega': path.resolve(__dirname, 'src'),
+        '@app': path.resolve(__dirname, 'src'),
       },
+        extensions: ['.js', '.ts', '.tsx'],
     },
   };
 };

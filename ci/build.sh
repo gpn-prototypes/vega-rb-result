@@ -20,6 +20,10 @@ fi
 TAG="$VEGA_REPOPREFIX/$IMAGE_NAME:$FE_BUILDER_VERSION"
 NAME="$VEGA_REPOPREFIX.$IMAGE_NAME"
 
+CACHE_PATH="/home/vega/vega-builder-automation/cache"
+
+mkdir -p /home/vega/vega-builder-automation/cache
+
 if [[ -z "$REBUILD" ]];
 then
   echo "Docker image build."
@@ -38,5 +42,6 @@ docker run \
   --env NPM_AUTH_TOKEN=$NPM_AUTH_TOKEN \
   --env BASE_URL=$BASE_URL \
   --env BASE_API_URL=$BASE_API_URL \
+  -v $CACHE_PATH:/usr/local/share/.cache/ \
   $TAG \
   /app/ci/build-entrypoint.sh

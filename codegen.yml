@@ -1,0 +1,15 @@
+overwrite: true
+schema:
+  - ${VEGA_PROJECT_SCHEMA_PATH}:
+      headers:
+        Authorization: Bearer ${AUTH_TOKEN}
+#documents: "src/components/TableResultRbController/queries.ts"
+generates:
+  src/generated/graphql.tsx:
+    plugins:
+      - "typescript"
+      - "typescript-operations"
+      - "typescript-react-apollo"
+hooks:
+  afterAllFileWrite:
+    - prettier --write
