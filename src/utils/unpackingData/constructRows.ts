@@ -6,9 +6,9 @@ import {
   RbDomainEntity,
 } from '@app/generated/graphql';
 import { SpecialColumns } from '@app/model/Table';
+import { entitiesOptions } from '@app/types/typesTable';
 import { v4 as uuid } from 'uuid';
 
-import { entitiesOptions } from '@app/types/typesTable';
 import { Row } from '../../components/TableResultRbController/TableResultRb/types';
 
 interface DefaultRows {
@@ -28,21 +28,13 @@ function prepareRows(
   domainObjects: DomainObject[],
 ): Row<DefaultRows>[] {
   return domainObjects.map(
-    (
-      {
-        vid,
-        domainObjectPath,
-        geoObjectCategory,
-      },
-      idx,
-    ) => {
+    ({ vid, domainObjectPath, geoObjectCategory }, idx) => {
       const id = (idx + 1).toString();
       const key = vid || uuid();
-      const geoObjectCategoryValue = getGeoObjectCategoryValue(
-        geoObjectCategory,
-      );
+      const geoObjectCategoryValue =
+        getGeoObjectCategoryValue(geoObjectCategory);
 
-      const domainEntitiesRows = {}
+      const domainEntitiesRows = {};
 
       domainObjectPath.forEach((path: DomainObjectPathLevel) => {
         domainEntitiesRows[path.code] = path.value;
@@ -62,9 +54,7 @@ function constructRows<T = any>({
   domainEntities = [],
   domainObjects = [],
 }: ProjectStructure): Row<any>[] {
-  return [
-    ...prepareRows(domainEntities, domainObjects),
-  ];
+  return [...prepareRows(domainEntities, domainObjects)];
 }
 
 export default constructRows;

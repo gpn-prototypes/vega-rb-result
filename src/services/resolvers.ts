@@ -4,8 +4,8 @@ import {
   DomainObjectPathLevel,
   RiskValue,
 } from '@app/generated/graphql';
-import { cloneDeep } from 'lodash/fp';
 import { getDiffPatcher } from '@app/utils/diffPatcher';
+import { cloneDeep } from 'lodash/fp';
 
 import { DomainObjectsDelta } from './types';
 

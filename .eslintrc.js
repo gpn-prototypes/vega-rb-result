@@ -24,10 +24,12 @@ module.exports = {
         '@typescript-eslint/no-shadow': 'error',
         '@typescript-eslint/no-use-before-define': ['error'],
         '@typescript-eslint/no-empty-function': 'off',
-        '@typescript-eslint/no-explicit-any': 'error',
+        '@typescript-eslint/no-explicit-any': 'off',
         '@typescript-eslint/no-non-null-assertion': 'off',
         '@typescript-eslint/no-unused-vars': 'off',
+        '@typescript-eslint/no-namespace': 'off',
         '@typescript-eslint/interface-name-prefix': 'off',
+        '@typescript-eslint/explicit-module-boundary-types': 'off',
       },
       settings: {
         'import/resolver': {

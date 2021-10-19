@@ -1,5 +1,4 @@
 import { gql } from '@apollo/client';
-
 import { ResourceBaseDiffFragment } from '@app/components/TableResultRbController/queries';
 
 export const CALCULATION_PROJECT = gql`

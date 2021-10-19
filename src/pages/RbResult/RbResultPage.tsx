@@ -1,24 +1,23 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { ChoiceGroup, SplitPanes, useInterval } from '@gpn-prototypes/vega-ui';
-import { TableErrorAlert } from '@app/components/TableErrorAlert';
-import projectService from '@app/services/ProjectService';
-import competitiveAccessDuck from '@app/store/competitiveAccessDuck';
-import projectDuck from '@app/store/projectDuck';
-import { RootState } from '@app/store/types';
-
-import Table from '@app/components/TableResultRbController';
-import TreeEditor from '@app/components/TreeEditor';
 import {
   FLUID_TYPES,
   IS_PROJECT_RECENTLY_EDITED_INTERVAL_IN_MS,
 } from '@app/common/consts';
-
-import './RbResultPage.css';
+import { EFluidType } from '@app/common/enums';
 import { HistogramComponent } from '@app/components/Histograms/HistogramComponent';
 import { SensitiveAnalysisComponent } from '@app/components/SensitiveAnalysis/SensitiveAnalysisComponent';
-import { EFluidType } from '@app/common/enums';
+import { TableErrorAlert } from '@app/components/TableErrorAlert';
+import Table from '@app/components/TableResultRbController';
+import TreeEditor from '@app/components/TreeEditor';
+import projectService from '@app/services/ProjectService';
+import competitiveAccessDuck from '@app/store/competitiveAccessDuck';
+import projectDuck from '@app/store/projectDuck';
 import tableDuck from '@app/store/tableDuck';
+import { RootState } from '@app/store/types';
+import { ChoiceGroup, SplitPanes, useInterval } from '@gpn-prototypes/vega-ui';
+
+import './RbResultPage.css';
 
 const RbResultPage: React.FC = () => {
   const dispatch = useDispatch();
@@ -36,7 +35,7 @@ const RbResultPage: React.FC = () => {
     dispatch(tableDuck.actions.setFluidType(type));
 
     setFluidType(type);
-  }
+  };
 
   const data = useSelector(({ table }: RootState) => table);
 
@@ -50,7 +49,7 @@ const RbResultPage: React.FC = () => {
       .then((projectName) =>
         dispatch(projectDuck.actions.updateProjectName(projectName)),
       );
-  }, []);
+  }, [dispatch]);
 
   useInterval(IS_PROJECT_RECENTLY_EDITED_INTERVAL_IN_MS, () => {
     projectService
@@ -75,12 +74,14 @@ const RbResultPage: React.FC = () => {
           min="24px"
           max="240px"
         >
-          {data.columns && <TreeEditor
-            rows={data.rows}
-            columns={data.columns}
-            isOpen={isShownTree}
-            ref={treeEditorRef}
-          />}
+          {data.columns && (
+            <TreeEditor
+              rows={data.rows}
+              columns={data.columns}
+              isOpen={isShownTree}
+              ref={treeEditorRef}
+            />
+          )}
         </SplitPanes.Pane>
         <SplitPanes.Pane aria-label="table">
           <div className="content">
@@ -99,12 +100,14 @@ const RbResultPage: React.FC = () => {
             </div>
 
             <div className="result__graphs">
-              {(data && data?.columns?.length > 0) && <div>
-                <HistogramComponent table={data}></HistogramComponent>
-              </div>}
+              {data && data?.columns?.length > 0 && (
+                <div>
+                  <HistogramComponent grid={data} />
+                </div>
+              )}
 
               <div className="result__analysis">
-                <SensitiveAnalysisComponent table={data} />
+                <SensitiveAnalysisComponent grid={data} />
               </div>
             </div>
           </div>

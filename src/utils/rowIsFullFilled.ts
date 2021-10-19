@@ -1,6 +1,9 @@
+import {
+  Column,
+  Row,
+} from '@app/components/TableResultRbController/TableResultRb/types';
+import { TableEntities } from '@app/types/enumsTable';
 import { filter, flow, map, some } from 'lodash/fp';
-import { TableEntities } from "@app/types/enumsTable";
-import { Column, Row } from '@app/components/TableResultRbController/TableResultRb/types';
 
 export const rowIsFulfilled = <T = any>(
   row: Row<T>,

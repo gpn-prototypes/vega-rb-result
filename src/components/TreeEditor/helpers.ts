@@ -1,11 +1,13 @@
+import { RbDomainEntityInput } from '@app/generated/graphql';
+import { getRowId } from '@app/utils/getRowId';
 import { TreeItem } from '@gpn-prototypes/vega-ui';
 import arrayToTree from 'array-to-tree';
-import { get, mergeWith, groupBy } from 'lodash/fp';
+import { get, groupBy, mergeWith } from 'lodash/fp';
 import { v4 as uuid } from 'uuid';
+
 import { Column, Row } from '../TableResultRbController/TableResultRb/types';
+
 import { CellPosition, TreeItemData } from './types';
-import { getRowId } from '@app/utils/getRowId';
-import { RbDomainEntityInput } from '@app/generated/graphql';
 
 const getTreeNodeItem = <T = any>(
   row: Row<T>,
@@ -133,9 +135,11 @@ export function getNodeListFromTableData<T>(
       return false;
     }
 
-    return structurecolumnKeys.some(({ key, name }) => key !== 'id' && row[key || '']);
+    return structurecolumnKeys.some(
+      ({ key, name }) => key !== 'id' && row[key || ''],
+    );
   });
-  
+
   const nodes: TreeItem<TreeItemData>[] = [];
 
   structurecolumnKeys.forEach(({ key: columnKey }, columnIdx) => {
@@ -158,8 +162,8 @@ export function getNodeListFromTableData<T>(
       nodes.push(...items);
     } else {
       const items = filledRows.map((row) =>
-          getTreeNodeItem(row, getRowId(row), columnIdx, columnKey, nodes),
-        );
+        getTreeNodeItem(row, getRowId(row), columnIdx, columnKey, nodes),
+      );
 
       if (structurecolumnKeys.length - 1 === columnIdx) {
         const groupByParent = groupBy(
@@ -169,23 +173,24 @@ export function getNodeListFromTableData<T>(
           ),
         );
 
-        const groupByNameByParent = Object.keys(groupByParent).map((key: string) => {
-          return groupBy(
-            (item) => item.name,
-            groupByParent[key],
-          )
-        });
-        
-        const mappedData = groupByNameByParent.map((grouped) => {
-          return Object.keys(grouped)
-            .map((key) =>
-              grouped[key].reduce(
-                (prev, curr) => mergeWith(mergeCustomizer, prev, curr),
-                {},
-              ),
-            )
-            .flat(1) as TreeItem<TreeItemData>[];
-        }).flat(1) as TreeItem<TreeItemData>[];
+        const groupByNameByParent = Object.keys(groupByParent).map(
+          (key: string) => {
+            return groupBy((item) => item.name, groupByParent[key]);
+          },
+        );
+
+        const mappedData = groupByNameByParent
+          .map((grouped) => {
+            return Object.keys(grouped)
+              .map((key) =>
+                grouped[key].reduce(
+                  (prev, curr) => mergeWith(mergeCustomizer, prev, curr),
+                  {},
+                ),
+              )
+              .flat(1) as TreeItem<TreeItemData>[];
+          })
+          .flat(1) as TreeItem<TreeItemData>[];
 
         nodes.push(...mappedData);
       } else {

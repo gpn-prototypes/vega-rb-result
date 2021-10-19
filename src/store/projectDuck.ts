@@ -1,9 +1,9 @@
-import * as E from 'fp-ts/lib/Either';
-import { PathReporter } from 'io-ts/lib/PathReporter';
 import paramsResponse from '@app/mocks/params.json';
 import { Param, ParamArray } from '@app/model/Param';
 import { ProjectID } from '@app/model/Project';
 import { ofAction } from '@app/operators/ofAction';
+import * as E from 'fp-ts/lib/Either';
+import { PathReporter } from 'io-ts/lib/PathReporter';
 import { Epic } from 'redux-observable';
 import { from, of, throwError } from 'rxjs';
 import { catchError, mergeMap } from 'rxjs/operators';

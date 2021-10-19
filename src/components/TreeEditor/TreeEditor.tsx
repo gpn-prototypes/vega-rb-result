@@ -1,16 +1,18 @@
 import React, { PropsWithChildren, useMemo } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import SvgResource from '@app/assets/icons/components/Resource';
+import { cnTreeEditor } from '@app/components/TreeEditor/cn-tree-editor';
+import { RbDomainEntityInput } from '@app/generated/graphql';
+import treeFilterDuck from '@app/store/treeDuck';
+import { RootState } from '@app/store/types';
 import { Text, Tree, useMount } from '@gpn-prototypes/vega-ui';
 
-import './TreeEditor.css';
-import { cnTreeEditor } from '@app/components/TreeEditor/cn-tree-editor';
 import { Column, Row } from '../TableResultRbController/TableResultRb/types';
-import SvgResource from '@app/assets/icons/components/Resource';
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '@app/store/types';
+
 import { getNodeListFromTableData, searchInTree } from './helpers';
 import { TargetData } from './types';
-import treeFilterDuck from '@app/store/treeDuck';
-import { RbDomainEntityInput } from '@app/generated/graphql';
+
+import './TreeEditor.css';
 
 const icons = {
   'blue-line': <SvgResource color="#00eeaa" />,
@@ -45,7 +47,7 @@ export default React.forwardRef<HTMLDivElement, StructureTreeEditorProps>(
     );
 
     const onSelect = (selectedItems: TargetData[]) => {
-      console.log('selectedItems', selectedItems)
+      console.log('selectedItems', selectedItems);
       if (selectedItems.length) {
         const node = searchInTree(tree, selectedItems[0].id);
         if (node && node.data) {
@@ -56,9 +58,7 @@ export default React.forwardRef<HTMLDivElement, StructureTreeEditorProps>(
               columnKeys:
                 columns
                   .filter(
-                    (_, idx) =>
-                      columnIdx >= idx &&
-                      idx !== columns.length - 1,
+                    (_, idx) => columnIdx >= idx && idx !== columns.length - 1,
                   )
                   .map(({ accessor }) => accessor || '') || '',
               rowsIdx: rowsIds,

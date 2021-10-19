@@ -15,8 +15,9 @@
 }
 
 .content {
-  overflow-x: auto;
   padding: 0 var(--size-text-m);
+
+  overflow-x: auto;
 }
 
 .ButtonStructure {
@@ -43,8 +44,9 @@
 
 .result {
   &__graphs {
-    display: flex;
     margin-top: var(--space-l);
+
+    display: flex;
   }
 
   &__analysis {

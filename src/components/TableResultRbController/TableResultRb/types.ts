@@ -11,16 +11,17 @@ export interface Column<T = any> {
   align?: 'left' | 'right';
   visible?: Visible;
   width?: number;
-};
+}
 
-export type Row<T = any> = TableRow & T & {
-  isAll?: boolean;
-};
+export type Row<T = any> = TableRow &
+  T & {
+    isAll?: boolean;
+  };
 
 export type FilterComponentProps = {
   onConfirm: (value: any) => void;
   onCancel: () => void;
-  filterValue?: any
+  filterValue?: any;
 } & Record<string, unknown>;
 
 export type Filter = {
@@ -28,12 +29,15 @@ export type Filter = {
   name: string;
   field: string;
   filterer: (value: any, filterValue?: any) => boolean;
-} & ({ component?: never } | {
-  component: {
-    name: React.FC<FilterComponentProps>;
-    props?: Omit<FilterComponentProps, 'onConfirm' | 'filterValue'>;
-  }
-});
+} & (
+  | { component?: never }
+  | {
+      component: {
+        name: React.FC<FilterComponentProps>;
+        props?: Omit<FilterComponentProps, 'onConfirm' | 'filterValue'>;
+      };
+    }
+);
 
 // type OnRowHover = ({ id, e }: { id: string | undefined; e: React.MouseEvent }) => void;
 //

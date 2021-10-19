@@ -1,3 +1,5 @@
 describe('Init', () => {
-  test('without errors', () => { expect(true); });
+  test('without errors', () => {
+    expect(true);
+  });
 });

@@ -6,6 +6,13 @@ import {
 import { FetchPolicy } from '@apollo/client/core/watchQueryOptions';
 import { GET_RECENTLY_EDITED } from '@app/components/CompetitiveAccess/queries';
 import {
+  GET_HISTOGRAM_RESULT_RB,
+  GET_PROJECT_NAME,
+  GET_SENSITIVE_ANALYSIS_RESULT_RB,
+  GET_TABLE_RESULT_RB,
+  GET_TABLE_TEMPLATE,
+} from '@app/components/TableResultRbController/queries';
+import {
   ProjectInner,
   ProjectStructure,
   Query,
@@ -13,24 +20,14 @@ import {
   ResultProjectStructure,
   SensitivityAnalysisStructure,
 } from '@app/generated/graphql';
-import { get, getOr } from 'lodash/fp';
-import { None } from 'monet';
-import {
-  GET_PROJECT_NAME,
-  GET_TABLE_TEMPLATE,
-  GET_TABLE_RESULT_RB,
-  GET_HISTOGRAM_RESULT_RB,
-  GET_SENSITIVE_ANALYSIS_RESULT_RB,
-} from '@app/components/TableResultRbController/queries';
-import {
-  IProjectService,
-  ProjectServiceProps,
-} from '@app/services/types';
+import { IProjectService, ProjectServiceProps } from '@app/services/types';
 import {
   getGraphqlUri,
   // wrapConception,
 } from '@app/services/utils';
 import { CurrentProject, Identity, Project } from '@app/types';
+import { get, getOr } from 'lodash/fp';
+import { None } from 'monet';
 
 // import { resolveDomainObjects } from './resolvers';
 
@@ -192,12 +189,15 @@ class ProjectService implements IProjectService {
 
     return getOr(
       None<ResultProjectStructure>(),
-      ['project', 'rbResult', 'result', 'template'],
+      ['project', 'resourceBase', 'result', 'resultTable', 'template'],
       responseData,
     );
   }
 
-  async getHistogramData(domainEntityCodes: string[], domainEntityNames: string[]): Promise<ResultHistogramsStructure> {
+  async getHistogramData(
+    domainEntityCodes: string[],
+    domainEntityNames: string[],
+  ): Promise<ResultHistogramsStructure> {
     const { data: responseData } = await this.client
       .watchQuery<Query>({
         query: GET_HISTOGRAM_RESULT_RB,
@@ -207,7 +207,7 @@ class ProjectService implements IProjectService {
         variables: {
           projectId: this.projectId,
           domainEntityCodes,
-          domainEntityNames
+          domainEntityNames,
         },
         fetchPolicy: 'no-cache',
       })
@@ -217,12 +217,14 @@ class ProjectService implements IProjectService {
 
     return getOr(
       None<ResultHistogramsStructure>(),
-      ['project', 'rbResult', 'histograms'],
+      ['project', 'resourceBase', 'result', 'histograms'],
       responseData,
     );
   }
 
-  async getSensitiveAnalysisData(domainEntityNames: string[]): Promise<SensitivityAnalysisStructure> {
+  async getSensitiveAnalysisData(
+    domainEntityNames: string[],
+  ): Promise<SensitivityAnalysisStructure> {
     const { data: responseData } = await this.client
       .watchQuery<Query>({
         query: GET_SENSITIVE_ANALYSIS_RESULT_RB,
@@ -241,7 +243,7 @@ class ProjectService implements IProjectService {
 
     return getOr(
       None<ResultHistogramsStructure>(),
-      ['project', 'rbResult', 'histograms'],
+      ['project', 'resourceBase', 'result', 'histograms'],
       responseData,
     );
   }
@@ -262,21 +264,21 @@ class ProjectService implements IProjectService {
     if (ProjectService.isProject(data.project)) {
       // ProjectService.assertRequiredFields(data.project);
       const isTemplateProject = Boolean(
-        data.project.rbResult?.result?.template,
+        data.project.rbResult?.result?.resultTable?.template,
       );
-      // @ts-ignore TODO - refactor after work with data
+      // TODO - refactor after work with data
       this.projectMod = isTemplateProject
-        ? {
+        ? ({
             ...data.project,
             rbResult: {
               ...data.project.rbResult,
               result: {
                 ...data.project.rbResult?.result,
-                template: data.project.rbResult?.result?.template,
+                template: data.project.rbResult?.result?.resultTable?.template,
               },
             },
-          }
-        : data.project;
+          } as ConcurrentProject)
+        : (data.project as ConcurrentProject);
     } else {
       throwError('"project" is not found in query');
     }

@@ -154,17 +154,27 @@ export const GET_TABLE_TEMPLATE = gql`
 `;
 
 export const GET_HISTOGRAM_RESULT_RB = gql`
-  query GetTableResultRb($projectId: ID!, $domainEntityCodes: [ID!], $domainEntityNames: [String!]) {
+  query GetTableResultRb(
+    $projectId: ID!
+    $domainEntityCodes: [ID!]
+    $domainEntityNames: [String!]
+  ) {
     project {
-      rbResult {
-        histograms{
-          getHistograms(projectId: $projectId, domainEntityCodes: $domainEntityCodes, domainEntityNames: $domainEntityNames){
-            histograms{
-              title
-              subtitle
-              percentiles
-              sample
-              numberOfIterationBin
+      resourceBase {
+        result {
+          histograms {
+            getHistograms(
+              projectId: $projectId
+              domainEntityCodes: $domainEntityCodes
+              domainEntityNames: $domainEntityNames
+            ) {
+              histograms {
+                title
+                subtitle
+                percentiles
+                sample
+                numberOfIterationBin
+              }
             }
           }
         }
@@ -176,14 +186,19 @@ export const GET_HISTOGRAM_RESULT_RB = gql`
 export const GET_SENSITIVE_ANALYSIS_RESULT_RB = gql`
   query GetTableResultRb($projectId: ID!, $domainEntityNames: [String!]) {
     project {
-      rbResult {
-        histograms{
-          getSensitivityAnalysis(projectId: $projectId, domainEntityNames: $domainEntityNames) {
-            title
-            names
-            sample
-            percentiles
-            zeroPoint
+      resourceBase {
+        result {
+          histograms {
+            getSensitivityAnalysis(
+              projectId: $projectId
+              domainEntityNames: $domainEntityNames
+            ) {
+              title
+              names
+              sample
+              percentiles
+              zeroPoint
+            }
           }
         }
       }
@@ -194,39 +209,41 @@ export const GET_SENSITIVE_ANALYSIS_RESULT_RB = gql`
 export const GET_TABLE_RESULT_RB = gql`
   query GetTableResultRb {
     project {
-      rbResult {
-        result{
-          template(projectId: "project_id") {
-            domainEntities{
-              code
-              name
-              visible{
-                calc
-                table
-                tree
-              }
-            }
-            attributes{
-              code
-              name
-              shortName
-              units
-              visible{
-                calc
-                table
-                tree
-              }
-            }
-            domainObjects{
-              parents{
+      resourceBase {
+        result {
+          resultTable {
+            template(projectId: "project_id") {
+              domainEntities {
                 code
                 name
-                isTotal
+                visible {
+                  calc
+                  table
+                  tree
+                }
               }
-              attributeValues{
+              attributes {
                 code
-                percentiles
-                values
+                name
+                shortName
+                units
+                visible {
+                  calc
+                  table
+                  tree
+                }
+              }
+              domainObjects {
+                parents {
+                  code
+                  name
+                  isTotal
+                }
+                attributeValues {
+                  code
+                  percentiles
+                  values
+                }
               }
             }
           }

@@ -1,7 +1,4 @@
-import {
-  ApolloClient,
-  NormalizedCacheObject,
-} from '@apollo/client';
+import { ApolloClient, NormalizedCacheObject } from '@apollo/client';
 import {
   ProjectStructure,
   ResultProjectStructure,

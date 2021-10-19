@@ -15,7 +15,6 @@ export default function useCombinedRefs<T>(
       if (typeof ref === 'function') {
         ref(targetRef.current);
       } else {
-        // eslint-disable-next-line lodash-fp/no-unused-result
         set(['current'], targetRef.current, ref);
       }
     });

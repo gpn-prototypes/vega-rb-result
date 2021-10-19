@@ -1,7 +1,7 @@
+import projectService from '@app/services/ProjectService';
 import { applyMiddleware, CombinedState, createStore, Store } from 'redux';
 import * as logger from 'redux-logger';
 import { createEpicMiddleware } from 'redux-observable';
-import projectService from '@app/services/ProjectService';
 import { AnyAction } from 'typescript-fsa';
 
 import rootReducer from './reducers';

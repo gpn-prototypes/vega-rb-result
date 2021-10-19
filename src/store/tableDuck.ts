@@ -1,7 +1,7 @@
+import { EFluidType } from '@app/common/enums';
+import { GridActiveRow, GridCollection } from '@app/types/typesTable';
 import actionCreatorFactory from 'typescript-fsa';
 import { reducerWithInitialState } from 'typescript-fsa-reducers';
-import { GridActiveRow, GridCollection } from "@app/types/typesTable";
-import { EFluidType } from '@app/common/enums';
 
 const factory = actionCreatorFactory('table');
 
@@ -23,20 +23,29 @@ const initialState: GridCollection = {
 
 const reducer = reducerWithInitialState<GridCollection>(initialState)
   .case(actions.resetState, () => initialState)
-  .case(actions.initState, (state: GridCollection, payload: GridCollection) => ({
-    ...state,
-    rows: payload.rows,
-    columns: payload.columns,
-    version: payload.version,
-  }))
-  .case(actions.setActiveRow, (state: GridCollection, payload: GridActiveRow | undefined) => ({
-    ...state,
-    activeRow: payload,
-  }))
-  .case(actions.setFluidType, (state: GridCollection, fluidType: EFluidType) => ({
-    ...state,
-    fluidType,
-  }));
+  .case(
+    actions.initState,
+    (state: GridCollection, payload: GridCollection) => ({
+      ...state,
+      rows: payload.rows,
+      columns: payload.columns,
+      version: payload.version,
+    }),
+  )
+  .case(
+    actions.setActiveRow,
+    (state: GridCollection, payload: GridActiveRow | undefined) => ({
+      ...state,
+      activeRow: payload,
+    }),
+  )
+  .case(
+    actions.setFluidType,
+    (state: GridCollection, fluidType: EFluidType) => ({
+      ...state,
+      fluidType,
+    }),
+  );
 
 export default {
   reducer,

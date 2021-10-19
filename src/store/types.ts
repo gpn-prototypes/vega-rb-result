@@ -1,6 +1,7 @@
 import { Param } from '@app/model/Param';
 import { IProjectService } from '@app/services/types';
 import { GridCollection } from '@app/types/typesTable';
+
 import { HistogramStore } from './histogramDuck';
 import { SensitiveAnalysisStore } from './sensitiveAnalysisDuck';
 

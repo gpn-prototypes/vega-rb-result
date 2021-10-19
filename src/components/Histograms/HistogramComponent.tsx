@@ -1,20 +1,20 @@
-import React , { useState, useEffect } from 'react';
-
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { VerticalMoreContextMenu } from '@app/components/Helpers/ContextMenuHelper';
+import { Histogram } from '@app/generated/graphql';
+import { MenuContextItem } from '@app/interfaces/ContextMenuInterface';
+import { loadHistogramData } from '@app/services/histogramService';
+import histogramDuck from '@app/store/histogramDuck';
 import { RootState } from '@app/store/types';
 import { GridActiveRow, GridCollection } from '@app/types/typesTable';
 import { Loader, useMount } from '@gpn-prototypes/vega-ui';
-import { Histogram } from '@app/generated/graphql';
-import { loadHistogramData } from '@app/services/histogramService';
-import histogramDuck from '@app/store/histogramDuck';
-import { MenuContextItem } from '@app/interfaces/ContextMenuInterface';
-import { VerticalMoreContextMenu } from '@app/components/Helpers/ContextMenuHelper';
 
-import './HistogramComponent.css';
 import ChartComponent from './chart/Chart';
 
+import './HistogramComponent.css';
+
 interface Props {
-  table: GridCollection;
+  grid: GridCollection;
 }
 
 const payloadMenuItems: MenuContextItem[] = [
@@ -28,21 +28,26 @@ const payloadMenuItems: MenuContextItem[] = [
   },
 ];
 
-export const HistogramComponent: React.FC<Props> = ({ table }) => {
+export const HistogramComponent: React.FC<Props> = ({ grid }) => {
   const dispatch = useDispatch();
 
-  const histogramsPayload: Histogram[] = useSelector(({ histograms }: RootState) => histograms.payload);
-  const activeRow: GridActiveRow | undefined = useSelector(({ table }: RootState) => table.activeRow);
+  const histogramsPayload: Histogram[] = useSelector(
+    ({ histograms }: RootState) => histograms.payload,
+  );
+  const activeRow: GridActiveRow | undefined = useSelector(
+    ({ table }: RootState) => table.activeRow,
+  );
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [menuItems, setMenuItems] = useState<MenuContextItem[]>(payloadMenuItems);
+  const [menuItems, setMenuItems] =
+    useState<MenuContextItem[]>(payloadMenuItems);
 
   /** Запрашиваем данные в самом начале, берем самый первый элемент */
   useMount(() => {
     loadHistogramData(
       dispatch,
-      [table.columns[0].accessor],
-      [String(table.rows[0][table.columns[0].accessor])],
+      [grid.columns[0].accessor],
+      [String(grid.rows[0][grid.columns[0].accessor])],
     ).then(() => setIsLoading(false));
 
     return () => {
@@ -61,47 +66,53 @@ export const HistogramComponent: React.FC<Props> = ({ table }) => {
         activeRow.title.split(','),
       ).then(() => setIsLoading(false));
     }
-  }, [activeRow]);
+  }, [activeRow, dispatch]);
 
   const handleChange = (item: MenuContextItem) => {
     const updatedMenuItems = menuItems.map((menuItem: MenuContextItem) => {
+      const newItem = { ...menuItem };
+
       if (menuItem.code === item.code) {
-        menuItem.switch = !menuItem.switch;
+        newItem.switch = !menuItem.switch;
       }
 
-      return menuItem;
+      return newItem;
     });
 
     setMenuItems(updatedMenuItems);
-  }
+  };
 
   const handleClick = (item: MenuContextItem) => {
     console.log('handle click', item);
-  }
+  };
 
-  return <div className="histogram">
-    <div>
-      <VerticalMoreContextMenu
-        menuItems={menuItems}
-        title="Гистограмма запасов"
-        onChange={handleChange}
-        onClick={handleClick}
-      />
-    </div>
-    {isLoading
-      ? <Loader className="histogram__loader" />
-      : (
-      <div className="histogram__content">
-        {histogramsPayload?.map((histogram: Histogram) => {
-          return <ChartComponent
+  const histograms = (
+    <div className="histogram__content">
+      {histogramsPayload?.map((histogram: Histogram) => {
+        return (
+          <ChartComponent
             title={histogram.title}
             subtitle={histogram.subtitle}
             percentiles={histogram.percentiles}
             sample={histogram.sample}
             numberOfIterationBin={histogram.numberOfIterationBin}
-          />;
-        })}
+          />
+        );
+      })}
+    </div>
+  );
+
+  return (
+    <div className="histogram">
+      <div>
+        <VerticalMoreContextMenu
+          menuItems={menuItems}
+          title="Гистограмма запасов"
+          onChange={handleChange}
+          onClick={handleClick}
+        />
       </div>
-    )}
-  </div>
+      {isLoading ? <Loader className="histogram__loader" /> : histograms}
+    </div>
+  );
 };

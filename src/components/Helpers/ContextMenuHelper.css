@@ -2,11 +2,14 @@
   display: flex;
 
   &__title {
+    display: flex;
+
     font-size: 16px;
     line-height: 120%;
-    color: var(--color-typo-primary);
-    display: flex;
+
     cursor: pointer;
+
+    color: var(--color-typo-primary);
   }
 
   &__more {

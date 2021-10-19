@@ -1,6 +1,6 @@
+import { Histogram } from '@app/generated/graphql';
 import actionCreatorFactory from 'typescript-fsa';
 import { reducerWithInitialState } from 'typescript-fsa-reducers';
-import { Histogram } from '@app/generated/graphql';
 
 export interface HistogramStore {
   payload: Histogram[];

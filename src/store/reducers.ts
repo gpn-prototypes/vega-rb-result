@@ -1,14 +1,14 @@
-import { combineReducers } from 'redux';
 import alertDuck from '@app/store/alertDuck';
 import errorsDuck from '@app/store/errorsDuck';
+import histogramDuck from '@app/store/histogramDuck';
 import projectDuck from '@app/store/projectDuck';
 import tableDuck from '@app/store/tableDuck';
 import treeDuck from '@app/store/treeDuck';
-import histogramDuck from '@app/store/histogramDuck';
+import { combineReducers } from 'redux';
 
 import competitiveAccessDuck from './competitiveAccessDuck';
-import { RootState } from './types';
 import sensitiveAnalysisDuck from './sensitiveAnalysisDuck';
+import { RootState } from './types';
 
 export default combineReducers<RootState>({
   alert: alertDuck.reducer,

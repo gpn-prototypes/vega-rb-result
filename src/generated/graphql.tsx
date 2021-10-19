@@ -1,3 +1,5 @@
+import { SensitiveAnalysis } from '@app/interfaces/SensitiveAnalysisInterface';
+
 export type Maybe<T> = T | null;
 export type Exact<T extends { [key: string]: unknown }> = {
   [K in keyof T]: T[K];
@@ -2890,7 +2892,7 @@ export type RbProjectInput = {
 /** Квери данных ресурсной базы. */
 export type RbResultQueries = {
   __typename?: 'RBResultQueries';
-  result: ResultTableQuery;
+  result: { resultTable: ResultTableQuery };
 };
 
 export type Region = {
@@ -3007,16 +3009,12 @@ export type ResultHistogramsStructure = {
   __typename?: 'HistogramsResult';
   getHistograms: {
     histograms: Array<Histogram>;
-  }
+  };
 };
 
 export type SensitivityAnalysisStructure = {
   __typename?: 'HistogramResultQuery';
-  getSensitivityAnalysis: {
-    names: Array<string>;
-    percentiles: Array<Array<number>>;
-    sample: Array<number>;
-  }
+  getSensitivityAnalysis: SensitiveAnalysis;
 };
 
 export type ResultTableQuery = {

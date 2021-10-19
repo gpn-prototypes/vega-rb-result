@@ -9,5 +9,3 @@ export type ProjectStructureState = {
 export type StoreRES = {
   projectStructure: ProjectStructureState;
 };
-
-

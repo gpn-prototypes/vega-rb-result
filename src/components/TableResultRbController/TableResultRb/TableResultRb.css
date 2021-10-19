@@ -1,28 +1,27 @@
-.TableResultRb {
-}
-
 .table {
-    .TableCell_isHeader {
-        font-size: var(--size-text-xs);
-        font-weight: 400;
-        color: var(--color-typo-primary);
-        text-transform: inherit;
-    }
+  .TableCell_isHeader {
+    font-size: var(--size-text-xs);
+    font-weight: 400;
 
-    .TableCell:not(.TableCell_isHeader) {
-        font-size: var(--font-size);
-        line-height: var(--row-height);
-    }
+    text-transform: inherit;
 
-    ._all {
-        font-weight: bold;
-    }
+    color: var(--color-typo-primary);
+  }
 
-    ._no-right-border {
-        border-left: 0!important;
-    }
+  .TableCell:not(.TableCell_isHeader) {
+    font-size: var(--font-size);
+    line-height: var(--row-height);
+  }
 
-    ._active {
-      background-color: var(--color-bg-stripe)!important;
-    }
+  ._all {
+    font-weight: 600;
+  }
+
+  ._no-right-border {
+    border-left: 0 !important;
+  }
+
+  ._active {
+    background-color: var(--color-bg-stripe) !important;
+  }
 }

@@ -1,15 +1,15 @@
 import { ReactText } from 'react';
+import { Row } from '@app/components/TableResultRbController/TableResultRb/types';
 import {
   AttributeValue,
   Distribution,
   Maybe,
   VisibleValue,
 } from '@app/generated/graphql';
-import { get, has, reduce, set } from 'lodash/fp';
 import { NoopFunction, Nullable } from '@app/types';
-import { omitTypename } from '@app/utils/omitTypename';
 import { GridCellArguments, GridCellProperties } from '@app/types/typesTable';
-import { Row } from '@app/components/TableResultRbController/TableResultRb/types';
+import { omitTypename } from '@app/utils/omitTypename';
+import { get, has, reduce, set } from 'lodash/fp';
 
 interface IData {
   code: string;

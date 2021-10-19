@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { Theme, presetGpnDark } from '@consta/uikit/Theme';
 import { ApolloClient, NormalizedCacheObject } from '@apollo/client';
-import { useMount } from '@gpn-prototypes/vega-ui';
 import ErrorBoundary from '@app/components/ErrorBoundary';
 import { Providers } from '@app/components/Providers';
+import RbResultPage from '@app/pages/RbResult/RbResultPage';
 import projectService from '@app/services/ProjectService';
 import { CurrentProject, Identity, ShellToolkit } from '@app/types';
-import RbResultPage from '@app/pages/RbResult/RbResultPage';
+import { presetGpnDark, Theme } from '@consta/uikit/Theme';
+import { useMount } from '@gpn-prototypes/vega-ui';
 
 import './App.css';
 
@@ -47,15 +47,15 @@ const App: React.FC<Partial<ShellToolkit>> = (props) => {
         <Theme preset={presetGpnDark} className="rb-result-app__wrapper">
           {/* Точно нужен этот враппер? */}
           {/* <Root > */}
-            <Providers
-              currentProject={currentProject as CurrentProject}
-              graphqlClient={graphqlClient as ApolloClient<NormalizedCacheObject>}
-              identity={identity as Identity}
-            >
-              <div className="rb-result-app">
-                {!isLoading && <RbResultPage />}
-              </div>
-            </Providers>
+          <Providers
+            currentProject={currentProject as CurrentProject}
+            graphqlClient={graphqlClient as ApolloClient<NormalizedCacheObject>}
+            identity={identity as Identity}
+          >
+            <div className="rb-result-app">
+              {!isLoading && <RbResultPage />}
+            </div>
+          </Providers>
           {/* </Root> */}
         </Theme>
       </ErrorBoundary>

@@ -1,19 +1,15 @@
 import React, { useState } from 'react';
-import { Loader, useMount } from '@gpn-prototypes/vega-ui';
+import { useDispatch, useSelector } from 'react-redux';
 import { TableResultRb } from '@app/components/TableResultRbController/TableResultRb/TableResultRb';
 import { loadTableData } from '@app/services/loadTableData';
-import { useDispatch, useSelector } from 'react-redux';
 import tableDuck from '@app/store/tableDuck';
 import { RootState } from '@app/store/types';
-import { EFluidType } from '@app/common/enums';
+import { Loader, useMount } from '@gpn-prototypes/vega-ui';
 
-interface IProps {}
-
-export const Table: React.FC<IProps> = () => {
+export const Table: React.FC = () => {
   const dispatch = useDispatch();
   const reduxTableData = useSelector(({ table }: RootState) => table);
   const filterData = useSelector(({ tree }: RootState) => tree.filter);
-  const fluidType = useSelector(({ table }: RootState) => table.fluidType);
 
   const [isLoading, setIsLoading] = useState(true);
 
@@ -34,7 +30,6 @@ export const Table: React.FC<IProps> = () => {
       columns={reduxTableData.columns}
       rows={reduxTableData.rows}
       filter={filterData}
-      fluidType={fluidType || EFluidType.ALL}
     />
   );
 };

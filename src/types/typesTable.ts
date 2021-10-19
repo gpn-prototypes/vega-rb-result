@@ -1,4 +1,9 @@
 import React, { ReactText } from 'react';
+import { EFluidType } from '@app/common/enums';
+import {
+  Column,
+  Row,
+} from '@app/components/TableResultRbController/TableResultRb/types';
 import {
   DistributionDefinitionTypes,
   DistributionParameterTypes,
@@ -8,8 +13,6 @@ import {
   TableError,
 } from '@app/generated/graphql';
 import { TableEntities, VisibleKeys } from '@app/types/enumsTable';
-import { Column, Row } from '@app/components/TableResultRbController/TableResultRb/types';
-import { EFluidType } from '@app/common/enums';
 
 export class OptionEntity implements DropDownOption {
   private readonly _id: GeoObjectCategories;

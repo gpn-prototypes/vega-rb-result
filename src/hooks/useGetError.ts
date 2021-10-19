@@ -2,9 +2,9 @@ import { useContext, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { ProjectContext } from '@app/components/Providers';
 import { TableError } from '@app/generated/graphql';
-import { get, getOr } from 'lodash/fp';
 import { RootState } from '@app/store/types';
-import {ColumnErrors} from "@app/types/typesTable";
+import { ColumnErrors } from '@app/types/typesTable';
+import { get, getOr } from 'lodash/fp';
 
 type PropertyPath = string | (string | number)[];
 
