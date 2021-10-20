@@ -11,7 +11,7 @@ import { Loader, useMount } from '@gpn-prototypes/vega-ui';
 
 import ChartComponent from './chart/Chart';
 
-import './HistogramComponent.css';
+import './HistogramComponent.scss';
 
 interface Props {
   grid: GridCollection;

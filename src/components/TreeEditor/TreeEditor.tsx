@@ -12,7 +12,7 @@ import { Column, Row } from '../TableResultRbController/TableResultRb/types';
 import { getNodeListFromTableData, searchInTree } from './helpers';
 import { TargetData } from './types';
 
-import './TreeEditor.css';
+import './TreeEditor.scss';
 
 const icons = {
   'blue-line': <SvgResource color="#00eeaa" />,

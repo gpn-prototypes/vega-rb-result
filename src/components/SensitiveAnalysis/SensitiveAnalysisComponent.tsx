@@ -1,75 +1,87 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { DomainEntityCode } from '@app/constants/GeneralConstants';
 import { MenuContextItem } from '@app/interfaces/ContextMenuInterface';
 import { SensitiveAnalysis } from '@app/interfaces/SensitiveAnalysisInterface';
-import { loadSensitiveAnalysisData } from '@app/services/sensitiveAnalysisService';
+import {
+  loadSensitiveAnalysisData,
+  loadSensitiveAnalysisStatistic,
+} from '@app/services/sensitiveAnalysisService';
 import sensitiveAnalysisDuck from '@app/store/sensitiveAnalysisDuck';
+import tableDuck from '@app/store/tableDuck';
 import { RootState } from '@app/store/types';
-import { GridActiveRow, GridCollection } from '@app/types/typesTable';
+import { GridActiveRow } from '@app/types/typesTable';
+import { Button } from '@consta/uikit/Button';
 import { Loader } from '@consta/uikit/Loader';
+import { Sidebar } from '@consta/uikit/Sidebar';
 import { useMount } from '@gpn-prototypes/vega-ui';
 
 import { VerticalMoreContextMenu } from '../Helpers/ContextMenuHelper';
 
 import { SensitiveAnalysisChartComponent } from './chart/Chart';
+import { SensitiveAnalysisStatisticComponent } from './statistic/SensitiveAnalysisStatisticComponent';
 
-import './SensitiveAnalysisComponent.css';
+import './SensitiveAnalysisComponent.scss';
 
 interface Props {
-  grid: GridCollection;
+  sidebarRow: GridActiveRow;
 }
 
-const payloadMenuItems: MenuContextItem[] = [
-  {
-    name: 'GRV',
-    code: 'grv',
-    switch: true,
-  },
-  {
-    name: 'Показывать статистику',
-    code: 'stat',
-    switch: false,
-  },
-];
+const payloadMenuItem: MenuContextItem = {
+  name: 'Показывать статистику',
+  code: 'stat',
+  switch: true,
+};
 
-export const SensitiveAnalysisComponent: React.FC<Props> = ({ grid }) => {
+export const SensitiveAnalysisComponent: React.FC<Props> = ({ sidebarRow }) => {
   const dispatch = useDispatch();
-  const activeRow: GridActiveRow | undefined = useSelector(
-    ({ table }: RootState) => table.activeRow,
-  );
+  const [menuItems, setMenuItems] = useState<MenuContextItem[]>([]);
   const sensitiveAnalysisData: SensitiveAnalysis | undefined = useSelector(
     ({ sensitiveAnalysis }: RootState) => sensitiveAnalysis.payload,
   );
 
-  const [isAvailable, setIsAvailable] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [menuItems, setMenuItems] =
-    useState<MenuContextItem[]>(payloadMenuItems);
+  const [isLoadingStatistic, setIsLoadingStatistic] = useState<boolean>(false);
+  const [isShowStatistic, setIsShowStatistic] = useState<boolean>(true);
 
   useMount(() => {
+    setIsLoading(true);
+    setIsLoadingStatistic(true);
+
+    loadSensitiveAnalysisData(dispatch, sidebarRow.title.split(',')).then(
+      () => {
+        setIsLoading(false);
+      },
+    );
+
+    loadSensitiveAnalysisStatistic(dispatch, sidebarRow.title.split(',')).then(
+      () => setIsLoadingStatistic(false),
+    );
+
     return () => {
       dispatch(sensitiveAnalysisDuck.actions.resetState());
+      dispatch(tableDuck.actions.resetSidebarRow());
     };
   });
 
-  /** Отлавливаем выбор ячейки */
   useEffect(() => {
-    if (
-      activeRow?.code &&
-      activeRow?.code.indexOf(DomainEntityCode.Layer) > -1
-    ) {
-      setIsAvailable(true);
-      setIsLoading(true);
-
-      loadSensitiveAnalysisData(dispatch, activeRow.title.split(',')).then(() =>
-        setIsLoading(false),
-      );
-    } else {
-      setIsAvailable(false);
-      setIsLoading(false);
+    /** Заполняем пункты меню, данными из бекенда */
+    if (!sensitiveAnalysisData) {
+      return;
     }
-  }, [activeRow, setIsAvailable, dispatch]);
+
+    const items: MenuContextItem[] =
+      sensitiveAnalysisData.names.map((name: string) => {
+        return {
+          name,
+          code: name,
+          switch: true,
+        };
+      }) || [];
+
+    items.push(payloadMenuItem);
+
+    setMenuItems(items);
+  }, [sensitiveAnalysisData]);
 
   const handleChange = (item: MenuContextItem) => {
     const updatedMenuItems = menuItems.map((menuItem: MenuContextItem) => {
@@ -77,6 +89,8 @@ export const SensitiveAnalysisComponent: React.FC<Props> = ({ grid }) => {
 
       if (cloneItem.code === item.code) {
         cloneItem.switch = !menuItem.switch;
+
+        setIsShowStatistic(cloneItem.switch);
       }
 
       return cloneItem;
@@ -89,6 +103,23 @@ export const SensitiveAnalysisComponent: React.FC<Props> = ({ grid }) => {
     console.log('handle click', item);
   };
 
+  const handleClose = () => {
+    dispatch(tableDuck.actions.resetSidebarRow());
+  };
+
+  const getAvailableNames = (): string[] => {
+    const result: string[] = [];
+
+    menuItems
+      .filter((item: MenuContextItem) => item.code !== 'stat')
+      .filter((item: MenuContextItem) => item.switch === true)
+      .forEach((item: MenuContextItem) => {
+        result.push(item.name);
+      });
+
+    return result;
+  };
+
   const chart = (
     <div className="sensitive-analysis__content">
       {sensitiveAnalysisData && (
@@ -97,32 +128,45 @@ export const SensitiveAnalysisComponent: React.FC<Props> = ({ grid }) => {
           sample={sensitiveAnalysisData.sample}
           names={sensitiveAnalysisData.names}
           zeroPoint={sensitiveAnalysisData.zeroPoint}
+          availableNames={getAvailableNames()}
         />
       )}
     </div>
   );
 
-  const available = (
-    <div>
-      <VerticalMoreContextMenu
-        menuItems={menuItems}
-        title="Анализ чувствительности"
-        onChange={handleChange}
-        onClick={handleClick}
-      />
-      {isLoading ? <Loader className="sensitive-analysis__loader" /> : chart}
-    </div>
-  );
-
-  const notAvailable = (
-    <div className="sensitive-analysis__not-available">
-      Необходимо выбрать Пласт как активную строку
-    </div>
-  );
-
   return (
     <div className="sensitive-analysis">
-      {isAvailable ? available : notAvailable}
+      <Sidebar.Content>
+        {/* График */}
+        <div className="sensitive-analysis__title">
+          <VerticalMoreContextMenu
+            menuItems={menuItems}
+            title="Анализ чувствительности"
+            onChange={handleChange}
+            onClick={handleClick}
+          />
+        </div>
+
+        <div className="sensitive-analysis__content">
+          {isLoading ? (
+            <Loader className="sensitive-analysis__loader" />
+          ) : (
+            chart
+          )}
+        </div>
+
+        {/* Статистика */}
+        {isShowStatistic && sensitiveAnalysisData ? (
+          <SensitiveAnalysisStatisticComponent
+            statistic={sensitiveAnalysisData}
+            isLoading={isLoadingStatistic}
+          />
+        ) : null}
+      </Sidebar.Content>
+
+      <Sidebar.Actions className="sensitive-analysis__actions">
+        <Button onClick={handleClose} label="Закрыть" size="m" />
+      </Sidebar.Actions>
     </div>
   );
 };

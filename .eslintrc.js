@@ -1,9 +1,7 @@
-const localePrettierConfig = require('./.prettierrc.js');
+const localePrettierConfig = require('./.prettierrc');
 
 module.exports = {
-  extends: [
-    require.resolve('@gpn-prototypes/frontend-configs/.eslintrc'),
-  ],
+  extends: [require.resolve('@gpn-prototypes/frontend-configs/.eslintrc')],
   rules: {
     'comma-dangle': 'off',
     'simple-import-sort/sort': 'warn',

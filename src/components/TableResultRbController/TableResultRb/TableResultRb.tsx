@@ -1,7 +1,10 @@
 import React, { useEffect, useLayoutEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { EFluidType } from '@app/common/enums';
-import { AttributeCode } from '@app/constants/GeneralConstants';
+import { EFluidType } from '@app/constants/Enums';
+import {
+  AttributeCode,
+  DomainEntityCode,
+} from '@app/constants/GeneralConstants';
 import { RbDomainEntityInput } from '@app/generated/graphql';
 import tableDuck from '@app/store/tableDuck';
 import { RootState, TreeFilter } from '@app/store/types';
@@ -10,7 +13,7 @@ import { Table } from '@consta/uikit/Table';
 
 import { Column, Row } from './types';
 
-import './TableResultRb.css';
+import './TableResultRb.scss';
 
 interface Props {
   rows: Row<RbDomainEntityInput>[];
@@ -145,6 +148,10 @@ export const TableResultRb: React.FC<Props> = ({ rows, columns, filter }) => {
     /** Отправляем активную строку в стору, это нужно для обновления данных в графиках */
     if (code && title) {
       dispatch(tableDuck.actions.setActiveRow({ code, title }));
+
+      if (code.indexOf(DomainEntityCode.Layer) > -1) {
+        dispatch(tableDuck.actions.setSidebarRow({ code, title }));
+      }
     }
   };
 

@@ -8,7 +8,7 @@ import { CurrentProject, Identity, ShellToolkit } from '@app/types';
 import { presetGpnDark, Theme } from '@consta/uikit/Theme';
 import { useMount } from '@gpn-prototypes/vega-ui';
 
-import './App.css';
+import './App.scss';
 
 const getInitProps = async ({
   currentProject,
@@ -45,8 +45,6 @@ const App: React.FC<Partial<ShellToolkit>> = (props) => {
     <React.StrictMode>
       <ErrorBoundary>
         <Theme preset={presetGpnDark} className="rb-result-app__wrapper">
-          {/* Точно нужен этот враппер? */}
-          {/* <Root > */}
           <Providers
             currentProject={currentProject as CurrentProject}
             graphqlClient={graphqlClient as ApolloClient<NormalizedCacheObject>}
@@ -56,7 +54,6 @@ const App: React.FC<Partial<ShellToolkit>> = (props) => {
               {!isLoading && <RbResultPage />}
             </div>
           </Providers>
-          {/* </Root> */}
         </Theme>
       </ErrorBoundary>
     </React.StrictMode>

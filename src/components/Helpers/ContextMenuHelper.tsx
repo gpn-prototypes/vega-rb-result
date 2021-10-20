@@ -4,7 +4,7 @@ import { MenuContextItem } from '@app/interfaces/ContextMenuInterface';
 import { ContextMenu } from '@consta/uikit/ContextMenu';
 import { Switch } from '@consta/uikit/Switch';
 
-import './ContextMenuHelper.css';
+import './ContextMenuHelper.scss';
 
 export function SwitchRightSide(
   item: MenuContextItem,
@@ -60,7 +60,7 @@ export const VerticalMoreContextMenu: React.FC<Props> = ({
   return (
     <div className="vertical">
       <div
-        onClick={() => {}}
+        onClick={() => setIsOpenContextMenu(true)}
         ref={ref}
         className="vertical__title"
         role="button"

@@ -10,9 +10,26 @@ export async function loadSensitiveAnalysisData(
 
   if (data) {
     dispatch(
-      sensitiveAnalysisDuck.actions.setSensitiveAnalysis({
-        payload: data.getSensitivityAnalysis,
-      }),
+      sensitiveAnalysisDuck.actions.setSensitiveAnalysis(
+        data.getSensitivityAnalysis,
+      ),
+    );
+  }
+}
+
+export async function loadSensitiveAnalysisStatistic(
+  dispatch: Dispatch<unknown>,
+  domainEntityNames: string[],
+): Promise<void> {
+  const data = await projectService.getSensitiveAnalysisStatistic(
+    domainEntityNames,
+  );
+
+  if (data) {
+    dispatch(
+      sensitiveAnalysisDuck.actions.setSensitiveAnalysisStatistic(
+        data.getSensitivityAnalysis,
+      ),
     );
   }
 }

@@ -7,11 +7,18 @@ export namespace SensitiveAnalysisChart {
   }
 
   export const Margin: Margin = {
-    top: 20,
-    right: 13,
+    top: 36,
+    right: 0,
     bottom: 0,
-    left: 83,
+    left: 110,
   };
-  export const Width = 626 - Margin.left - Margin.right;
-  export const Height = 243 - Margin.top - Margin.bottom;
+
+  export const Width = 651 - Margin.right - Margin.left;
+  export const Height = 400 - Margin.top - Margin.bottom;
+
+  export interface Payload {
+    name: string;
+    value: number;
+    category: number;
+  }
 }

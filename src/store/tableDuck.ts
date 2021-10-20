@@ -1,4 +1,4 @@
-import { EFluidType } from '@app/common/enums';
+import { EFluidType } from '@app/constants/Enums';
 import { GridActiveRow, GridCollection } from '@app/types/typesTable';
 import actionCreatorFactory from 'typescript-fsa';
 import { reducerWithInitialState } from 'typescript-fsa-reducers';
@@ -10,7 +10,10 @@ const actions = {
   resetState: factory('RESET_STATE'),
   exceptionThrew: factory<{ error: string }>('EXCEPTION_THREW'),
   setActiveRow: factory<GridActiveRow | undefined>('SET_ACTIVE_ROW'),
+  setSidebarRow: factory<GridActiveRow | undefined>('SET_SIDEBAR_ROW'),
   setFluidType: factory<EFluidType>('SET_FLUID_TYPE'),
+  resetActiveRow: factory('RESET_ACTIVE_ROW'),
+  resetSidebarRow: factory('RESET_SIDEBAR_ROW'),
 };
 
 const initialState: GridCollection = {
@@ -18,6 +21,7 @@ const initialState: GridCollection = {
   rows: [],
   version: 0,
   activeRow: undefined,
+  sidebarRow: undefined,
   fluidType: EFluidType.ALL,
 };
 
@@ -45,7 +49,22 @@ const reducer = reducerWithInitialState<GridCollection>(initialState)
       ...state,
       fluidType,
     }),
-  );
+  )
+  .case(
+    actions.setSidebarRow,
+    (state: GridCollection, sidebarRow: GridActiveRow | undefined) => ({
+      ...state,
+      sidebarRow,
+    }),
+  )
+  .case(actions.resetActiveRow, (state: GridCollection) => ({
+    ...state,
+    activeRow: undefined,
+  }))
+  .case(actions.resetSidebarRow, (state: GridCollection) => ({
+    ...state,
+    sidebarRow: undefined,
+  }));
 
 export default {
   reducer,

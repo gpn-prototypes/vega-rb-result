@@ -6,7 +6,7 @@ import { Bin } from 'd3-array';
 import { cnChart } from './cn-chart';
 import { Chart } from './drawUtils';
 
-import './Chart.css';
+import './Chart.scss';
 
 const ChartComponent: React.FC<Histogram> = ({
   title,
@@ -76,7 +76,11 @@ const ChartComponent: React.FC<Histogram> = ({
       </div>
 
       <div className={cnChart()}>
-        <svg width={Chart.Width} height={Chart.Height} ref={d3Container} />
+        <svg
+          width={Chart.DefaultWidth}
+          height={Chart.DefaultHeight}
+          ref={d3Container}
+        />
       </div>
     </div>
   );

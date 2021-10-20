@@ -26,7 +26,6 @@ module.exports = (webpackConfigEnv) => {
   }, {});
 
   return webpackMerge.smart(defaultConfig, {
-    // modify the webpack config however you'd like to by adding to this object
     entry: ['./src/singleSpaEntry.tsx'],
     mode: 'development',
     devtool: 'source-map',
@@ -41,26 +40,19 @@ module.exports = (webpackConfigEnv) => {
           ],
         },
         {
-          test: /\.css$/,
-          use: [
-            {
-              loader: 'postcss-loader',
-            },
-          ],
+          test: /\.s[ac]ss$/i,
+          use: ['style-loader', 'css-loader', 'sass-loader'],
         },
         {
           test: /\.svg$/,
-          use: [
-            '@svgr/webpack',
-            'url-loader'
-          ]
-        }
+          use: ['@svgr/webpack', 'url-loader'],
+        },
       ],
     },
     resolve: {
       alias: {
         '@app': path.resolve(__dirname, 'src'),
-      }
+      },
     },
     plugins: [
       new ImportMapPlugin({
