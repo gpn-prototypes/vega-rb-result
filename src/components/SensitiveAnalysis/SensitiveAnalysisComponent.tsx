@@ -30,6 +30,7 @@ const payloadMenuItem: MenuContextItem = {
   name: 'Показывать статистику',
   code: 'stat',
   switch: true,
+  border: true,
 };
 
 export const SensitiveAnalysisComponent: React.FC<Props> = ({ sidebarRow }) => {
@@ -90,7 +91,9 @@ export const SensitiveAnalysisComponent: React.FC<Props> = ({ sidebarRow }) => {
       if (cloneItem.code === item.code) {
         cloneItem.switch = !menuItem.switch;
 
-        setIsShowStatistic(cloneItem.switch);
+        if (cloneItem.code === 'stat') {
+          setIsShowStatistic(cloneItem.switch);
+        }
       }
 
       return cloneItem;
@@ -120,17 +123,29 @@ export const SensitiveAnalysisComponent: React.FC<Props> = ({ sidebarRow }) => {
     return result;
   };
 
-  const chart = (
-    <div className="sensitive-analysis__content">
-      {sensitiveAnalysisData && (
-        <SensitiveAnalysisChartComponent
-          percentiles={sensitiveAnalysisData.percentiles}
-          sample={sensitiveAnalysisData.sample}
-          names={sensitiveAnalysisData.names}
-          zeroPoint={sensitiveAnalysisData.zeroPoint}
-          availableNames={getAvailableNames()}
-        />
-      )}
+  const chart = sensitiveAnalysisData && (
+    <SensitiveAnalysisChartComponent
+      percentiles={sensitiveAnalysisData.percentiles}
+      sample={sensitiveAnalysisData.sample}
+      names={sensitiveAnalysisData.names}
+      zeroPoint={sensitiveAnalysisData.zeroPoint}
+      availableNames={getAvailableNames()}
+    />
+  );
+
+  const statistic = (
+    <div className="sensitive-analysis">
+      <div>
+        <div className="sensitive-analysis__title">Статистика</div>
+
+        {isLoadingStatistic || !sensitiveAnalysisData ? (
+          <Loader />
+        ) : (
+          <SensitiveAnalysisStatisticComponent
+            statistic={sensitiveAnalysisData}
+          />
+        )}
+      </div>
     </div>
   );
 
@@ -148,20 +163,17 @@ export const SensitiveAnalysisComponent: React.FC<Props> = ({ sidebarRow }) => {
         </div>
 
         <div className="sensitive-analysis__content">
-          {isLoading ? (
-            <Loader className="sensitive-analysis__loader" />
-          ) : (
-            chart
-          )}
-        </div>
+          <div>
+            {isLoading ? (
+              <Loader className="sensitive-analysis__loader" />
+            ) : (
+              chart
+            )}
+          </div>
 
-        {/* Статистика */}
-        {isShowStatistic && sensitiveAnalysisData ? (
-          <SensitiveAnalysisStatisticComponent
-            statistic={sensitiveAnalysisData}
-            isLoading={isLoadingStatistic}
-          />
-        ) : null}
+          {/* Статистика */}
+          {isShowStatistic ? statistic : null}
+        </div>
       </Sidebar.Content>
 
       <Sidebar.Actions className="sensitive-analysis__actions">

@@ -162,7 +162,7 @@ export namespace Chart {
         .call(d3.axisLeft(y1Scale).ticks(3))
         .call((innerG) => innerG.select('.domain').remove())
         .attr('class', 'chart__text')
-        .call((innerG) => innerG.selectAll('.tick text').attr('x', -31))
+        .call((innerG) => innerG.selectAll('.tick text').attr('x', -12))
         .call((innerG) =>
           innerG
             .select('.tick:last-of-type text')
@@ -183,16 +183,21 @@ export namespace Chart {
         )
         .call((innerG) => innerG.select('.domain').remove())
         .attr('class', 'chart__text')
-        .call((nestedG) => nestedG.select('.tick line'))
+        /** Line */
+        .call((nestedG) => nestedG.selectAll('.tick line'))
         .attr('stroke-dasharray', 3)
         .attr('stroke', 'rgba(246, 251, 253, 0.28)')
+
+        /** Text */
         .call((innerG) =>
           innerG
-            .select('.tick:last-of-type text')
+            .selectAll('.tick text')
+            .attr('x', 45)
             .clone()
-            .attr('x', 4)
+            .attr('x', 45)
             .text(payload.y),
-        );
+        )
+        .call((nestedG) => nestedG.select('.tick:first-of-type line').remove());
 
     return { y1Axis, y2Axis };
   };
@@ -257,7 +262,7 @@ export namespace Chart {
       .join('text')
       .attr('class', 'chart__text')
       .attr('dy', '0.35em')
-      .attr('x', (d: any) => xScale(d.x) + 4)
+      .attr('x', (d: any) => xScale(d.x) + 34)
       .attr('y', (d: any) => y1Scale(d.y))
       .text((d: any) => String(d.value).split('.')[0]);
   };

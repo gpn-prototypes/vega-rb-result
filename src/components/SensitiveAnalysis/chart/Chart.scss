@@ -111,6 +111,10 @@
       text-anchor: middle;
     }
   }
+
+  &__main {
+    transform: translate(0, 15px);
+  }
 }
 
 .line {

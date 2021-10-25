@@ -1,4 +1,6 @@
 .sensitive-analysis {
+  overflow: auto;
+
   width: 100%;
 
   &__title {
@@ -16,6 +18,9 @@
 
   &__content {
     margin-top: var(--space-m);
+
+    display: grid;
+    grid-template-rows: 1fr 1fr;
 
     min-height: 246px;
   }

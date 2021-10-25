@@ -1,5 +1,5 @@
 /* eslint-disable no-param-reassign */
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { SensitiveAnalysis } from '@app/interfaces/SensitiveAnalysisInterface';
 import * as d3 from 'd3';
 
@@ -8,10 +8,37 @@ import { SensitiveAnalysisChart } from './drawUtils';
 
 import './Chart.scss';
 
+const PER_ELEMENT_HEIGHT = 66.6;
+
 export const SensitiveAnalysisChartComponent: React.FC<
   SensitiveAnalysis & { availableNames: string[] }
 > = ({ names, percentiles, sample, zeroPoint, availableNames }) => {
   const d3Container = useRef(null);
+
+  /**
+   * Необходимо собрать объект, собираем все значения из percentales и мапим их по названию
+   */
+  const [currentPercentiles, setCurrentPercentiles] =
+    useState<number[][]>(percentiles);
+  const [currentHeight, setCurrentHeight] = useState<number>(
+    currentPercentiles.length * PER_ELEMENT_HEIGHT,
+  );
+
+  useEffect(() => {
+    const result = percentiles.filter((percent: number[], index: number) => {
+      return availableNames.includes(names[index]);
+    });
+
+    setCurrentPercentiles(result);
+
+    setCurrentHeight(result.length * PER_ELEMENT_HEIGHT);
+  }, [
+    availableNames,
+    percentiles,
+    setCurrentPercentiles,
+    setCurrentHeight,
+    names,
+  ]);
 
   const draw = useCallback(() => {
     const svg = d3.select(d3Container.current);
@@ -21,24 +48,17 @@ export const SensitiveAnalysisChartComponent: React.FC<
 
     const data: SensitiveAnalysisChart.Payload[] = [];
 
-    console.log('reflow', availableNames);
-
-    /**
-     * Необходимо собрать объект, собираем все значения из percentales и мапим их по названию
-     */
-    percentiles
-      .filter((percent: number[], index: number) => {
-        return availableNames.includes(names[index]);
-      })
-      .forEach((percentale: number[], index: number) => {
-        percentale.forEach((percent: number, innerIndex: number) => {
-          data.push({
-            name: names[index],
-            value: percent,
-            category: innerIndex === 0 ? 0 : 1,
-          });
+    currentPercentiles.forEach((percentale: number[], index: number) => {
+      percentale.forEach((percent: number, innerIndex: number) => {
+        data.push({
+          name: names[index],
+          /** Для показа множу маленькие значения */
+          value: percent < 100 ? percent * 1000 : percent,
+          // value: percent,
+          category: innerIndex === 0 ? 0 : 1,
         });
       });
+    });
 
     console.log(data);
 
@@ -127,7 +147,7 @@ export const SensitiveAnalysisChartComponent: React.FC<
       .domain([d3.min(sample) || 0, d3.max(sample) || 0])
       .range([
         SensitiveAnalysisChart.Margin.left,
-        SensitiveAnalysisChart.Width - SensitiveAnalysisChart.Margin.right,
+        SensitiveAnalysisChart.Width + SensitiveAnalysisChart.Margin.right,
       ]);
 
     const y = d3
@@ -148,10 +168,11 @@ export const SensitiveAnalysisChartComponent: React.FC<
     const xAxis = (g) =>
       g
         .attr('transform', `translate(0,${SensitiveAnalysisChart.Margin.top})`)
+        .attr('class', 'chart__xAxis')
         .call(
           d3
             .axisTop(x1Scale)
-            .ticks(sample.length)
+            .ticks(6)
             .tickFormat(formatValue())
             .tickSizeOuter(0),
         )
@@ -163,10 +184,9 @@ export const SensitiveAnalysisChartComponent: React.FC<
             .attr('class', 'chart__text chart__text_middle')
             .attr('text-anchor', 'middle')
             .data(sample)
-            .append('path')
-            .attr('transform', () => `translate(0, -25)`)
-            .attr('d', 'M0.5,50.5V454.5')
-            .attr('height', SensitiveAnalysisChart.Height)
+            .append('line')
+            .attr('transform', () => `translate(0, 20)`)
+            .attr('y2', currentPercentiles.length * 66.6)
             .attr('stroke-dasharray', 3)
             .attr('stroke', 'rgba(246, 251, 253, 0.28)'),
         );
@@ -176,6 +196,7 @@ export const SensitiveAnalysisChartComponent: React.FC<
       g
         /** Установка zero point */
         .attr('transform', `translate(0,0)`)
+        .attr('class', 'chart__yAxisLeft')
         .call(d3.axisLeft(y).tickSizeOuter(0))
         .call((innerG) =>
           innerG
@@ -191,10 +212,7 @@ export const SensitiveAnalysisChartComponent: React.FC<
             .text('')
             .append('text')
             .attr('class', 'chart__text chart__text_white')
-            .attr('fill', 'currentColor')
-            .attr('height', '12')
-            .attr('text-anchor', 'end')
-            .text('1,0'),
+            .text(([, value]) => value),
         )
         /** Установка позиции zero point */
         .call((innerG) =>
@@ -208,6 +226,7 @@ export const SensitiveAnalysisChartComponent: React.FC<
     const y2Axis = (g) =>
       g
         .attr('transform', `translate(0,0)`)
+        .attr('class', 'chart__yAxisRight')
         .call((innerG) =>
           innerG
             .call(d3.axisLeft(y).tickSizeOuter(0))
@@ -223,10 +242,11 @@ export const SensitiveAnalysisChartComponent: React.FC<
             .text('')
             .append('text')
             .attr('class', 'chart__text chart__text_white')
-            .attr('fill', 'currentColor')
-            .attr('height', '12')
-            .attr('text-anchor', 'end')
-            .text('1,0'),
+            .text(([, value], index: number) => {
+              const rightBarSeries = series[1];
+              const currentTick = rightBarSeries[index][1];
+              return currentTick;
+            }),
         )
         .call((innerG) => innerG.select('.domain').attr('display', 'none'));
 
@@ -234,6 +254,7 @@ export const SensitiveAnalysisChartComponent: React.FC<
     const y3Axis = (g) =>
       g
         .attr('transform', `translate(0,0)`)
+        .attr('class', 'chart__yAxisLeftName')
         .call((innerG) =>
           innerG
             .call(d3.axisLeft(y))
@@ -244,7 +265,7 @@ export const SensitiveAnalysisChartComponent: React.FC<
             .attr(
               'transform',
               ([name, min]) =>
-                `translate(100, ${(y(name) || 0) + y.bandwidth() - 11 / 2})`,
+                `translate(95, ${(y(name) || 0) + y.bandwidth() - 11 / 2})`,
               // `translate(${x(bias[0][1]) - 20},${
               //   (y(name) || 0) + y.bandwidth() - 11 / 2
               // })`,
@@ -258,8 +279,44 @@ export const SensitiveAnalysisChartComponent: React.FC<
             .attr('text-anchor', 'end'),
         );
 
+    /**
+     * У нас отвязана ось X от графика. Но нам нужно, чтоб фиктивная ось X
+     * Была связана с графиком, поэтому необходимо двигать X положения баров в графике
+     * Для этого мы находим все элементы оси X, парсим, получая значения и позицию
+     * После этого, нам необходимо высчитать процент zeroPoint от следующего шага
+     * После получения процента, мы множим пред. позицию и выставляем начальную позицию баров
+     */
+    setTimeout(() => {
+      const xAxisResult: { value: number; xPos: number }[] = [];
+
+      document
+        .querySelectorAll('.chart__xAxis g')
+        .forEach((element: Element) => {
+          const xPos = (element.getAttribute('transform') || '')
+            .replace('translate(', '')
+            .replace(')', '')
+            .split(',')[0];
+
+          xAxisResult.push({
+            value: Number(element.textContent),
+            xPos: Number(xPos),
+          });
+        });
+
+      const nextFromZeroPoint = xAxisResult.findIndex((innerX) => {
+        return innerX.value >= zeroPoint;
+      });
+      const zeroPointMultiplier = Math.round(
+        100 - (zeroPoint / xAxisResult[nextFromZeroPoint].value) * 100,
+      );
+      const prevFromZeroPointXPos = xAxisResult[nextFromZeroPoint - 1].xPos;
+      const zeroPointXPos = prevFromZeroPointXPos * zeroPointMultiplier;
+      console.log(zeroPointXPos);
+    });
+
     svg
       .append('g')
+      .attr('class', 'chart__main')
       .selectAll('g')
       .data(series)
       .join('g')
@@ -267,6 +324,7 @@ export const SensitiveAnalysisChartComponent: React.FC<
       .selectAll('rect')
       .data((d) => d.map((v) => Object.assign(v, { key: d.key })))
       .join('rect')
+      .attr('class', 'chart__bar')
       .attr('x', (d) => x(d[0]))
       .attr('y', ({ data: [name] }: any) => y(name) || 0)
       .attr('rx', (d) => 2)
@@ -274,14 +332,11 @@ export const SensitiveAnalysisChartComponent: React.FC<
       .attr('height', y.bandwidth())
       .append('title');
 
-    svg.append('g').call(xAxis);
-
     svg.append('g').call(yAxis);
     svg.append('g').call(y2Axis);
     svg.append('g').call(y3Axis);
-
-    console.log(sample, percentiles, names, zeroPoint);
-  }, [sample, percentiles, names, zeroPoint, availableNames]);
+    svg.append('g').call(xAxis);
+  }, [sample, currentPercentiles, names, zeroPoint]);
 
   useEffect(() => {
     if (d3Container.current) {
@@ -299,7 +354,7 @@ export const SensitiveAnalysisChartComponent: React.FC<
             SensitiveAnalysisChart.Margin.right
           }
           height={
-            SensitiveAnalysisChart.Height +
+            currentHeight +
             SensitiveAnalysisChart.Margin.top +
             SensitiveAnalysisChart.Margin.bottom
           }

@@ -1,18 +1,13 @@
 import React from 'react';
 import { SensitiveAnalysis } from '@app/interfaces/SensitiveAnalysisInterface';
-import { Loader } from '@consta/uikit/Loader';
 import { Table } from '@consta/uikit/Table';
-
-import './SensitiveAnalysisStatisticComponent.scss';
 
 interface Props {
   statistic: SensitiveAnalysis;
-  isLoading: boolean;
 }
 
 export const SensitiveAnalysisStatisticComponent: React.FC<Props> = ({
   statistic,
-  isLoading,
 }) => {
   const columns: any = [
     {
@@ -100,17 +95,5 @@ export const SensitiveAnalysisStatisticComponent: React.FC<Props> = ({
     },
   ];
 
-  return (
-    <div className="sensitive-analysis">
-      {isLoading ? (
-        <Loader className="sensitive-analysis__loader" />
-      ) : (
-        <div>
-          <div className="sensitive-analysis__title">Статистика</div>
-
-          <Table columns={columns} rows={rows} zebraStriped="odd" />
-        </div>
-      )}
-    </div>
-  );
+  return <Table columns={columns} rows={rows} zebraStriped="odd" />;
 };

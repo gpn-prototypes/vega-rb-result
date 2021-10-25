@@ -19,4 +19,14 @@
 
     min-height: 244px;
   }
+
+  &__statistic-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 89px;
+  }
+
+  &__statistic {
+    margin-top: var(--space-xl);
+  }
 }
