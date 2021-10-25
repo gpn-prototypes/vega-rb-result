@@ -12,7 +12,7 @@ import { Column, Row } from '../TableResultRbController/TableResultRb/types';
 import { getNodeListFromTableData, searchInTree } from './helpers';
 import { TargetData } from './types';
 
-import './TreeEditor.css';
+import './TreeEditor.scss';
 
 const icons = {
   'blue-line': <SvgResource color="#00eeaa" />,
@@ -47,7 +47,6 @@ export default React.forwardRef<HTMLDivElement, StructureTreeEditorProps>(
     );
 
     const onSelect = (selectedItems: TargetData[]) => {
-      console.log('selectedItems', selectedItems);
       if (selectedItems.length) {
         const node = searchInTree(tree, selectedItems[0].id);
         if (node && node.data) {

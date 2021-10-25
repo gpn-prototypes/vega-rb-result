@@ -95,6 +95,26 @@
     font-size: 10px;
     line-height: 14px;
   }
+
+  &__text {
+    font-size: 14px;
+    line-height: 17px;
+
+    fill: var(--color-typo-secondary);
+    text-anchor: end;
+
+    &_white {
+      fill: var(--color-typo-primary);
+    }
+
+    &_middle {
+      text-anchor: middle;
+    }
+  }
+
+  &__main {
+    transform: translate(0, 15px);
+  }
 }
 
 .line {

@@ -9,6 +9,7 @@ import {
   GET_HISTOGRAM_RESULT_RB,
   GET_PROJECT_NAME,
   GET_SENSITIVE_ANALYSIS_RESULT_RB,
+  GET_SENSITIVE_ANALYSIS_STATISTIC_RESULT_RB,
   GET_TABLE_RESULT_RB,
   GET_TABLE_TEMPLATE,
 } from '@app/components/TableResultRbController/queries';
@@ -228,6 +229,32 @@ class ProjectService implements IProjectService {
     const { data: responseData } = await this.client
       .watchQuery<Query>({
         query: GET_SENSITIVE_ANALYSIS_RESULT_RB,
+        context: {
+          uri: getGraphqlUri(this.projectId),
+        },
+        variables: {
+          projectId: this.projectId,
+          domainEntityNames,
+        },
+        fetchPolicy: 'no-cache',
+      })
+      .result();
+
+    this.trySetupWorkingProject(responseData);
+
+    return getOr(
+      None<ResultHistogramsStructure>(),
+      ['project', 'resourceBase', 'result', 'histograms'],
+      responseData,
+    );
+  }
+
+  async getSensitiveAnalysisStatistic(
+    domainEntityNames: string[],
+  ): Promise<SensitivityAnalysisStructure> {
+    const { data: responseData } = await this.client
+      .watchQuery<Query>({
+        query: GET_SENSITIVE_ANALYSIS_STATISTIC_RESULT_RB,
         context: {
           uri: getGraphqlUri(this.projectId),
         },

@@ -52,4 +52,11 @@
   &__analysis {
     margin-right: var(--space-2xl);
   }
+
+  &__sidebar {
+    margin-top: var(--space-3xl);
+    padding: var(--space-l);
+
+    min-width: 736px;
+  }
 }

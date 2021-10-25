@@ -1,0 +1,32 @@
+.histogram {
+  width: 100%;
+  min-width: 782px;
+  min-height: 200px;
+
+  &__content {
+    margin-top: var(--space-m);
+
+    display: grid;
+
+    min-height: 244px;
+
+    grid-gap: 120px;
+    grid-template-columns: 545px 545px;
+  }
+
+  &__loader {
+    margin-top: var(--space-m);
+
+    min-height: 244px;
+  }
+
+  &__statistic-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 89px;
+  }
+
+  &__statistic {
+    margin-top: var(--space-xl);
+  }
+}

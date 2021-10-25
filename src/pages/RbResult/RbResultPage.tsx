@@ -1,29 +1,40 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  FLUID_TYPES,
-  IS_PROJECT_RECENTLY_EDITED_INTERVAL_IN_MS,
-} from '@app/common/consts';
-import { EFluidType } from '@app/common/enums';
 import { HistogramComponent } from '@app/components/Histograms/HistogramComponent';
 import { SensitiveAnalysisComponent } from '@app/components/SensitiveAnalysis/SensitiveAnalysisComponent';
 import { TableErrorAlert } from '@app/components/TableErrorAlert';
 import Table from '@app/components/TableResultRbController';
 import TreeEditor from '@app/components/TreeEditor';
+import { EFluidType } from '@app/constants/Enums';
+import {
+  FLUID_TYPES,
+  IS_PROJECT_RECENTLY_EDITED_INTERVAL_IN_MS,
+} from '@app/constants/GeneralConstants';
 import projectService from '@app/services/ProjectService';
 import competitiveAccessDuck from '@app/store/competitiveAccessDuck';
 import projectDuck from '@app/store/projectDuck';
 import tableDuck from '@app/store/tableDuck';
 import { RootState } from '@app/store/types';
+import { GridActiveRow, GridCollection } from '@app/types/typesTable';
+import { Sidebar } from '@consta/uikit/Sidebar';
 import { ChoiceGroup, SplitPanes, useInterval } from '@gpn-prototypes/vega-ui';
 
-import './RbResultPage.css';
+import './RbResultPage.scss';
 
 const RbResultPage: React.FC = () => {
   const dispatch = useDispatch();
   const treeEditorRef = useRef<HTMLDivElement>(null);
   const [isShownTree, setIsShownTree] = useState(true);
   const [fluidType, setFluidType] = useState<EFluidType>(EFluidType.ALL);
+
+  const data: GridCollection = useSelector(({ table }: RootState) => table);
+  const sidebarRow: GridActiveRow | undefined = useSelector(
+    ({ table }: RootState) => table.sidebarRow,
+  );
+
+  const isRecentlyEdited = useSelector(
+    ({ competitiveAccess }: RootState) => competitiveAccess.isRecentlyEdited,
+  );
 
   const handleResize = (): void => {
     if (treeEditorRef?.current?.clientWidth) {
@@ -36,12 +47,6 @@ const RbResultPage: React.FC = () => {
 
     setFluidType(type);
   };
-
-  const data = useSelector(({ table }: RootState) => table);
-
-  const isRecentlyEdited = useSelector(
-    ({ competitiveAccess }: RootState) => competitiveAccess.isRecentlyEdited,
-  );
 
   useEffect(() => {
     projectService
@@ -106,9 +111,18 @@ const RbResultPage: React.FC = () => {
                 </div>
               )}
 
-              <div className="result__analysis">
-                <SensitiveAnalysisComponent grid={data} />
-              </div>
+              <Sidebar
+                isOpen={sidebarRow !== undefined}
+                onClickOutside={() =>
+                  dispatch(tableDuck.actions.resetSidebarRow())
+                }
+                hasOverlay
+                className="result__sidebar"
+              >
+                {sidebarRow && (
+                  <SensitiveAnalysisComponent sidebarRow={sidebarRow} />
+                )}
+              </Sidebar>
             </div>
           </div>
         </SplitPanes.Pane>

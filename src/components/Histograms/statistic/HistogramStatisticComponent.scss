@@ -1,0 +1,39 @@
+.histogram-statistic {
+  padding-bottom: var(--space-3xl);
+
+  display: grid;
+  grid-template-columns: 167px 109px;
+  grid-gap: 22px;
+
+  &__rows {
+    display: grid;
+    grid-template-columns: 112px 54px;
+
+    &_same {
+      grid-template-columns: 54px 54px;
+    }
+  }
+
+  &__row {
+    padding: 4px 8px;
+
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+
+    height: 100%;
+
+    font-size: 14px;
+    line-height: 120%;
+
+    color: var(--color-typo-primary);
+
+    border-bottom: 1px solid var(--color-bg-border);
+
+    &_last {
+      text-align: right;
+
+      border-left: 1px solid var(--color-bg-border);
+    }
+  }
+}

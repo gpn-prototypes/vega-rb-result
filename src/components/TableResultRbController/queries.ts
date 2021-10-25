@@ -206,6 +206,29 @@ export const GET_SENSITIVE_ANALYSIS_RESULT_RB = gql`
   }
 `;
 
+export const GET_SENSITIVE_ANALYSIS_STATISTIC_RESULT_RB = gql`
+  query GetTableResultRb($projectId: ID!, $domainEntityNames: [String!]) {
+    project {
+      resourceBase {
+        result {
+          histograms {
+            getSensitivityAnalysis(
+              projectId: $projectId
+              domainEntityNames: $domainEntityNames
+            ) {
+              title
+              names
+              sample
+              percentiles
+              zeroPoint
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
 export const GET_TABLE_RESULT_RB = gql`
   query GetTableResultRb {
     project {

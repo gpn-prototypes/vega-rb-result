@@ -64,12 +64,14 @@ export namespace Chart {
 
   export const Margin: Margin = {
     top: 20,
-    right: 40,
-    bottom: 30,
-    left: 40,
+    right: 50,
+    bottom: 35,
+    left: 50,
   };
-  export const Width = 459 - Margin.left - Margin.right;
-  export const Height = 221 - Margin.top - Margin.bottom;
+  export const DefaultWidth = 545;
+  export const Width = 545;
+  export const DefaultHeight = 279;
+  export const Height = 279;
 
   export const getScales = ({
     bins,
@@ -116,14 +118,13 @@ export namespace Chart {
             .ticks(Width / 80)
             .tickSizeOuter(0),
         )
+        .selectAll('.tick')
+        .attr('class', 'chart__text')
         .call((innerG) =>
           innerG
             .append('text')
             .attr('x', Width - Margin.right)
             .attr('y', -4)
-            .attr('fill', 'currentColor')
-            .attr('font-weight', 'bold')
-            .attr('text-anchor', 'end')
             .text(payload.x),
         );
 
@@ -133,6 +134,7 @@ export namespace Chart {
         .attr('display', 'none')
         .call(d3.axisLeft(yScale).ticks(Height / 40))
         .call((innerG) => innerG.select('.domain').remove())
+        .attr('class', 'chart__text')
         .call((innerG) =>
           innerG
             .select('.tick:last-of-type text')
@@ -159,13 +161,13 @@ export namespace Chart {
         .attr('transform', `translate(${Margin.left - 10},0)`)
         .call(d3.axisLeft(y1Scale).ticks(3))
         .call((innerG) => innerG.select('.domain').remove())
+        .attr('class', 'chart__text')
+        .call((innerG) => innerG.selectAll('.tick text').attr('x', -12))
         .call((innerG) =>
           innerG
             .select('.tick:last-of-type text')
             .clone()
             .attr('x', 4)
-            .attr('text-anchor', 'start')
-            .attr('font-weight', 'bold')
             .text(payload.y),
         );
 
@@ -180,15 +182,22 @@ export namespace Chart {
             .tickSize(-(Width - Margin.left - Margin.right)),
         )
         .call((innerG) => innerG.select('.domain').remove())
+        .attr('class', 'chart__text')
+        /** Line */
+        .call((nestedG) => nestedG.selectAll('.tick line'))
+        .attr('stroke-dasharray', 3)
+        .attr('stroke', 'rgba(246, 251, 253, 0.28)')
+
+        /** Text */
         .call((innerG) =>
           innerG
-            .select('.tick:last-of-type text')
+            .selectAll('.tick text')
+            .attr('x', 45)
             .clone()
-            .attr('x', 4)
-            .attr('text-anchor', 'start')
-            .attr('font-weight', 'bold')
+            .attr('x', 45)
             .text(payload.y),
-        );
+        )
+        .call((nestedG) => nestedG.select('.tick:first-of-type line').remove());
 
     return { y1Axis, y2Axis };
   };
@@ -231,18 +240,19 @@ export namespace Chart {
       };
     });
 
-    svg
-      .append('g')
-      .attr('stroke', 'var(--color-bg-warning)')
-      .attr('stroke-width', 1.5)
-      .attr('fill', 'var(--color-bg-warning)')
-      .attr('class', 'chart__dot')
-      .selectAll('circle')
-      .data(payload)
-      .join('circle')
-      .attr('cx', (d: any) => xScale(d.x))
-      .attr('cy', (d: any) => y1Scale(d.y))
-      .attr('r', 1.5);
+    /** Пока точки не отображаем */
+    // svg
+    //   .append('g')
+    //   .attr('stroke', 'var(--color-bg-warning)')
+    //   .attr('stroke-width', 1.5)
+    //   .attr('fill', 'var(--color-bg-warning)')
+    //   .attr('class', 'chart__dot')
+    //   .selectAll('circle')
+    //   .data(payload)
+    //   .join('circle')
+    //   .attr('cx', (d: any) => xScale(d.x))
+    //   .attr('cy', (d: any) => y1Scale(d.y))
+    //   .attr('r', 1.5);
 
     svg
       .append('g')
@@ -250,8 +260,9 @@ export namespace Chart {
       .selectAll('text')
       .data(payload)
       .join('text')
+      .attr('class', 'chart__text')
       .attr('dy', '0.35em')
-      .attr('x', (d: any) => xScale(d.x) + 4)
+      .attr('x', (d: any) => xScale(d.x) + 34)
       .attr('y', (d: any) => y1Scale(d.y))
       .text((d: any) => String(d.value).split('.')[0]);
   };

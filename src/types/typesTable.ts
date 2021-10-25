@@ -1,9 +1,9 @@
 import React, { ReactText } from 'react';
-import { EFluidType } from '@app/common/enums';
 import {
   Column,
   Row,
 } from '@app/components/TableResultRbController/TableResultRb/types';
+import { EFluidType } from '@app/constants/Enums';
 import {
   DistributionDefinitionTypes,
   DistributionParameterTypes,
@@ -102,6 +102,7 @@ export interface GridCollection {
   rows: Row<RbDomainEntityInput>[];
   version: number;
   activeRow?: GridActiveRow | undefined;
+  sidebarRow?: GridActiveRow | undefined;
   fluidType?: EFluidType;
 }
 

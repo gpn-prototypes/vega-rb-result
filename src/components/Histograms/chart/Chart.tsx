@@ -6,14 +6,15 @@ import { Bin } from 'd3-array';
 import { cnChart } from './cn-chart';
 import { Chart } from './drawUtils';
 
-import './Chart.css';
+import './Chart.scss';
 
-const ChartComponent: React.FC<Histogram> = ({
+const ChartComponent: React.FC<Histogram & { numberOfRows: number }> = ({
   title,
   subtitle,
   percentiles,
   sample,
   numberOfIterationBin,
+  numberOfRows,
 }) => {
   const d3Container = useRef(null);
 
@@ -27,7 +28,9 @@ const ChartComponent: React.FC<Histogram> = ({
     const payload: Chart.Payload = Object.assign(sample, { x: '', y: '' });
 
     /** Создание бинов, это "бары", которые будут отображаться на графике */
-    const bins: Bin<number, number>[] = d3.bin().thresholds(50)(payload);
+    const bins: Bin<number, number>[] = d3.bin().thresholds(numberOfRows)(
+      payload,
+    );
 
     /** Получаем основные данные и их распределение на гистограмме */
     const { xScale, yScale, y1Scale, y2Scale } = Chart.getScales({
@@ -60,7 +63,7 @@ const ChartComponent: React.FC<Histogram> = ({
     svg.append('g').call(y1Axis);
 
     svg.append('g').call(y2Axis);
-  }, [sample, percentiles, numberOfIterationBin]);
+  }, [sample, percentiles, numberOfIterationBin, numberOfRows]);
 
   useEffect(() => {
     if (d3Container.current) {
@@ -76,7 +79,11 @@ const ChartComponent: React.FC<Histogram> = ({
       </div>
 
       <div className={cnChart()}>
-        <svg width={Chart.Width} height={Chart.Height} ref={d3Container} />
+        <svg
+          width={Chart.DefaultWidth}
+          height={Chart.DefaultHeight}
+          ref={d3Container}
+        />
       </div>
     </div>
   );

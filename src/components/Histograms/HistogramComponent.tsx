@@ -10,21 +10,30 @@ import { GridActiveRow, GridCollection } from '@app/types/typesTable';
 import { Loader, useMount } from '@gpn-prototypes/vega-ui';
 
 import ChartComponent from './chart/Chart';
+import { HistogramStatisticComponent } from './statistic/HistogramStatisticComponent';
 
-import './HistogramComponent.css';
+import './HistogramComponent.scss';
 
 interface Props {
   grid: GridCollection;
 }
 
+const DEFAULT_NUMBER_OF_ROWS = 50;
+
 const payloadMenuItems: MenuContextItem[] = [
   {
     name: 'Кол-во столбцов в гистограмме',
+    code: 'numberOfRows',
+    choice: {
+      value: DEFAULT_NUMBER_OF_ROWS,
+      values: [25, DEFAULT_NUMBER_OF_ROWS, 100],
+    },
   },
   {
     name: 'Показывать статистику',
     code: 'stat',
     switch: false,
+    border: true,
   },
 ];
 
@@ -39,6 +48,13 @@ export const HistogramComponent: React.FC<Props> = ({ grid }) => {
   );
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isShowStatistic, setIsShowStatistic] = useState<boolean>(false);
+  const [numberOfRows, setNumberOfRows] = useState<number>(
+    DEFAULT_NUMBER_OF_ROWS,
+  );
+  const [previousActiveRow, setPreviousActiveRow] = useState<
+    GridActiveRow | undefined
+  >(undefined);
   const [menuItems, setMenuItems] =
     useState<MenuContextItem[]>(payloadMenuItems);
 
@@ -57,29 +73,41 @@ export const HistogramComponent: React.FC<Props> = ({ grid }) => {
 
   /** Отлавливаем выбор ячейки, выбор ячейки происходит по клику на таблице и по клику по ноде в дереве */
   useEffect(() => {
-    setIsLoading(true);
+    if (activeRow?.code && previousActiveRow?.code !== activeRow.code) {
+      setIsLoading(true);
 
-    if (activeRow?.code) {
       loadHistogramData(
         dispatch,
         activeRow.code.split(','),
         activeRow.title.split(','),
-      ).then(() => setIsLoading(false));
+      ).then(() => {
+        setIsLoading(false);
+
+        setPreviousActiveRow(activeRow);
+      });
     }
-  }, [activeRow, dispatch]);
+  }, [activeRow, previousActiveRow, dispatch, setPreviousActiveRow]);
 
   const handleChange = (item: MenuContextItem) => {
-    const updatedMenuItems = menuItems.map((menuItem: MenuContextItem) => {
-      const newItem = { ...menuItem };
+    if (item.code === 'stat') {
+      const updatedMenuItems = menuItems.map((menuItem: MenuContextItem) => {
+        const newItem = { ...menuItem };
 
-      if (menuItem.code === item.code) {
-        newItem.switch = !menuItem.switch;
-      }
+        if (menuItem.code === 'stat') {
+          newItem.switch = !item.switch;
 
-      return newItem;
-    });
+          setIsShowStatistic(newItem.switch);
+        }
 
-    setMenuItems(updatedMenuItems);
+        return newItem;
+      });
+
+      setMenuItems(updatedMenuItems);
+    }
+
+    if (item.code === 'numberOfRows') {
+      setNumberOfRows(item.choice?.value || DEFAULT_NUMBER_OF_ROWS);
+    }
   };
 
   const handleClick = (item: MenuContextItem) => {
@@ -96,6 +124,7 @@ export const HistogramComponent: React.FC<Props> = ({ grid }) => {
             percentiles={histogram.percentiles}
             sample={histogram.sample}
             numberOfIterationBin={histogram.numberOfIterationBin}
+            numberOfRows={numberOfRows}
           />
         );
       })}
@@ -113,6 +142,18 @@ export const HistogramComponent: React.FC<Props> = ({ grid }) => {
         />
       </div>
       {isLoading ? <Loader className="histogram__loader" /> : histograms}
+
+      {isShowStatistic && (
+        <div className="histogram__statistic-wrapper">
+          <div className="histogram__statistic">
+            <HistogramStatisticComponent />
+          </div>
+
+          <div className="histogram__statistic">
+            <HistogramStatisticComponent />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

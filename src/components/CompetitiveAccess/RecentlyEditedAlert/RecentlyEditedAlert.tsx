@@ -4,7 +4,7 @@ import { IconAlert, SnackBar } from '@gpn-prototypes/vega-ui';
 
 import { cnAlert } from './cn-alert';
 
-import './RecentlyEditedAlert.css';
+import './RecentlyEditedAlert.scss';
 
 export const RecentlyEditedAlert: React.FC = () => {
   const items: Item[] = [

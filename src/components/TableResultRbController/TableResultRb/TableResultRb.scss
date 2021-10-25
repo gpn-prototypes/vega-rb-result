@@ -1,5 +1,7 @@
 .table {
   .TableCell_isHeader {
+    min-width: 120px;
+
     font-size: var(--size-text-xs);
     font-weight: 400;
 
