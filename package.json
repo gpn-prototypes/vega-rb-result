@@ -60,7 +60,7 @@
     "redux-persist": "^6.0.0",
     "redux-thunk": "^2.3.0",
     "eslint-plugin-lodash-fp": "^2.2.0-a1",
-    "single-spa-react": "^3.1.0",
+    "single-spa-react": "^4.4.0",
     "sass": "1.43.2",
     "sass-loader": "10.1.1",
     "style-loader": "2.0.0",
