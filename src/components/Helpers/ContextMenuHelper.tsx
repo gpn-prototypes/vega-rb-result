@@ -174,16 +174,6 @@ export const VerticalMoreContextMenu: React.FC<Props> = ({
         >
           {items}
         </Popover>
-        // <ContextMenu
-        //   items={menuItems}
-        //   getLabel={(item) => item.name}
-        //   getRightSideBar={(item) => SwitchRightSide(item, onChange)}
-        //   anchorRef={ref}
-        //   onClick={handleContextClick}
-        //   size="s"
-        //
-        //
-        // />
       )}
     </div>
   );

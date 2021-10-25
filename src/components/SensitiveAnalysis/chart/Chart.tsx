@@ -60,224 +60,28 @@ export const SensitiveAnalysisChartComponent: React.FC<
       });
     });
 
-    console.log(data);
-
-    const options = {
-      format: '',
-      negative: '',
-      positive: '',
-      negatives: [0],
-      positives: [1],
-      colors: {
-        0: '#F38B00',
-        1: '#0AA5FF',
-      },
-    };
-
-    /** TODO: Убрать все any, по быстрому не получилось исправить */
-    const signs: Map<[number, number], [number, number]> = new Map<
-      [number, number],
-      [number, number]
-    >([
-      ...(options.negatives.map((d) => [d, -1]) as any),
-      ...(options.positives.map((d) => [d, +1]) as any),
-    ]);
-
-    const series = d3
-      .stack()
-      .keys(
-        [].concat(
-          options.negatives.slice().reverse() as any,
-          options.positives as any,
-        ),
-      )
-      .value(
-        ([, value]: any, category: any) =>
-          (signs.get(category) as any) * (value.get(category) || 0),
-      )
-      .offset(d3.stackOffsetDiverging)(
-      d3.rollups(
-        data,
-        (innerData) =>
-          d3.rollup(
-            innerData,
-            ([d]) => d.value,
-            (d) => d.category,
-          ),
-        (d) => d.name,
-      ) as any,
-    );
-
-    const bias = d3
-      .rollups(
-        data,
-        (v) =>
-          d3.sum(
-            v,
-            (d: any) => d.value * Math.min(0, signs.get(d.category) as any),
-          ),
-        (d) => d.name,
-      )
-      .sort(([, a], [, b]) => d3.ascending(a, b));
-
-    const heightMultiplier = 68;
-    const height =
-      bias.length * heightMultiplier +
-      SensitiveAnalysisChart.Margin.top +
-      SensitiveAnalysisChart.Margin.bottom;
+    const { series, bias, options } = SensitiveAnalysisChart.getAxisData(data);
 
     const getColor = (key) => {
       return options.colors[key];
     };
 
-    const offset = 50;
+    const { xScale, x1Scale, yScale } = SensitiveAnalysisChart.getAxisScale({
+      series,
+      sample,
+      bias,
+    });
 
-    const x = d3
-      .scaleLinear()
-      .domain(d3.extent(series.flat(2)) as any)
-      .rangeRound([
-        SensitiveAnalysisChart.Margin.left + offset,
-        SensitiveAnalysisChart.Width -
-          SensitiveAnalysisChart.Margin.right -
-          offset,
-      ]);
-
-    const x1Scale = d3
-      .scaleLinear()
-      .domain([d3.min(sample) || 0, d3.max(sample) || 0])
-      .range([
-        SensitiveAnalysisChart.Margin.left,
-        SensitiveAnalysisChart.Width + SensitiveAnalysisChart.Margin.right,
-      ]);
-
-    const y = d3
-      .scaleBand()
-      .domain(bias.map(([name]) => name))
-      .rangeRound([
-        SensitiveAnalysisChart.Margin.top,
-        height - SensitiveAnalysisChart.Margin.bottom,
-      ])
-      .padding(53 / heightMultiplier);
-
-    const formatValue = () => {
-      const format = d3.format(options.format || '');
-      return (innerX) => format(Math.abs(innerX));
-    };
-
-    /** Добавление оси X, а так же добавление полосок */
-    const xAxis = (g) =>
-      g
-        .attr('transform', `translate(0,${SensitiveAnalysisChart.Margin.top})`)
-        .attr('class', 'chart__xAxis')
-        .call(
-          d3
-            .axisTop(x1Scale)
-            .ticks(6)
-            .tickFormat(formatValue())
-            .tickSizeOuter(0),
-        )
-        .call((innerG) => innerG.select('.domain').remove())
-        .call((innerG) =>
-          innerG
-            .selectAll('.tick')
-            .call((nestedG) => nestedG.selectAll('.tick line').remove())
-            .attr('class', 'chart__text chart__text_middle')
-            .attr('text-anchor', 'middle')
-            .data(sample)
-            .append('line')
-            .attr('transform', () => `translate(0, 20)`)
-            .attr('y2', currentPercentiles.length * 66.6)
-            .attr('stroke-dasharray', 3)
-            .attr('stroke', 'rgba(246, 251, 253, 0.28)'),
-        );
-
-    /** Заглушка, показываем в левой части "1,0" + установка "zero point" */
-    const yAxis = (g) =>
-      g
-        /** Установка zero point */
-        .attr('transform', `translate(0,0)`)
-        .attr('class', 'chart__yAxisLeft')
-        .call(d3.axisLeft(y).tickSizeOuter(0))
-        .call((innerG) =>
-          innerG
-            .selectAll('.tick')
-            .data(bias)
-            .attr(
-              'transform',
-              ([name, min]) =>
-                `translate(${x(min) - 5},${
-                  (y(name) || 0) + y.bandwidth() - 2
-                })`,
-            )
-            .text('')
-            .append('text')
-            .attr('class', 'chart__text chart__text_white')
-            .text(([, value]) => value),
-        )
-        /** Установка позиции zero point */
-        .call((innerG) =>
-          innerG
-            .select('.domain')
-            .attr('display', 'none')
-            .attr('transform', `translate(${x(0)},0)`),
-        );
-
-    /** Заглушка, показываем в правой части "1,0" */
-    const y2Axis = (g) =>
-      g
-        .attr('transform', `translate(0,0)`)
-        .attr('class', 'chart__yAxisRight')
-        .call((innerG) =>
-          innerG
-            .call(d3.axisLeft(y).tickSizeOuter(0))
-            .selectAll('.tick')
-            .data(bias)
-            .attr('transform', ([name, min], index) => {
-              const rightBarSeries = series[1];
-              const currentTick = rightBarSeries[index][1];
-              return `translate(${x(currentTick) + 21},${
-                (y(name) || 0) + y.bandwidth() - 2
-              })`;
-            })
-            .text('')
-            .append('text')
-            .attr('class', 'chart__text chart__text_white')
-            .text(([, value], index: number) => {
-              const rightBarSeries = series[1];
-              const currentTick = rightBarSeries[index][1];
-              return currentTick;
-            }),
-        )
-        .call((innerG) => innerG.select('.domain').attr('display', 'none'));
-
-    /** Обозначение слева(названия) */
-    const y3Axis = (g) =>
-      g
-        .attr('transform', `translate(0,0)`)
-        .attr('class', 'chart__yAxisLeftName')
-        .call((innerG) =>
-          innerG
-            .call(d3.axisLeft(y))
-            .call((nestedG) => nestedG.select('.domain').remove())
-            .selectAll('.tick')
-            .data(bias)
-            .attr('class', 'chart__text')
-            .attr(
-              'transform',
-              ([name, min]) =>
-                `translate(95, ${(y(name) || 0) + y.bandwidth() - 11 / 2})`,
-              // `translate(${x(bias[0][1]) - 20},${
-              //   (y(name) || 0) + y.bandwidth() - 11 / 2
-              // })`,
-            ),
-        )
-        .call((nestedG) => nestedG.selectAll('.chart__text line').remove())
-        .call((nestedG) =>
-          nestedG
-            .selectAll('.chart__text text')
-            .attr('x', '0')
-            .attr('text-anchor', 'end'),
-        );
+    const { xAxis, yAxis, y2Axis, y3Axis } = SensitiveAnalysisChart.getAxis({
+      xScale,
+      x1Scale,
+      yScale,
+      options,
+      sample,
+      currentPercentiles,
+      bias,
+      series,
+    });
 
     /**
      * У нас отвязана ось X от графика. Но нам нужно, чтоб фиктивная ось X
@@ -286,33 +90,33 @@ export const SensitiveAnalysisChartComponent: React.FC<
      * После этого, нам необходимо высчитать процент zeroPoint от следующего шага
      * После получения процента, мы множим пред. позицию и выставляем начальную позицию баров
      */
-    setTimeout(() => {
-      const xAxisResult: { value: number; xPos: number }[] = [];
+    /** TODO: Под вопросом, нужно ли */
+    // setTimeout(() => {
+    //   const xAxisResult: { value: number; xPos: number }[] = [];
 
-      document
-        .querySelectorAll('.chart__xAxis g')
-        .forEach((element: Element) => {
-          const xPos = (element.getAttribute('transform') || '')
-            .replace('translate(', '')
-            .replace(')', '')
-            .split(',')[0];
+    //   document
+    //     .querySelectorAll('.chart__xAxis g')
+    //     .forEach((element: Element) => {
+    //       const xPos = (element.getAttribute('transform') || '')
+    //         .replace('translate(', '')
+    //         .replace(')', '')
+    //         .split(',')[0];
 
-          xAxisResult.push({
-            value: Number(element.textContent),
-            xPos: Number(xPos),
-          });
-        });
+    //       xAxisResult.push({
+    //         value: Number(element.textContent),
+    //         xPos: Number(xPos),
+    //       });
+    //     });
 
-      const nextFromZeroPoint = xAxisResult.findIndex((innerX) => {
-        return innerX.value >= zeroPoint;
-      });
-      const zeroPointMultiplier = Math.round(
-        100 - (zeroPoint / xAxisResult[nextFromZeroPoint].value) * 100,
-      );
-      const prevFromZeroPointXPos = xAxisResult[nextFromZeroPoint - 1].xPos;
-      const zeroPointXPos = prevFromZeroPointXPos * zeroPointMultiplier;
-      console.log(zeroPointXPos);
-    });
+    //   const nextFromZeroPoint = xAxisResult.findIndex((innerX) => {
+    //     return innerX.value >= zeroPoint;
+    //   });
+    //   const zeroPointMultiplier = Math.round(
+    //     100 - (zeroPoint / xAxisResult[nextFromZeroPoint].value) * 100,
+    //   );
+    //   const prevFromZeroPointXPos = xAxisResult[nextFromZeroPoint - 1].xPos;
+    //   const zeroPointXPos = prevFromZeroPointXPos * zeroPointMultiplier;
+    // });
 
     svg
       .append('g')
@@ -325,18 +129,18 @@ export const SensitiveAnalysisChartComponent: React.FC<
       .data((d) => d.map((v) => Object.assign(v, { key: d.key })))
       .join('rect')
       .attr('class', 'chart__bar')
-      .attr('x', (d) => x(d[0]))
-      .attr('y', ({ data: [name] }: any) => y(name) || 0)
+      .attr('x', (d) => xScale(d[0]))
+      .attr('y', ({ data: [name] }: any) => yScale(name) || 0)
       .attr('rx', (d) => 2)
-      .attr('width', (d) => x(d[1]) - x(d[0]))
-      .attr('height', y.bandwidth())
+      .attr('width', (d) => xScale(d[1]) - xScale(d[0]))
+      .attr('height', yScale.bandwidth())
       .append('title');
 
     svg.append('g').call(yAxis);
     svg.append('g').call(y2Axis);
     svg.append('g').call(y3Axis);
     svg.append('g').call(xAxis);
-  }, [sample, currentPercentiles, names, zeroPoint]);
+  }, [sample, currentPercentiles, names]);
 
   useEffect(() => {
     if (d3Container.current) {

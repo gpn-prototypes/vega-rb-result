@@ -47,7 +47,6 @@ export default React.forwardRef<HTMLDivElement, StructureTreeEditorProps>(
     );
 
     const onSelect = (selectedItems: TargetData[]) => {
-      console.log('selectedItems', selectedItems);
       if (selectedItems.length) {
         const node = searchInTree(tree, selectedItems[0].id);
         if (node && node.data) {
