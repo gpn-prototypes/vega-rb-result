@@ -134,9 +134,6 @@ class ProjectService implements IProjectService {
     const { data: responseData } = await this.client
       .watchQuery<Query>({
         query: GET_TABLE_TEMPLATE,
-        variables: {
-          vid: this.projectId,
-        },
         context: {
           uri: getGraphqlUri(this.projectId),
         },

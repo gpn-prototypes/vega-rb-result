@@ -11,10 +11,14 @@ export interface Column<T = any> {
   align?: 'left' | 'right';
   visible?: Visible;
   width?: number;
+  getComparisonValue?: (row: Row[Column['accessor']]) => string;
 }
 
 export type Row<T = any> = TableRow &
   T & {
+    code: string;
+    value: string;
+    formattedValue: string;
     isAll?: boolean;
   };
 

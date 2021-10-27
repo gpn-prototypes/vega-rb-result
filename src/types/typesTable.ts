@@ -104,6 +104,7 @@ export interface GridCollection {
   activeRow?: GridActiveRow | undefined;
   sidebarRow?: GridActiveRow | undefined;
   fluidType?: EFluidType;
+  decimalFixed?: number;
 }
 
 export interface FilteredGridDataKeys {

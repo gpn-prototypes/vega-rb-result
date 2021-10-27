@@ -12,6 +12,10 @@ import {
   ResultDomainEntity,
   ResultProjectStructure,
 } from '../generated/graphql';
+import {
+  getDecimalRows,
+  tableInitialState,
+} from '../store/table/tableReducers';
 import { GridCollection } from '../types/typesTable';
 
 const isHasParentAll = (parents: Parent[]): boolean => {
@@ -32,19 +36,17 @@ export const prepareColumns = (
   ): string => {
     const baseClass = row.isAll ? '_all' : '';
 
-    // if (row.isAll && row[domainEntity.code] === undefined) {
-    //   baseClass += ' _no-right';
-    // }
-
     return baseClass;
   };
 
+  /** TODO: Сделать один общий объект, и наполнять его в зависимости от логики, убрать дублирование */
   const preparedEntities = domainEntities.map(
     (domainEntity: ResultDomainEntity, index: number) => {
       const column: Column<RbDomainEntityInput> = {
         title: domainEntity.name,
         accessor: domainEntity.code as keyof RbDomainEntityInput,
         mergeCells: true,
+        getComparisonValue: (row: Row<RbDomainEntityInput>) => row?.value || '',
         isResizable: true,
         visible: domainEntity?.visible,
         renderCell: (row: Row<RbDomainEntityInput>) => {
@@ -58,10 +60,13 @@ export const prepareColumns = (
                   .join(',');
           const nameWithParents =
             index === 0
-              ? row[domainEntity.code]
+              ? row[domainEntity.code].value
               : domainEntities
                   .slice(0, index + 1)
-                  .map((entity: ResultDomainEntity) => row[entity.code])
+                  .map(
+                    (entity: ResultDomainEntity) =>
+                      row[entity.code]?.value || '',
+                  )
                   .join(',');
 
           return (
@@ -70,7 +75,7 @@ export const prepareColumns = (
               data-code={codeWithParents}
               data-name={nameWithParents}
             >
-              {row[domainEntity.code] || ''}
+              {row[domainEntity.code]?.value || ''}
             </div>
           );
         },
@@ -86,6 +91,7 @@ export const prepareColumns = (
       accessor: attribute.code as keyof RbDomainEntityInput,
       mergeCells: true,
       align: attribute.code === 'PERCENTILE' ? 'left' : 'right',
+      getComparisonValue: (row: Row<RbDomainEntityInput>) => row?.value || '',
       isResizable: true,
       renderCell: (row: Row<RbDomainEntityInput>) => {
         /** Заполняем коды и названия с учетом родителей, нужно для отправки данных в отображение гистограм */
@@ -93,8 +99,16 @@ export const prepareColumns = (
           .map((entity: ResultDomainEntity) => entity.code)
           .join(',');
         const nameWithParents = domainEntities
-          .map((entity: ResultDomainEntity) => row[entity.code])
+          .map((entity: ResultDomainEntity) => row[entity.code]?.value || '')
           .join(',');
+
+        const value = row[attribute.code]?.formattedValue;
+
+        const formattedValue =
+          // eslint-disable-next-line no-restricted-globals
+          !isNaN(value) || value === undefined
+            ? value
+            : new Intl.NumberFormat('ru-RU').format(value);
 
         return (
           <div
@@ -103,7 +117,7 @@ export const prepareColumns = (
             data-code={codeWithParents}
             data-name={nameWithParents}
           >
-            {row[attribute.code] || ''}
+            {formattedValue || ''}
           </div>
         );
       },
@@ -115,7 +129,7 @@ export const prepareColumns = (
   return [...preparedEntities, ...preparedAttributes];
 };
 
-/** Подгтовка ячеек */
+/** Подготовка ячеек */
 export const prepareRows = ({
   domainObjects,
   attributes,
@@ -129,7 +143,7 @@ export const prepareRows = ({
 
     // Row - structure of three small rows
     const row: Row<RbDomainEntityInput>[] = [];
-    let isAllEmited = false;
+    let isAllEmitted = false;
 
     domainObject.attributeValues.forEach(
       (attributeValue: ResultAttributeValue, attributeIndex: number) => {
@@ -142,22 +156,36 @@ export const prepareRows = ({
           /** Устанавливаем необходимые данные для ячеек */
           row[percIndex].id = (rowNumber + percIndex).toString();
 
+          const value = attributeValue.values[percIndex];
+          const formattedValue =
+            // eslint-disable-next-line no-restricted-globals
+            !isNaN(value) || value === undefined
+              ? value
+              : new Intl.NumberFormat('ru-RU').format(value);
+
           /** Установка значения по коду */
-          row[percIndex][attributeValue.code] =
-            attributeValue.values[percIndex];
+          row[percIndex][attributeValue.code] = {
+            code: attributeValue.code,
+            value: attributeValue.values[percIndex],
+            formattedValue,
+          };
 
           /** Устанавливаем кастомные флаги, для того чтобы менять отображение таблицы */
           if (isHasParentAll(domainObject.parents)) {
-            if (isAllEmited) {
+            if (isAllEmitted) {
               row[percIndex].isAll = true;
             }
 
-            isAllEmited = true;
+            isAllEmitted = true;
           }
 
           /** Пробегаемся по родителям и устанавливаем как значение ячейки, в таблице они объединятся */
           domainObject.parents.forEach((parent) => {
-            row[percIndex][parent.code] = parent.name;
+            row[percIndex][parent.code] = {
+              code: attributeValue.code,
+              value: parent.name,
+              formattedValue: parent.name.toString(),
+            };
           });
         });
 
@@ -169,7 +197,7 @@ export const prepareRows = ({
     rowNumber += addRowsNum;
   });
 
-  return [...preparedRows];
+  return [...getDecimalRows(preparedRows, tableInitialState.decimalFixed)];
 };
 
 export function unpackTableData(

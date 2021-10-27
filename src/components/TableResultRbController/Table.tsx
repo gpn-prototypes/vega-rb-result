@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { TableResultRb } from '@app/components/TableResultRbController/TableResultRb/TableResultRb';
 import { loadTableData } from '@app/services/loadTableData';
-import tableDuck from '@app/store/tableDuck';
+import { TableActions } from '@app/store/table/tableActions';
 import { RootState } from '@app/store/types';
 import { Loader, useMount } from '@gpn-prototypes/vega-ui';
 
@@ -19,7 +19,7 @@ export const Table: React.FC = () => {
     loadTableData(dispatch).then(() => setIsLoading(false));
 
     return () => {
-      dispatch(tableDuck.actions.resetState());
+      dispatch(TableActions.resetState());
     };
   });
 

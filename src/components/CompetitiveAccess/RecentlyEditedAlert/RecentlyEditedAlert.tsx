@@ -1,6 +1,6 @@
 import React from 'react';
-import { Item } from '@consta/uikit/SnackBar';
-import { IconAlert, SnackBar } from '@gpn-prototypes/vega-ui';
+import { Item, SnackBar } from '@consta/uikit/SnackBar';
+import { IconAlert } from '@gpn-prototypes/vega-ui';
 
 import { cnAlert } from './cn-alert';
 

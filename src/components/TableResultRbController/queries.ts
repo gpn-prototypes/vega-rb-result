@@ -235,7 +235,7 @@ export const GET_TABLE_RESULT_RB = gql`
       resourceBase {
         result {
           resultTable {
-            template(projectId: "project_id") {
+            template {
               domainEntities {
                 code
                 name

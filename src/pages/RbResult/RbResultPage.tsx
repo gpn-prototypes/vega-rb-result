@@ -13,11 +13,12 @@ import {
 import projectService from '@app/services/ProjectService';
 import competitiveAccessDuck from '@app/store/competitiveAccessDuck';
 import projectDuck from '@app/store/projectDuck';
-import tableDuck from '@app/store/tableDuck';
+import { TableActions } from '@app/store/table/tableActions';
 import { RootState } from '@app/store/types';
 import { GridActiveRow, GridCollection } from '@app/types/typesTable';
+import { ChoiceGroup } from '@consta/uikit/ChoiceGroup';
 import { Sidebar } from '@consta/uikit/Sidebar';
-import { ChoiceGroup, SplitPanes, useInterval } from '@gpn-prototypes/vega-ui';
+import { SplitPanes, useInterval } from '@gpn-prototypes/vega-ui';
 
 import './RbResultPage.scss';
 
@@ -43,7 +44,7 @@ const RbResultPage: React.FC = () => {
   };
 
   const handleChangeFluidType = (type: EFluidType) => {
-    dispatch(tableDuck.actions.setFluidType(type));
+    dispatch(TableActions.setFluidType(type));
 
     setFluidType(type);
   };
@@ -96,7 +97,7 @@ const RbResultPage: React.FC = () => {
                 items={FLUID_TYPES}
                 name="FluidTypesChoiceGroup"
                 className="FluidTypesChoiceGroup"
-                size="m"
+                size="s"
                 multiple={false}
                 getLabel={(item) => item}
                 onChange={({ value }) => handleChangeFluidType(value)}
@@ -113,9 +114,7 @@ const RbResultPage: React.FC = () => {
 
               <Sidebar
                 isOpen={sidebarRow !== undefined}
-                onClickOutside={() =>
-                  dispatch(tableDuck.actions.resetSidebarRow())
-                }
+                onClickOutside={() => dispatch(TableActions.resetSidebarRow())}
                 hasOverlay
                 className="result__sidebar"
               >

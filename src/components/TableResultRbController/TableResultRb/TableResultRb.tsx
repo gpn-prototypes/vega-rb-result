@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { EFluidType } from '@app/constants/Enums';
 import {
@@ -6,9 +6,15 @@ import {
   DomainEntityCode,
 } from '@app/constants/GeneralConstants';
 import { RbDomainEntityInput } from '@app/generated/graphql';
-import tableDuck from '@app/store/tableDuck';
+import { TableActions } from '@app/store/table/tableActions';
+import { tableInitialState } from '@app/store/table/tableReducers';
 import { RootState, TreeFilter } from '@app/store/types';
 import { GridActiveRow } from '@app/types/typesTable';
+import { ContextMenu } from '@consta/uikit/ContextMenu';
+import { IconProps } from '@consta/uikit/Icon';
+import { IconAdd } from '@consta/uikit/IconAdd';
+import { IconRemove } from '@consta/uikit/IconRemove';
+import { Position } from '@consta/uikit/Popover';
 import { Table } from '@consta/uikit/Table';
 
 import { Column, Row } from './types';
@@ -52,24 +58,60 @@ const setActiveClass = (title: string) => {
     });
 };
 
+type Item = {
+  name: string;
+  icon: React.FC<IconProps>;
+  code: menuItemCode;
+};
+
+type menuItemCode = 'remove' | 'add';
+
+const menuItems: Item[] = [
+  {
+    code: 'remove',
+    name: 'Уменьшить разрядность',
+    icon: IconRemove,
+  },
+  {
+    code: 'add',
+    name: 'Увеличить разрядность',
+    icon: IconAdd,
+  },
+];
+
+function renderLeftSide(item: Item): React.ReactNode {
+  const Icon = item.icon;
+  return <Icon size="s" />;
+}
+
 export const TableResultRb: React.FC<Props> = ({ rows, columns, filter }) => {
   const dispatch = useDispatch();
+  const rowRef = useRef(null);
   const [filteredRows, setFilteredRows] =
     useState<Row<RbDomainEntityInput>[]>(rows);
   const [filteredColumns, setFilteredColumns] =
     useState<Column<RbDomainEntityInput>[]>(columns);
+  const [visible, setContextMenu] = useState<boolean>(false);
+  const [position, setPosition] = useState<Position>({ x: 0, y: 0 });
+
   const activeRow: GridActiveRow | undefined = useSelector(
     ({ table }: RootState) => table.activeRow,
   );
   const fluidType: EFluidType | undefined = useSelector(
     ({ table }: RootState) => table.fluidType,
   );
+  const decimalFixed: number = useSelector(({ table }: RootState) => {
+    if (!table.decimalFixed && table.decimalFixed !== 0) {
+      return tableInitialState.decimalFixed || 3;
+    }
+    return table.decimalFixed;
+  });
 
+  /**
+   * Сортировка данных по клику на элемент древа
+   * Нам необходимо убрать лишние колонки и отображать строки по переданным индексам
+   */
   useEffect(() => {
-    /**
-     * Сортировка данных по клику на элемент древа
-     * Нам необходимо убрать лишние колонки и отображать строки по переданным индексам
-     */
     let filteredRowsData = rows;
     let filteredColumnsData = columns;
 
@@ -93,7 +135,7 @@ export const TableResultRb: React.FC<Props> = ({ rows, columns, filter }) => {
           return true;
         }
 
-        return row[AttributeCode.GeoType] === fluidType;
+        return row[AttributeCode.GeoType]?.value === fluidType;
       },
     );
 
@@ -101,32 +143,41 @@ export const TableResultRb: React.FC<Props> = ({ rows, columns, filter }) => {
     setFilteredColumns(filteredColumnsData);
   }, [filter, rows, columns, fluidType, setFilteredRows, setFilteredColumns]);
 
+  /** Отлавливаем активный класс */
   useEffect(() => {
     setActiveClass(activeRow?.title || '');
   }, [activeRow]);
 
-  /** Хак:
-   * В таблице мы добавили классы для ячеек, где их нужно объединить.
-   * Тут мы их находим и добавляем к ячейке таблицы эти классы, чтоб убрать borders.
-   * Хак нужен потому что мы не управляем напрямую таблицей. И нам нужно изнутри поменять класс у ячейки
-   */
-  useLayoutEffect(() => {
-    document.querySelectorAll('._no-right').forEach((element: Element) => {
-      const parentTd = element.parentElement?.parentElement;
+  /** Добавляем обработчик клика по шапке таблицы */
+  useEffect(() => {
+    document
+      .querySelectorAll('.TableCell_isHeader')
+      .forEach((element: Element) => {
+        const rightSelector = element.querySelector(
+          '.TableCell-Wrapper_horizontalAlign_right',
+        );
 
-      /** Необходимо не устанавливать ликвидацию бордера, если пред. элемент "Всего" */
-      const isPreviousAll = () => {
-        const previousTd = parentTd?.previousElementSibling;
-        const previousAllElement = previousTd?.querySelector('._all');
+        /** Показываем контекстное меню, в случае когда это числа, а числа у нас по правому краю */
+        if (rightSelector === null) {
+          return;
+        }
 
-        return previousAllElement !== null;
-      };
+        const htmlElement = element as HTMLElement;
 
-      if (!isPreviousAll()) {
-        parentTd?.classList.add('_no-right-border');
-      }
-    });
-  });
+        htmlElement.oncontextmenu = (event) => {
+          event.preventDefault();
+
+          const rect = element.getBoundingClientRect();
+
+          setPosition({
+            x: rect.left,
+            y: rect.bottom,
+          });
+
+          setContextMenu(true);
+        };
+      });
+  }, [setPosition, setContextMenu]);
 
   const handleClickRow = ({
     id,
@@ -146,13 +197,42 @@ export const TableResultRb: React.FC<Props> = ({ rows, columns, filter }) => {
     const title = innerElement?.dataset.name;
 
     /** Отправляем активную строку в стору, это нужно для обновления данных в графиках */
-    if (code && title) {
-      dispatch(tableDuck.actions.setActiveRow({ code, title }));
+    if (code && DataTransferItemList) {
+      dispatch(TableActions.setActiveRow({ code, title: title || '' }));
 
-      if (code.indexOf(DomainEntityCode.Layer) > -1) {
-        dispatch(tableDuck.actions.setSidebarRow({ code, title }));
+      if (
+        code.indexOf(DomainEntityCode.Layer) > -1 &&
+        (title || '').indexOf('Всего') === -1
+      ) {
+        dispatch(TableActions.setSidebarRow({ code, title: title || '' }));
       }
     }
+  };
+
+  const handleClickOutside = () => setContextMenu(false);
+
+  const handleContextMenuClick = (
+    item: Item,
+  ): React.EventHandler<React.MouseEvent<HTMLDivElement>> => {
+    return (event: React.MouseEvent) => {
+      dispatch(
+        TableActions.setDecimalFixed(
+          item.code === 'add' ? decimalFixed + 1 : decimalFixed - 1,
+        ),
+      );
+    };
+  };
+
+  const isContextMenuDisabled = (item: Item) => {
+    if (item.code === 'add' && decimalFixed > 7) {
+      return true;
+    }
+
+    if (item.code === 'remove' && decimalFixed < 1) {
+      return true;
+    }
+
+    return false;
   };
 
   return (
@@ -163,12 +243,26 @@ export const TableResultRb: React.FC<Props> = ({ rows, columns, filter }) => {
         verticalAlign="center"
         activeRow={{ id: undefined, onChange: handleClickRow }}
         size="s"
-        zebraStriped="odd"
         className="TableResultRb"
         borderBetweenColumns
         borderBetweenRows
         isResizable
       />
+
+      {visible && (
+        <ContextMenu
+          items={menuItems}
+          getLabel={(item: Item) => item.name}
+          ref={rowRef}
+          getLeftSideBar={renderLeftSide}
+          getOnClick={handleContextMenuClick}
+          getDisabled={isContextMenuDisabled}
+          direction="downStartLeft"
+          position={position}
+          size="s"
+          onClickOutside={handleClickOutside}
+        />
+      )}
     </div>
   );
 };
