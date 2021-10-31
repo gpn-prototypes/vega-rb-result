@@ -18,6 +18,8 @@ import {
 } from '../store/table/tableReducers';
 import { GridCollection } from '../types/typesTable';
 
+import { getNumberWithSpaces } from './StringHelper';
+
 const isHasParentAll = (parents: Parent[]): boolean => {
   return (
     parents.find((innerParent: Parent) => innerParent.isTotal) !== undefined
@@ -39,16 +41,32 @@ export const prepareColumns = (
     return baseClass;
   };
 
-  /** TODO: Сделать один общий объект, и наполнять его в зависимости от логики, убрать дублирование */
+  const getPreparedColumn = ({
+    title,
+    accessor,
+    align,
+    visible,
+    renderCell,
+  }: Column<RbDomainEntityInput>): Column<RbDomainEntityInput> => {
+    return {
+      title,
+      accessor,
+      align,
+      mergeCells: true,
+      isResizable: true,
+      getComparisonValue: (row: Row<RbDomainEntityInput>) => row?.value || '',
+      visible,
+      renderCell,
+    };
+  };
+
   const preparedEntities = domainEntities.map(
     (domainEntity: ResultDomainEntity, index: number) => {
-      const column: Column<RbDomainEntityInput> = {
+      const column: Column<RbDomainEntityInput> = getPreparedColumn({
         title: domainEntity.name,
         accessor: domainEntity.code as keyof RbDomainEntityInput,
-        mergeCells: true,
-        getComparisonValue: (row: Row<RbDomainEntityInput>) => row?.value || '',
-        isResizable: true,
         visible: domainEntity?.visible,
+        align: 'left',
         renderCell: (row: Row<RbDomainEntityInput>) => {
           /** Заполняем коды и названия с учетом родителей, нужно для отправки данных в отображение гистограм */
           const codeWithParents =
@@ -60,7 +78,7 @@ export const prepareColumns = (
                   .join(',');
           const nameWithParents =
             index === 0
-              ? row[domainEntity.code].value
+              ? row[domainEntity.code]?.value
               : domainEntities
                   .slice(0, index + 1)
                   .map(
@@ -79,20 +97,18 @@ export const prepareColumns = (
             </div>
           );
         },
-      };
+      });
 
       return column;
     },
   );
 
   const preparedAttributes = attributes.map((attribute: ResultAttribute) => {
-    const column: Column<RbDomainEntityInput> = {
+    const column: Column<RbDomainEntityInput> = getPreparedColumn({
       title: [attribute.shortName, attribute.units].filter(Boolean).join(', '),
       accessor: attribute.code as keyof RbDomainEntityInput,
-      mergeCells: true,
       align: attribute.code === 'PERCENTILE' ? 'left' : 'right',
-      getComparisonValue: (row: Row<RbDomainEntityInput>) => row?.value || '',
-      isResizable: true,
+      visible: attribute?.visible,
       renderCell: (row: Row<RbDomainEntityInput>) => {
         /** Заполняем коды и названия с учетом родителей, нужно для отправки данных в отображение гистограм */
         const codeWithParents = domainEntities
@@ -106,9 +122,9 @@ export const prepareColumns = (
 
         const formattedValue =
           // eslint-disable-next-line no-restricted-globals
-          !isNaN(value) || value === undefined
+          isNaN(value) || value === undefined
             ? value
-            : new Intl.NumberFormat('ru-RU').format(value);
+            : getNumberWithSpaces(value);
 
         return (
           <div
@@ -121,7 +137,7 @@ export const prepareColumns = (
           </div>
         );
       },
-    };
+    });
 
     return column;
   });
@@ -159,9 +175,9 @@ export const prepareRows = ({
           const value = attributeValue.values[percIndex];
           const formattedValue =
             // eslint-disable-next-line no-restricted-globals
-            !isNaN(value) || value === undefined
+            isNaN(value) || value === undefined
               ? value
-              : new Intl.NumberFormat('ru-RU').format(value);
+              : getNumberWithSpaces(value.toString());
 
           /** Установка значения по коду */
           row[percIndex][attributeValue.code] = {
@@ -169,6 +185,13 @@ export const prepareRows = ({
             value: attributeValue.values[percIndex],
             formattedValue,
           };
+
+          if (
+            attributeValue.code === 'ngzngr_GCoS' ||
+            attributeValue.code === 'ngzngr'
+          ) {
+            row[percIndex].isRisk = true;
+          }
 
           /** Устанавливаем кастомные флаги, для того чтобы менять отображение таблицы */
           if (isHasParentAll(domainObject.parents)) {

@@ -60,11 +60,9 @@ export const HistogramComponent: React.FC<Props> = ({ grid }) => {
 
   /** Запрашиваем данные в самом начале, берем самый первый элемент */
   useMount(() => {
-    loadHistogramData(
-      dispatch,
-      [grid.columns[0].accessor],
-      [String(grid.rows[0][grid.columns[0].accessor])],
-    ).then(() => setIsLoading(false));
+    loadHistogramData(dispatch, [
+      String(grid.rows[0][grid.columns[0].accessor]),
+    ]).then(() => setIsLoading(false));
 
     return () => {
       dispatch(histogramDuck.actions.resetState());
@@ -73,14 +71,10 @@ export const HistogramComponent: React.FC<Props> = ({ grid }) => {
 
   /** Отлавливаем выбор ячейки, выбор ячейки происходит по клику на таблице и по клику по ноде в дереве */
   useEffect(() => {
-    if (activeRow?.code && previousActiveRow?.code !== activeRow.code) {
+    if (activeRow?.title && previousActiveRow?.title !== activeRow.title) {
       setIsLoading(true);
 
-      loadHistogramData(
-        dispatch,
-        activeRow.code.split(','),
-        activeRow.title.split(','),
-      ).then(() => {
+      loadHistogramData(dispatch, activeRow.title.split(',')).then(() => {
         setIsLoading(false);
 
         setPreviousActiveRow(activeRow);
@@ -135,7 +129,7 @@ export const HistogramComponent: React.FC<Props> = ({ grid }) => {
     <div className="histogram">
       <div>
         <VerticalMoreContextMenu
-          menuItems={menuItems}
+          menuItems={() => (() => menuItems)()}
           title="Гистограмма запасов"
           onChange={handleChange}
           onClick={handleClick}

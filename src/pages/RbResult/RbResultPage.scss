@@ -15,8 +15,6 @@
 }
 
 .content {
-  padding: 0 var(--size-text-m);
-
   overflow-x: auto;
 }
 
@@ -39,12 +37,13 @@
 }
 
 .FluidTypesChoiceGroup {
-  margin: var(--size-text-2xs) 0;
+  margin: var(--size-text-2xs) 0 var(--size-text-2xs) var(--size-text-m);
 }
 
 .result {
   &__graphs {
-    margin-top: var(--space-l);
+    padding-top: var(--space-l);
+    padding-left: var(--size-text-m);
 
     display: flex;
   }
@@ -59,4 +58,9 @@
 
     min-width: 736px;
   }
+}
+
+// TODO: Удалить, это дубли vega-ui, нужно убрать везде vega-ui тогда можно будет удалить
+.ChoiceGroup-Label:first-child::after {
+  width: inherit !important;
 }

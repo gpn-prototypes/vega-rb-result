@@ -16,7 +16,7 @@ export namespace LocalStorageHelper {
 
   /** Получение parsed данных по ключу */
   export function getParsed<T>(key: LocalStorageKey): T {
-    return JSON.parse(localStorage.getItem(key) || '');
+    return JSON.parse(localStorage.getItem(key) || '{}');
   }
 
   /** Установка parsed данных по ключу */

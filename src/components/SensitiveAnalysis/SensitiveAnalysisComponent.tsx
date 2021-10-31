@@ -155,7 +155,7 @@ export const SensitiveAnalysisComponent: React.FC<Props> = ({ sidebarRow }) => {
         {/* График */}
         <div className="sensitive-analysis__title">
           <VerticalMoreContextMenu
-            menuItems={menuItems}
+            menuItems={() => (() => menuItems)()}
             title="Анализ чувствительности"
             onChange={handleChange}
             onClick={handleClick}

@@ -3,53 +3,97 @@ import SvgMoreVertical from '@app/assets/icons/components/MoreVertical';
 import { MenuContextItem } from '@app/interfaces/ContextMenuInterface';
 import { Button } from '@consta/uikit/Button';
 import { ChoiceGroup } from '@consta/uikit/ChoiceGroup';
-import { Popover } from '@consta/uikit/Popover';
+import { Popover, Position } from '@consta/uikit/Popover';
 import { Switch } from '@consta/uikit/Switch';
 import { TextField } from '@consta/uikit/TextField';
 
 import './ContextMenuHelper.scss';
 
-interface Props {
-  title: string;
-  menuItems: MenuContextItem[];
-  onChange: (item: MenuContextItem) => void;
-  onClick: (item: MenuContextItem) => void;
+interface ContextMenuBaseItemProps {
+  menuItem: MenuContextItem;
+  handleContextClick?: (menuItem: MenuContextItem) => void;
+  column?: boolean;
+  getDisabled?: (item: MenuContextItem) => boolean;
 }
 
-export const VerticalMoreContextMenu: React.FC<Props> = ({
-  menuItems,
-  title,
-  onChange,
-  onClick,
+export const ContextMenuBaseItem: React.FC<ContextMenuBaseItemProps> = ({
+  menuItem,
+  handleContextClick,
+  column,
+  getDisabled,
+  children,
 }) => {
-  const ref = useRef(null);
-  const [isOpenContextMenu, setIsOpenContextMenu] = useState<boolean>(false);
+  return (
+    <div
+      className={`menu__title ${menuItem.border ? 'menu__border' : ''} ${
+        getDisabled && getDisabled(menuItem) ? 'menu__disabled' : ''
+      } ${column ? 'menu__column' : ''}`}
+      onClick={() => {
+        if (handleContextClick) {
+          handleContextClick(menuItem);
+        }
+      }}
+      onKeyUp={() => {}}
+      role="button"
+      tabIndex={0}
+    >
+      <div className="menu__left">
+        {menuItem.icon && <div className="menu__icon">{menuItem.icon()}</div>}
+
+        <div>{menuItem.name}</div>
+      </div>
+
+      <div>{children}</div>
+    </div>
+  );
+};
+
+interface ContextMenuProps {
+  ref: React.RefObject<HTMLHeadingElement>;
+  menuItems: () => MenuContextItem[];
+  onClick: (item: MenuContextItem) => void;
+  setIsOpenContextMenu: (isOpened: boolean) => void;
+  position: Position;
+  onChange?: (item: MenuContextItem) => void;
+  getDisabled?: (item: MenuContextItem) => boolean;
+}
+
+export const CustomContextMenu: React.FC<ContextMenuProps> = ({
+  ref,
+  menuItems,
+  onClick,
+  onChange,
+  position,
+  setIsOpenContextMenu,
+  getDisabled,
+}) => {
   const [isOpenEdit, setIsOpenEdit] = useState<boolean>(false);
   const [inputValue, setValue] = useState(null);
   const handleInputChange = ({ value }) => setValue(value);
 
+  console.log(11);
+
   /** Обработка клика по контекстному меню */
   const handleContextClick = (menuItem: MenuContextItem) => {
     onClick(menuItem);
+
     setIsOpenContextMenu(false);
   };
 
   const itemWithSwitch = (menuItem: MenuContextItem) => (
-    <div className={`menu__switch ${menuItem.border ? 'menu__border' : ''}`}>
-      <div className="menu__title">{menuItem.name}</div>
-
+    <ContextMenuBaseItem menuItem={menuItem} getDisabled={getDisabled}>
       <Switch
         size="m"
         checked={menuItem.switch}
-        onChange={() => onChange(menuItem)}
+        onChange={() => onChange && onChange(menuItem)}
         key="Switch"
         className="menu__switch-element"
       />
-    </div>
+    </ContextMenuBaseItem>
   );
 
   const itemWithChoice = (menuItem: MenuContextItem) => {
-    if (!menuItem.choice) {
+    if (!menuItem.choice || !onChange) {
       return <div />;
     }
 
@@ -80,9 +124,7 @@ export const VerticalMoreContextMenu: React.FC<Props> = ({
     };
 
     return (
-      <div>
-        <div className="menu__title">{menuItem.name}</div>
-
+      <ContextMenuBaseItem menuItem={menuItem} column getDisabled={getDisabled}>
         <ChoiceGroup
           value={String(menuItem.choice?.value)}
           items={stringifyValues || []}
@@ -123,23 +165,19 @@ export const VerticalMoreContextMenu: React.FC<Props> = ({
             </div>
           )}
         </div>
-      </div>
+      </ContextMenuBaseItem>
     );
   };
 
   const simpleItem = (menuItem: MenuContextItem) => (
-    <div
-      className="menu__title"
-      onClick={() => {}}
-      onKeyUp={() => handleContextClick(menuItem)}
-      role="button"
-      tabIndex={0}
-    >
-      {menuItem.name}
-    </div>
+    <ContextMenuBaseItem
+      menuItem={menuItem}
+      handleContextClick={handleContextClick}
+      getDisabled={getDisabled}
+    />
   );
 
-  const items = menuItems.map((menuItem: MenuContextItem) => {
+  const items = menuItems().map((menuItem: MenuContextItem) => {
     if (menuItem.switch !== undefined) {
       return itemWithSwitch(menuItem);
     }
@@ -150,6 +188,42 @@ export const VerticalMoreContextMenu: React.FC<Props> = ({
 
     return simpleItem(menuItem);
   });
+
+  return (
+    <Popover
+      anchorRef={ref}
+      onClickOutside={() => setIsOpenContextMenu(false)}
+      direction="downStartLeft"
+      className="menu"
+      position={position}
+    >
+      {items}
+    </Popover>
+  );
+};
+
+interface Props {
+  title: string;
+  menuItems: () => MenuContextItem[];
+  onChange: (item: MenuContextItem) => void;
+  onClick: (item: MenuContextItem) => void;
+}
+
+export const VerticalMoreContextMenu: React.FC<Props> = ({
+  menuItems,
+  title,
+  onChange,
+  onClick,
+}) => {
+  const ref = useRef<HTMLHeadingElement>(null);
+  const [isOpenContextMenu, setIsOpenContextMenu] = useState<boolean>(false);
+
+  /** Установка позиции Popover */
+  const getPosition = (): Position => {
+    const rect: DOMRect | undefined = ref.current?.getBoundingClientRect();
+
+    return rect ? { x: rect.left, y: rect.bottom } : { x: 0, y: 0 };
+  };
 
   return (
     <div className="vertical">
@@ -166,14 +240,14 @@ export const VerticalMoreContextMenu: React.FC<Props> = ({
       </div>
 
       {isOpenContextMenu && (
-        <Popover
-          anchorRef={ref}
-          onClickOutside={() => setIsOpenContextMenu(false)}
-          direction="downStartLeft"
-          className="menu"
-        >
-          {items}
-        </Popover>
+        <CustomContextMenu
+          ref={ref}
+          menuItems={() => menuItems()}
+          onClick={onClick}
+          onChange={onChange}
+          position={getPosition()}
+          setIsOpenContextMenu={setIsOpenContextMenu}
+        />
       )}
     </div>
   );

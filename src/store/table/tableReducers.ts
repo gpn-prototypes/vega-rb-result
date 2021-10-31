@@ -2,15 +2,23 @@ import { Row } from '@app/components/TableResultRbController/TableResultRb/types
 import { EFluidType } from '@app/constants/Enums';
 import { LocalStorageKey } from '@app/constants/LocalStorageKeyConstants';
 import { RbDomainEntityInput } from '@app/generated/graphql';
-import { GridActiveRow, GridCollection } from '@app/types/typesTable';
+import {
+  DecimalFixed,
+  GridActiveRow,
+  GridCollection,
+} from '@app/types/typesTable';
 import { LocalStorageHelper } from '@app/utils/LocalStorageHelper';
 import { reducerWithInitialState } from 'typescript-fsa-reducers';
 
-import { TableActions } from './tableActions';
+import {
+  TableActions,
+  TableSetDecimalFixedActionPayload,
+} from './tableActions';
 
-const decimalFromLocalStorage: string | null = LocalStorageHelper.get(
-  LocalStorageKey.DecimalFixed,
-);
+const decimalFromLocalStorage: DecimalFixed | null =
+  LocalStorageHelper.getParsed<DecimalFixed>(LocalStorageKey.DecimalFixed);
+
+export const DEFAULT_DECIMAL_FIXED = 3;
 
 export const tableInitialState: GridCollection = {
   columns: [],
@@ -19,19 +27,18 @@ export const tableInitialState: GridCollection = {
   activeRow: undefined,
   sidebarRow: undefined,
   fluidType: EFluidType.ALL,
-  decimalFixed:
-    decimalFromLocalStorage !== null ? Number(decimalFromLocalStorage) : 3,
+  decimalFixed: decimalFromLocalStorage !== null ? decimalFromLocalStorage : {},
 };
 
 export const getDecimalRows = (
   rows: Row<RbDomainEntityInput>[],
-  decimalFixed: number = tableInitialState.decimalFixed || 3,
+  decimalFixed: DecimalFixed = tableInitialState.decimalFixed || {},
 ): Row<RbDomainEntityInput>[] => {
   const resultRows = [...rows].map((row: Row<RbDomainEntityInput>) => {
-    const decimalColumn = {};
+    const decimalRow = {};
 
     Object.keys(row).forEach((rowKey: string) => {
-      decimalColumn[rowKey] = row[rowKey];
+      decimalRow[rowKey] = row[rowKey];
 
       const { value } = row[rowKey];
 
@@ -40,12 +47,18 @@ export const getDecimalRows = (
       }
 
       // eslint-disable-next-line no-restricted-globals
-      decimalColumn[rowKey].formattedValue = isNaN(value)
+      decimalRow[rowKey].formattedValue = isNaN(value)
         ? value
-        : Number(value).toFixed(decimalFixed).toString();
+        : Number(value)
+            .toFixed(
+              decimalFixed[rowKey] || decimalFixed[rowKey] === 0
+                ? decimalFixed[rowKey]
+                : DEFAULT_DECIMAL_FIXED,
+            )
+            .toString();
     });
 
-    return decimalColumn as Row<RbDomainEntityInput>;
+    return decimalRow as Row<RbDomainEntityInput>;
   });
 
   return resultRows;
@@ -95,10 +108,18 @@ export const TableReducers = reducerWithInitialState<GridCollection>(
   }))
   .case(
     TableActions.setDecimalFixed,
-    (state: GridCollection, decimalFixed: number) => {
-      LocalStorageHelper.set(
+    (state: GridCollection, payload: TableSetDecimalFixedActionPayload) => {
+      const decimalFixed = LocalStorageHelper.getParsed<DecimalFixed>(
         LocalStorageKey.DecimalFixed,
-        decimalFixed.toString(),
+      );
+      const value = decimalFixed[payload.columnCode] || DEFAULT_DECIMAL_FIXED;
+
+      decimalFixed[payload.columnCode] =
+        payload.type === 'plus' ? value + 1 : value - 1;
+
+      LocalStorageHelper.setParsed<DecimalFixed>(
+        LocalStorageKey.DecimalFixed,
+        decimalFixed,
       );
 
       return {

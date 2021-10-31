@@ -97,6 +97,8 @@ export interface GridActiveRow {
   title: string;
 }
 
+export type DecimalFixed = Record<string, number>;
+
 export interface GridCollection {
   columns: Column<RbDomainEntityInput>[];
   rows: Row<RbDomainEntityInput>[];
@@ -104,7 +106,7 @@ export interface GridCollection {
   activeRow?: GridActiveRow | undefined;
   sidebarRow?: GridActiveRow | undefined;
   fluidType?: EFluidType;
-  decimalFixed?: number;
+  decimalFixed?: DecimalFixed;
 }
 
 export interface FilteredGridDataKeys {

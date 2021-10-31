@@ -4,6 +4,11 @@ import actionCreatorFactory from 'typescript-fsa';
 
 const factory = actionCreatorFactory('table');
 
+export type TableSetDecimalFixedActionPayload = {
+  type: 'plus' | 'minus';
+  columnCode: string;
+};
+
 export const TableActions = {
   initState: factory<GridCollection>('INIT_STATE'),
   resetState: factory('RESET_STATE'),
@@ -13,5 +18,6 @@ export const TableActions = {
   setFluidType: factory<EFluidType>('SET_FLUID_TYPE'),
   resetActiveRow: factory('RESET_ACTIVE_ROW'),
   resetSidebarRow: factory('RESET_SIDEBAR_ROW'),
-  setDecimalFixed: factory<number>('SET_DECIMAL_FIXED'),
+  setDecimalFixed:
+    factory<TableSetDecimalFixedActionPayload>('SET_DECIMAL_FIXED'),
 };

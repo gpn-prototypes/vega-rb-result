@@ -193,7 +193,6 @@ class ProjectService implements IProjectService {
   }
 
   async getHistogramData(
-    domainEntityCodes: string[],
     domainEntityNames: string[],
   ): Promise<ResultHistogramsStructure> {
     const { data: responseData } = await this.client
@@ -203,8 +202,6 @@ class ProjectService implements IProjectService {
           uri: getGraphqlUri(this.projectId),
         },
         variables: {
-          projectId: this.projectId,
-          domainEntityCodes,
           domainEntityNames,
         },
         fetchPolicy: 'no-cache',
@@ -230,7 +227,6 @@ class ProjectService implements IProjectService {
           uri: getGraphqlUri(this.projectId),
         },
         variables: {
-          projectId: this.projectId,
           domainEntityNames,
         },
         fetchPolicy: 'no-cache',
@@ -256,7 +252,6 @@ class ProjectService implements IProjectService {
           uri: getGraphqlUri(this.projectId),
         },
         variables: {
-          projectId: this.projectId,
           domainEntityNames,
         },
         fetchPolicy: 'no-cache',

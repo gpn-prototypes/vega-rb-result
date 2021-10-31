@@ -35,7 +35,7 @@ const getTreeNodeItem = (
         ),
       )?.id;
 
-  const name = row[columnKey || ''].value || '? (заглушка)';
+  const name = row[columnKey || '']?.value || '? (заглушка)';
 
   return {
     name: name as string,
@@ -137,7 +137,7 @@ export function getNodeListFromTableData<T>(
       }
 
       return structurecolumnKeys.some(
-        ({ key, name }) => key !== 'id' && row[key].value,
+        ({ key, name }) => key !== 'id' && row[key]?.value,
       );
     },
   );

@@ -20,6 +20,7 @@ export type Row<T = any> = TableRow &
     value: string;
     formattedValue: string;
     isAll?: boolean;
+    isRisk?: boolean;
   };
 
 export type FilterComponentProps = {

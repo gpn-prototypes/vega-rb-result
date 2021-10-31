@@ -154,20 +154,12 @@ export const GET_TABLE_TEMPLATE = gql`
 `;
 
 export const GET_HISTOGRAM_RESULT_RB = gql`
-  query GetTableResultRb(
-    $projectId: ID!
-    $domainEntityCodes: [ID!]
-    $domainEntityNames: [String!]
-  ) {
+  query GetTableResultRb($domainEntityNames: [String!]) {
     project {
       resourceBase {
         result {
           histograms {
-            getHistograms(
-              projectId: $projectId
-              domainEntityCodes: $domainEntityCodes
-              domainEntityNames: $domainEntityNames
-            ) {
+            getHistograms(domainEntityNames: $domainEntityNames) {
               histograms {
                 title
                 subtitle
@@ -184,15 +176,12 @@ export const GET_HISTOGRAM_RESULT_RB = gql`
 `;
 
 export const GET_SENSITIVE_ANALYSIS_RESULT_RB = gql`
-  query GetTableResultRb($projectId: ID!, $domainEntityNames: [String!]) {
+  query GetTableResultRb($domainEntityNames: [String!]) {
     project {
       resourceBase {
         result {
           histograms {
-            getSensitivityAnalysis(
-              projectId: $projectId
-              domainEntityNames: $domainEntityNames
-            ) {
+            getSensitivityAnalysis(domainEntityNames: $domainEntityNames) {
               title
               names
               sample

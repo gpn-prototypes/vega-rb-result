@@ -1,17 +1,16 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { CustomContextMenu } from '@app/components/Helpers/ContextMenuHelper';
 import { EFluidType } from '@app/constants/Enums';
 import {
   AttributeCode,
   DomainEntityCode,
 } from '@app/constants/GeneralConstants';
 import { RbDomainEntityInput } from '@app/generated/graphql';
+import { MenuContextItem } from '@app/interfaces/ContextMenuInterface';
 import { TableActions } from '@app/store/table/tableActions';
-import { tableInitialState } from '@app/store/table/tableReducers';
 import { RootState, TreeFilter } from '@app/store/types';
-import { GridActiveRow } from '@app/types/typesTable';
-import { ContextMenu } from '@consta/uikit/ContextMenu';
-import { IconProps } from '@consta/uikit/Icon';
+import { DecimalFixed, GridActiveRow } from '@app/types/typesTable';
 import { IconAdd } from '@consta/uikit/IconAdd';
 import { IconRemove } from '@consta/uikit/IconRemove';
 import { Position } from '@consta/uikit/Popover';
@@ -58,31 +57,18 @@ const setActiveClass = (title: string) => {
     });
 };
 
-type Item = {
-  name: string;
-  icon: React.FC<IconProps>;
-  code: menuItemCode;
-};
-
-type menuItemCode = 'remove' | 'add';
-
-const menuItems: Item[] = [
+const menuItems = (): MenuContextItem[] => [
   {
     code: 'remove',
     name: 'Уменьшить разрядность',
-    icon: IconRemove,
+    icon: () => <IconRemove size="s" />,
   },
   {
     code: 'add',
     name: 'Увеличить разрядность',
-    icon: IconAdd,
+    icon: () => <IconAdd size="s" />,
   },
 ];
-
-function renderLeftSide(item: Item): React.ReactNode {
-  const Icon = item.icon;
-  return <Icon size="s" />;
-}
 
 export const TableResultRb: React.FC<Props> = ({ rows, columns, filter }) => {
   const dispatch = useDispatch();
@@ -92,6 +78,7 @@ export const TableResultRb: React.FC<Props> = ({ rows, columns, filter }) => {
   const [filteredColumns, setFilteredColumns] =
     useState<Column<RbDomainEntityInput>[]>(columns);
   const [visible, setContextMenu] = useState<boolean>(false);
+  const [currentColumnCode, setCurrentColumnCode] = useState<string>('');
   const [position, setPosition] = useState<Position>({ x: 0, y: 0 });
 
   const activeRow: GridActiveRow | undefined = useSelector(
@@ -100,12 +87,9 @@ export const TableResultRb: React.FC<Props> = ({ rows, columns, filter }) => {
   const fluidType: EFluidType | undefined = useSelector(
     ({ table }: RootState) => table.fluidType,
   );
-  const decimalFixed: number = useSelector(({ table }: RootState) => {
-    if (!table.decimalFixed && table.decimalFixed !== 0) {
-      return tableInitialState.decimalFixed || 3;
-    }
-    return table.decimalFixed;
-  });
+  const decimalFixed: DecimalFixed | undefined = useSelector(
+    ({ table }: RootState) => table.decimalFixed,
+  );
 
   /**
    * Сортировка данных по клику на элемент древа
@@ -148,6 +132,28 @@ export const TableResultRb: React.FC<Props> = ({ rows, columns, filter }) => {
     setActiveClass(activeRow?.title || '');
   }, [activeRow]);
 
+  const onContextMenuClick = useCallback(
+    (event, element: Element, text: string) => {
+      event.preventDefault();
+
+      const rect = element.getBoundingClientRect();
+
+      setCurrentColumnCode(
+        columns.find(
+          (column: Column<RbDomainEntityInput>) => column.title === text,
+        )?.accessor || '',
+      );
+
+      setPosition({
+        x: rect.left,
+        y: rect.bottom,
+      });
+
+      setContextMenu(true);
+    },
+    [setPosition, setContextMenu, setCurrentColumnCode, columns],
+  );
+
   /** Добавляем обработчик клика по шапке таблицы */
   useEffect(() => {
     document
@@ -156,28 +162,20 @@ export const TableResultRb: React.FC<Props> = ({ rows, columns, filter }) => {
         const rightSelector = element.querySelector(
           '.TableCell-Wrapper_horizontalAlign_right',
         );
+        const text = rightSelector?.textContent || '';
+        const blackListNames = ['Категория', 'Флюид'];
 
         /** Показываем контекстное меню, в случае когда это числа, а числа у нас по правому краю */
-        if (rightSelector === null) {
+        if (rightSelector === null || blackListNames.includes(text)) {
           return;
         }
 
         const htmlElement = element as HTMLElement;
 
-        htmlElement.oncontextmenu = (event) => {
-          event.preventDefault();
-
-          const rect = element.getBoundingClientRect();
-
-          setPosition({
-            x: rect.left,
-            y: rect.bottom,
-          });
-
-          setContextMenu(true);
-        };
+        htmlElement.oncontextmenu = (event) =>
+          onContextMenuClick(event, element, text);
       });
-  }, [setPosition, setContextMenu]);
+  }, [onContextMenuClick]);
 
   const handleClickRow = ({
     id,
@@ -197,7 +195,7 @@ export const TableResultRb: React.FC<Props> = ({ rows, columns, filter }) => {
     const title = innerElement?.dataset.name;
 
     /** Отправляем активную строку в стору, это нужно для обновления данных в графиках */
-    if (code && DataTransferItemList) {
+    if (code && title) {
       dispatch(TableActions.setActiveRow({ code, title: title || '' }));
 
       if (
@@ -209,26 +207,25 @@ export const TableResultRb: React.FC<Props> = ({ rows, columns, filter }) => {
     }
   };
 
-  const handleClickOutside = () => setContextMenu(false);
-
-  const handleContextMenuClick = (
-    item: Item,
-  ): React.EventHandler<React.MouseEvent<HTMLDivElement>> => {
-    return (event: React.MouseEvent) => {
-      dispatch(
-        TableActions.setDecimalFixed(
-          item.code === 'add' ? decimalFixed + 1 : decimalFixed - 1,
-        ),
-      );
-    };
+  const handleContextMenuClick = (item: MenuContextItem): void => {
+    dispatch(
+      TableActions.setDecimalFixed({
+        type: item.code === 'add' ? 'plus' : 'minus',
+        columnCode: currentColumnCode || '',
+      }),
+    );
   };
 
-  const isContextMenuDisabled = (item: Item) => {
-    if (item.code === 'add' && decimalFixed > 7) {
+  const isContextMenuDisabled = (item: MenuContextItem) => {
+    if (!decimalFixed) {
+      return false;
+    }
+
+    if (item.code === 'add' && decimalFixed[currentColumnCode || ''] > 7) {
       return true;
     }
 
-    if (item.code === 'remove' && decimalFixed < 1) {
+    if (item.code === 'remove' && decimalFixed[currentColumnCode || ''] < 1) {
       return true;
     }
 
@@ -246,21 +243,18 @@ export const TableResultRb: React.FC<Props> = ({ rows, columns, filter }) => {
         className="TableResultRb"
         borderBetweenColumns
         borderBetweenRows
+        stickyHeader
         isResizable
       />
 
       {visible && (
-        <ContextMenu
-          items={menuItems}
-          getLabel={(item: Item) => item.name}
+        <CustomContextMenu
+          menuItems={() => menuItems()}
           ref={rowRef}
-          getLeftSideBar={renderLeftSide}
-          getOnClick={handleContextMenuClick}
-          getDisabled={isContextMenuDisabled}
-          direction="downStartLeft"
+          onClick={handleContextMenuClick}
+          setIsOpenContextMenu={(isVisible) => setContextMenu(isVisible)}
           position={position}
-          size="s"
-          onClickOutside={handleClickOutside}
+          getDisabled={isContextMenuDisabled}
         />
       )}
     </div>
