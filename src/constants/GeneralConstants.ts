@@ -4,6 +4,7 @@ export enum DomainEntityCode {
   Area = 'AREA',
   Deposit = 'DEPOSIT',
   Layer = 'LAYER',
+  Mine = 'MINE',
 }
 
 /** Время обновления информации о том, редактировался ли проект. */

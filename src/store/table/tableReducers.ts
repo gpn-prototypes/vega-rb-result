@@ -8,6 +8,7 @@ import {
   GridCollection,
 } from '@app/types/typesTable';
 import { LocalStorageHelper } from '@app/utils/LocalStorageHelper';
+import { getDecimalByColumns } from '@app/utils/unpackTableData';
 import { reducerWithInitialState } from 'typescript-fsa-reducers';
 
 import {
@@ -112,7 +113,11 @@ export const TableReducers = reducerWithInitialState<GridCollection>(
       const decimalFixed = LocalStorageHelper.getParsed<DecimalFixed>(
         LocalStorageKey.DecimalFixed,
       );
-      const value = decimalFixed[payload.columnCode] || DEFAULT_DECIMAL_FIXED;
+
+      /** Получаем из localstorage, либо из данных таблицы */
+      const value =
+        decimalFixed[payload.columnCode] ||
+        getDecimalByColumns(state.columns)[payload.columnCode];
 
       decimalFixed[payload.columnCode] =
         payload.type === 'plus' ? value + 1 : value - 1;

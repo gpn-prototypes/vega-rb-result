@@ -6,6 +6,8 @@ import { TableReducers } from '@app/store/table/tableReducers';
 import treeDuck from '@app/store/treeDuck';
 import { combineReducers } from 'redux';
 
+import { NotifyReducers } from './notify/notifyReducers';
+import { SettingsReducers } from './settings/settingsReducers';
 import competitiveAccessDuck from './competitiveAccessDuck';
 import sensitiveAnalysisDuck from './sensitiveAnalysisDuck';
 import { RootState } from './types';
@@ -19,4 +21,6 @@ export default combineReducers<RootState>({
   tree: treeDuck.reducer,
   histograms: histogramDuck.reducer,
   sensitiveAnalysis: sensitiveAnalysisDuck.reducer,
+  settings: SettingsReducers,
+  notify: NotifyReducers,
 });

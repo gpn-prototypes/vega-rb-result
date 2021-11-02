@@ -2,6 +2,8 @@ import { Param } from '@app/model/Param';
 import { IProjectService } from '@app/services/types';
 import { GridCollection } from '@app/types/typesTable';
 
+import { NotifyStore } from './notify/notifyActions';
+import { SettingStore } from './settings/settingsActions';
 import { HistogramStore } from './histogramDuck';
 import { SensitiveAnalysisStore } from './sensitiveAnalysisDuck';
 
@@ -45,6 +47,8 @@ export interface RootState {
   errors: ErrorsState;
   histograms: HistogramStore;
   sensitiveAnalysis: SensitiveAnalysisStore;
+  settings: SettingStore;
+  notify: NotifyStore;
 }
 
 export type TypedColumnsList = {

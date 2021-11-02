@@ -196,15 +196,12 @@ export const GET_SENSITIVE_ANALYSIS_RESULT_RB = gql`
 `;
 
 export const GET_SENSITIVE_ANALYSIS_STATISTIC_RESULT_RB = gql`
-  query GetTableResultRb($projectId: ID!, $domainEntityNames: [String!]) {
+  query GetTableResultRb($domainEntityNames: [String!]) {
     project {
       resourceBase {
         result {
           histograms {
-            getSensitivityAnalysis(
-              projectId: $projectId
-              domainEntityNames: $domainEntityNames
-            ) {
+            getSensitivityAnalysis(domainEntityNames: $domainEntityNames) {
               title
               names
               sample
@@ -239,6 +236,7 @@ export const GET_TABLE_RESULT_RB = gql`
                 name
                 shortName
                 units
+                geoType
                 visible {
                   calc
                   table

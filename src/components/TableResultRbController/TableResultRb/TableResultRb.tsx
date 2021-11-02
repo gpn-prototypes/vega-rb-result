@@ -1,11 +1,8 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { CustomContextMenu } from '@app/components/Helpers/ContextMenuHelper';
-import { EFluidType } from '@app/constants/Enums';
-import {
-  AttributeCode,
-  DomainEntityCode,
-} from '@app/constants/GeneralConstants';
+import { EFluidType, EFluidTypeCode } from '@app/constants/Enums';
+import { DomainEntityCode } from '@app/constants/GeneralConstants';
 import { RbDomainEntityInput } from '@app/generated/graphql';
 import { MenuContextItem } from '@app/interfaces/ContextMenuInterface';
 import { TableActions } from '@app/store/table/tableActions';
@@ -90,6 +87,12 @@ export const TableResultRb: React.FC<Props> = ({ rows, columns, filter }) => {
   const decimalFixed: DecimalFixed | undefined = useSelector(
     ({ table }: RootState) => table.decimalFixed,
   );
+  const openSensitiveAnalysis: boolean = useSelector(
+    ({ settings }: RootState) => settings.openSensitiveAnalysis,
+  );
+  const showHistogram: boolean = useSelector(
+    ({ settings }: RootState) => settings.showHistogram,
+  );
 
   /**
    * Сортировка данных по клику на элемент древа
@@ -113,13 +116,17 @@ export const TableResultRb: React.FC<Props> = ({ rows, columns, filter }) => {
     }
 
     /** Фильтрация данных по типу флюида */
-    filteredRowsData = filteredRowsData.filter(
-      (row: Row<RbDomainEntityInput>) => {
-        if (fluidType === EFluidType.ALL) {
+    filteredColumnsData = filteredColumnsData.filter(
+      (column: Column<RbDomainEntityInput>) => {
+        if (
+          fluidType === EFluidType.ALL ||
+          fluidType === undefined ||
+          !column?.geoType
+        ) {
           return true;
         }
 
-        return row[AttributeCode.GeoType]?.value === fluidType;
+        return column?.geoType === EFluidTypeCode[fluidType];
       },
     );
 
@@ -196,11 +203,14 @@ export const TableResultRb: React.FC<Props> = ({ rows, columns, filter }) => {
 
     /** Отправляем активную строку в стору, это нужно для обновления данных в графиках */
     if (code && title) {
-      dispatch(TableActions.setActiveRow({ code, title: title || '' }));
+      if (showHistogram) {
+        dispatch(TableActions.setActiveRow({ code, title: title || '' }));
+      }
 
       if (
-        code.indexOf(DomainEntityCode.Layer) > -1 &&
-        (title || '').indexOf('Всего') === -1
+        code.indexOf(DomainEntityCode.Mine) > -1 &&
+        (title || '').indexOf('Всего') === -1 &&
+        openSensitiveAnalysis
       ) {
         dispatch(TableActions.setSidebarRow({ code, title: title || '' }));
       }

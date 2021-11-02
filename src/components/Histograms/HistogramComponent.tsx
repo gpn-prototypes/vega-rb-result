@@ -61,7 +61,7 @@ export const HistogramComponent: React.FC<Props> = ({ grid }) => {
   /** Запрашиваем данные в самом начале, берем самый первый элемент */
   useMount(() => {
     loadHistogramData(dispatch, [
-      String(grid.rows[0][grid.columns[0].accessor]),
+      String((grid.rows[0][grid.columns[0].accessor] as any)?.value),
     ]).then(() => setIsLoading(false));
 
     return () => {

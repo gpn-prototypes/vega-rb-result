@@ -51,9 +51,9 @@ export const ContextMenuBaseItem: React.FC<ContextMenuBaseItemProps> = ({
 interface ContextMenuProps {
   ref: React.RefObject<HTMLHeadingElement>;
   menuItems: () => MenuContextItem[];
-  onClick: (item: MenuContextItem) => void;
   setIsOpenContextMenu: (isOpened: boolean) => void;
   position: Position;
+  onClick?: (item: MenuContextItem) => void;
   onChange?: (item: MenuContextItem) => void;
   getDisabled?: (item: MenuContextItem) => boolean;
 }
@@ -71,11 +71,11 @@ export const CustomContextMenu: React.FC<ContextMenuProps> = ({
   const [inputValue, setValue] = useState(null);
   const handleInputChange = ({ value }) => setValue(value);
 
-  console.log(11);
-
   /** Обработка клика по контекстному меню */
   const handleContextClick = (menuItem: MenuContextItem) => {
-    onClick(menuItem);
+    if (onClick) {
+      onClick(menuItem);
+    }
 
     setIsOpenContextMenu(false);
   };

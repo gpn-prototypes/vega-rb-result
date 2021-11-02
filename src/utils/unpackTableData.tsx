@@ -13,10 +13,10 @@ import {
   ResultProjectStructure,
 } from '../generated/graphql';
 import {
+  DEFAULT_DECIMAL_FIXED,
   getDecimalRows,
-  tableInitialState,
 } from '../store/table/tableReducers';
-import { GridCollection } from '../types/typesTable';
+import { DecimalFixed, GridCollection } from '../types/typesTable';
 
 import { getNumberWithSpaces } from './StringHelper';
 
@@ -24,6 +24,22 @@ const isHasParentAll = (parents: Parent[]): boolean => {
   return (
     parents.find((innerParent: Parent) => innerParent.isTotal) !== undefined
   );
+};
+
+export const getDecimalByColumns = (
+  columns: Column<RbDomainEntityInput>[],
+): DecimalFixed => {
+  const decimalFixed: DecimalFixed = {};
+
+  columns
+    .filter(
+      (column: Column<RbDomainEntityInput>) => column.decimal !== undefined,
+    )
+    .forEach((column: Column<RbDomainEntityInput>) => {
+      decimalFixed[column.accessor] = column.decimal || DEFAULT_DECIMAL_FIXED;
+    });
+
+  return decimalFixed;
 };
 
 /** Подготовка колонок */
@@ -46,6 +62,8 @@ export const prepareColumns = (
     accessor,
     align,
     visible,
+    geoType,
+    decimal,
     renderCell,
   }: Column<RbDomainEntityInput>): Column<RbDomainEntityInput> => {
     return {
@@ -56,6 +74,8 @@ export const prepareColumns = (
       isResizable: true,
       getComparisonValue: (row: Row<RbDomainEntityInput>) => row?.value || '',
       visible,
+      geoType,
+      decimal,
       renderCell,
     };
   };
@@ -109,6 +129,8 @@ export const prepareColumns = (
       accessor: attribute.code as keyof RbDomainEntityInput,
       align: attribute.code === 'PERCENTILE' ? 'left' : 'right',
       visible: attribute?.visible,
+      geoType: attribute?.geoType,
+      decimal: attribute?.decimal || DEFAULT_DECIMAL_FIXED,
       renderCell: (row: Row<RbDomainEntityInput>) => {
         /** Заполняем коды и названия с учетом родителей, нужно для отправки данных в отображение гистограм */
         const codeWithParents = domainEntities
@@ -146,10 +168,10 @@ export const prepareColumns = (
 };
 
 /** Подготовка ячеек */
-export const prepareRows = ({
-  domainObjects,
-  attributes,
-}: ResultProjectStructure): Row<RbDomainEntityInput>[] => {
+export const prepareRows = (
+  { domainObjects, attributes }: ResultProjectStructure,
+  columns: Column<RbDomainEntityInput>[],
+): Row<RbDomainEntityInput>[] => {
   let rowNumber = 1;
 
   const preparedRows: Row<RbDomainEntityInput>[] = [];
@@ -220,7 +242,7 @@ export const prepareRows = ({
     rowNumber += addRowsNum;
   });
 
-  return [...getDecimalRows(preparedRows, tableInitialState.decimalFixed)];
+  return [...getDecimalRows(preparedRows, getDecimalByColumns(columns))];
 };
 
 export function unpackTableData(
@@ -229,7 +251,10 @@ export function unpackTableData(
 ): GridCollection {
   const columns: Column<RbDomainEntityInput>[] =
     prepareColumns(projectStructure);
-  const rows: Row<RbDomainEntityInput>[] = prepareRows(projectStructure);
+  const rows: Row<RbDomainEntityInput>[] = prepareRows(
+    projectStructure,
+    columns,
+  );
 
   return {
     columns,

@@ -10,6 +10,8 @@ export interface Column<T = any> {
   isResizable?: boolean;
   align?: 'left' | 'right';
   visible?: Visible;
+  geoType?: string;
+  decimal?: number;
   width?: number;
   getComparisonValue?: (row: Row[Column['accessor']]) => string;
 }

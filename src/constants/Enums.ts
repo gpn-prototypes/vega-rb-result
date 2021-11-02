@@ -4,3 +4,10 @@ export enum EFluidType {
   OIL_N_GAS = 'Нефть+Газ',
   ALL = 'Все',
 }
+
+export const EFluidTypeCode = {
+  [EFluidType.OIL]: 'OIL',
+  [EFluidType.GAS]: 'GAS',
+  [EFluidType.OIL_N_GAS]: 'MIXTURE',
+  [EFluidType.ALL]: '',
+};

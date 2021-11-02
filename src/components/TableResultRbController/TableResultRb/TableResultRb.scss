@@ -1,5 +1,5 @@
 .table {
-  height: 500px;
+  height: 100%;
 
   .TableCell_isHeader {
     min-width: 120px;
@@ -23,9 +23,5 @@
 
   ._no-right-border {
     border-left: 0 !important;
-  }
-
-  ._active {
-    background-color: var(--color-bg-stripe) !important;
   }
 }

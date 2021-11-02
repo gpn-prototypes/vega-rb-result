@@ -36,16 +36,16 @@
   max-height: calc(100vh - 100px);
 }
 
-.FluidTypesChoiceGroup {
-  margin: var(--size-text-2xs) 0 var(--size-text-2xs) var(--size-text-m);
-}
-
 .result {
   &__graphs {
     padding-top: var(--space-l);
     padding-left: var(--size-text-m);
 
     display: flex;
+
+    &_hide {
+      display: none;
+    }
   }
 
   &__analysis {
@@ -57,6 +57,32 @@
     padding: var(--space-l);
 
     min-width: 736px;
+  }
+
+  &__icons {
+    margin-left: var(--space-m);
+  }
+
+  &__icon {
+    cursor: pointer;
+
+    margin-left: var(--space-m);
+  }
+
+  &__top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    margin: var(--space-s) var(--space-m);
+  }
+
+  &__table {
+    height: 470px;
+
+    &_full {
+      height: calc(100vh - 100px);
+    }
   }
 }
 

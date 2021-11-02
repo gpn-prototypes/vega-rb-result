@@ -182,10 +182,26 @@ export namespace SensitiveAnalysisChart {
       return (innerX) => format(Math.abs(innerX));
     };
 
+    const getPositiveTickByNegativeValue = (negativeValue: number): number => {
+      const findPositiveIndexByNegative = () => {
+        const negativeSeries = series[0];
+
+        const index = negativeSeries.findIndex((innerSeries: any[]) => {
+          return innerSeries[0] === negativeValue;
+        });
+
+        return index;
+      };
+      const rightBarSeries = series[1];
+      const currentTick = rightBarSeries[findPositiveIndexByNegative()][1];
+
+      return currentTick;
+    };
+
     /** Добавление оси X, а так же добавление полосок */
     const xAxis = (g) =>
       g
-        .attr('transform', `translate(0,${SensitiveAnalysisChart.Margin.top})`)
+        .attr('transform', `translate(4,${SensitiveAnalysisChart.Margin.top})`)
         .attr('class', 'chart__xAxis')
         .call(
           d3
@@ -224,7 +240,7 @@ export namespace SensitiveAnalysisChart {
               'transform',
               ([name, min]) =>
                 `translate(${xScale(min) - 5},${
-                  (yScale(name) || 0) + yScale.bandwidth() - 2
+                  (yScale(name) || 0) + yScale.bandwidth() + 13
                 })`,
             )
             .text('')
@@ -250,20 +266,16 @@ export namespace SensitiveAnalysisChart {
             .call(d3.axisLeft(yScale).tickSizeOuter(0))
             .selectAll('.tick')
             .data(bias)
-            .attr('transform', ([name, min], index) => {
-              const rightBarSeries = series[1];
-              const currentTick = rightBarSeries[index][1];
-              return `translate(${xScale(currentTick) + 21},${
-                (yScale(name) || 0) + yScale.bandwidth() - 2
-              })`;
+            .attr('transform', ([name, min]) => {
+              return `translate(${
+                xScale(getPositiveTickByNegativeValue(min)) + 5
+              },${(yScale(name) || 0) + yScale.bandwidth() + 13})`;
             })
             .text('')
             .append('text')
-            .attr('class', 'chart__text chart__text_white')
-            .text(([, value], index: number) => {
-              const rightBarSeries = series[1];
-              const currentTick = rightBarSeries[index][1];
-              return currentTick;
+            .attr('class', 'chart__text chart__text_start chart__text_white')
+            .text(([, min]) => {
+              return getPositiveTickByNegativeValue(min);
             }),
         )
         .call((innerG) => innerG.select('.domain').attr('display', 'none'));
@@ -286,9 +298,6 @@ export namespace SensitiveAnalysisChart {
                 `translate(95, ${
                   (yScale(name) || 0) + yScale.bandwidth() - 11 / 2
                 })`,
-              // `translate(${x(bias[0][1]) - 20},${
-              //   (y(name) || 0) + y.bandwidth() - 11 / 2
-              // })`,
             ),
         )
         .call((nestedG) => nestedG.selectAll('.chart__text line').remove())

@@ -21,8 +21,13 @@ import {
   ResultProjectStructure,
   SensitivityAnalysisStructure,
 } from '@app/generated/graphql';
-import { IProjectService, ProjectServiceProps } from '@app/services/types';
 import {
+  CalculationResponse,
+  IProjectService,
+  ProjectServiceProps,
+} from '@app/services/types';
+import {
+  getDownloadResultUri,
   getGraphqlUri,
   // wrapConception,
 } from '@app/services/utils';
@@ -82,9 +87,9 @@ class ProjectService implements IProjectService {
     return this.clientMod as ApolloClient<NormalizedCacheObject>;
   }
 
-  // get identity() {
-  //   return this.#identity as Identity;
-  // }
+  get identity() {
+    return this.identityMod as Identity;
+  }
 
   get projectId(): string {
     return String(this.projectShellMod?.get().vid);
@@ -301,6 +306,25 @@ class ProjectService implements IProjectService {
     } else {
       throwError('"project" is not found in query');
     }
+  }
+
+  async getCalculationArchive(fileId: string): Promise<CalculationResponse> {
+    const DEFAULT_FILENAME = 'result.zip';
+
+    const token = await this.identity.getToken();
+    const serverResponse = await fetch(getDownloadResultUri(fileId), {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const filename = serverResponse.headers
+      .get('Content-Disposition')
+      ?.match('filename="(?<filename>.*)"')?.groups?.filename;
+
+    return {
+      filename: filename || DEFAULT_FILENAME,
+      data: await serverResponse.blob(),
+    };
   }
 
   // private async updateCachedProject(): Promise<void> {
