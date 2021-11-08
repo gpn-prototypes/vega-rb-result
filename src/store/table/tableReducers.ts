@@ -1,4 +1,7 @@
-import { Row } from '@app/components/TableResultRbController/TableResultRb/types';
+import {
+  Column,
+  Row,
+} from '@app/components/TableResultRbController/TableResultRb/types';
 import { EFluidType } from '@app/constants/Enums';
 import { LocalStorageKey } from '@app/constants/LocalStorageKeyConstants';
 import { RbDomainEntityInput } from '@app/generated/graphql';
@@ -8,7 +11,6 @@ import {
   GridCollection,
 } from '@app/types/typesTable';
 import { LocalStorageHelper } from '@app/utils/LocalStorageHelper';
-import { getDecimalByColumns } from '@app/utils/unpackTableData';
 import { reducerWithInitialState } from 'typescript-fsa-reducers';
 
 import {
@@ -63,6 +65,23 @@ export const getDecimalRows = (
   });
 
   return resultRows;
+};
+
+export const getDecimalByColumns = (
+  columns: Column<RbDomainEntityInput>[],
+): DecimalFixed => {
+  const decimalFixed: DecimalFixed = {};
+
+  columns
+    .filter(
+      (column: Column<RbDomainEntityInput>) => column.decimal !== undefined,
+    )
+    .forEach((column: Column<RbDomainEntityInput>) => {
+      decimalFixed[column.accessor] =
+        column.decimal !== undefined ? column.decimal : DEFAULT_DECIMAL_FIXED;
+    });
+
+  return decimalFixed;
 };
 
 export const TableReducers = reducerWithInitialState<GridCollection>(

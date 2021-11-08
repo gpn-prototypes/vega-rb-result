@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { VerticalMoreContextMenu } from '@app/components/Helpers/ContextMenuHelper';
 import { Histogram } from '@app/generated/graphql';
@@ -60,27 +60,49 @@ export const HistogramComponent: React.FC<Props> = ({ grid }) => {
 
   /** Запрашиваем данные в самом начале, берем самый первый элемент */
   useMount(() => {
-    loadHistogramData(dispatch, [
-      String((grid.rows[0][grid.columns[0].accessor] as any)?.value),
-    ]).then(() => setIsLoading(false));
+    loadHistogramData(
+      dispatch,
+      [String((grid.rows[0][grid.columns[0].accessor] as any)?.value)],
+      DEFAULT_NUMBER_OF_ROWS,
+    ).then(() => setIsLoading(false));
 
     return () => {
       dispatch(histogramDuck.actions.resetState());
     };
   });
 
+  const loadData = useCallback(
+    (innerActiveRow: GridActiveRow | undefined) => {
+      if (
+        innerActiveRow?.title &&
+        previousActiveRow?.title !== innerActiveRow.title
+      ) {
+        setIsLoading(true);
+
+        loadHistogramData(
+          dispatch,
+          innerActiveRow.title.split(','),
+          numberOfRows,
+        ).then(() => {
+          setIsLoading(false);
+
+          setPreviousActiveRow(innerActiveRow);
+        });
+      }
+    },
+    [
+      numberOfRows,
+      previousActiveRow,
+      dispatch,
+      setIsLoading,
+      setPreviousActiveRow,
+    ],
+  );
+
   /** Отлавливаем выбор ячейки, выбор ячейки происходит по клику на таблице и по клику по ноде в дереве */
   useEffect(() => {
-    if (activeRow?.title && previousActiveRow?.title !== activeRow.title) {
-      setIsLoading(true);
-
-      loadHistogramData(dispatch, activeRow.title.split(',')).then(() => {
-        setIsLoading(false);
-
-        setPreviousActiveRow(activeRow);
-      });
-    }
-  }, [activeRow, previousActiveRow, dispatch, setPreviousActiveRow]);
+    loadData(activeRow);
+  }, [activeRow, loadData]);
 
   const handleChange = (item: MenuContextItem) => {
     if (item.code === 'stat') {
@@ -101,6 +123,8 @@ export const HistogramComponent: React.FC<Props> = ({ grid }) => {
 
     if (item.code === 'numberOfRows') {
       setNumberOfRows(item.choice?.value || DEFAULT_NUMBER_OF_ROWS);
+
+      loadData(activeRow);
     }
   };
 
@@ -118,6 +142,7 @@ export const HistogramComponent: React.FC<Props> = ({ grid }) => {
             percentiles={histogram.percentiles}
             sample={histogram.sample}
             numberOfIterationBin={histogram.numberOfIterationBin}
+            cdf={histogram.cdf}
             numberOfRows={numberOfRows}
           />
         );

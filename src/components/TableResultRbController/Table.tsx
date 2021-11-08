@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 import { TableResultRb } from '@app/components/TableResultRbController/TableResultRb/TableResultRb';
 import { loadTableData } from '@app/services/loadTableData';
 import { TableActions } from '@app/store/table/tableActions';
@@ -8,6 +9,7 @@ import { Loader, useMount } from '@gpn-prototypes/vega-ui';
 
 export const Table: React.FC = () => {
   const dispatch = useDispatch();
+  const history = useHistory();
   const reduxTableData = useSelector(({ table }: RootState) => table);
   const filterData = useSelector(({ tree }: RootState) => tree.filter);
 
@@ -16,7 +18,12 @@ export const Table: React.FC = () => {
   useMount(() => {
     setIsLoading(true);
 
-    loadTableData(dispatch).then(() => setIsLoading(false));
+    loadTableData(dispatch)
+      .catch(() => {
+        /** Придумать механизм редиректа между проектами */
+        history.push(window.location.pathname.replace('/rb-result', '/rb'));
+      })
+      .then(() => setIsLoading(false));
 
     return () => {
       dispatch(TableActions.resetState());

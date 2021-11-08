@@ -154,18 +154,19 @@ export const GET_TABLE_TEMPLATE = gql`
 `;
 
 export const GET_HISTOGRAM_RESULT_RB = gql`
-  query GetTableResultRb($domainEntityNames: [String!]) {
+  query GetTableResultRb($domainEntityNames: [String!], $bins: Int) {
     project {
       resourceBase {
         result {
           histograms {
-            getHistograms(domainEntityNames: $domainEntityNames) {
+            getHistograms(domainEntityNames: $domainEntityNames, bins: $bins) {
               histograms {
                 title
                 subtitle
                 percentiles
                 sample
                 numberOfIterationBin
+                cdf
               }
             }
           }
@@ -237,6 +238,7 @@ export const GET_TABLE_RESULT_RB = gql`
                 shortName
                 units
                 geoType
+                decimal
                 visible {
                   calc
                   table

@@ -20,6 +20,7 @@ export async function loadTableData(
   if (resourceBaseData) {
     dispatchOnInit(resourceBaseData);
   } else if (resourceBaseData === null) {
+    throw new Error();
     // const structureTemplate = await projectService.getTableTemplate();
     // TODO: uncommnet
     // dispatchOnInit(structureTemplate);

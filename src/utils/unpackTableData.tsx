@@ -14,9 +14,10 @@ import {
 } from '../generated/graphql';
 import {
   DEFAULT_DECIMAL_FIXED,
+  getDecimalByColumns,
   getDecimalRows,
 } from '../store/table/tableReducers';
-import { DecimalFixed, GridCollection } from '../types/typesTable';
+import { GridCollection } from '../types/typesTable';
 
 import { getNumberWithSpaces } from './StringHelper';
 
@@ -24,22 +25,6 @@ const isHasParentAll = (parents: Parent[]): boolean => {
   return (
     parents.find((innerParent: Parent) => innerParent.isTotal) !== undefined
   );
-};
-
-export const getDecimalByColumns = (
-  columns: Column<RbDomainEntityInput>[],
-): DecimalFixed => {
-  const decimalFixed: DecimalFixed = {};
-
-  columns
-    .filter(
-      (column: Column<RbDomainEntityInput>) => column.decimal !== undefined,
-    )
-    .forEach((column: Column<RbDomainEntityInput>) => {
-      decimalFixed[column.accessor] = column.decimal || DEFAULT_DECIMAL_FIXED;
-    });
-
-  return decimalFixed;
 };
 
 /** Подготовка колонок */

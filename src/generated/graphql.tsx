@@ -3002,6 +3002,7 @@ export type ResultProjectStructure = {
 export type Histogram = {
   percentiles: number[];
   sample: number[];
+  cdf: number[];
   numberOfIterationBin: number[];
   subtitle: string;
   title: string;

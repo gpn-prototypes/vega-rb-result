@@ -1,3 +1,4 @@
+import { DrawHelper } from '@app/utils/DrawHelper';
 import * as d3 from 'd3';
 import { Bin } from 'd3-array';
 import { ScaleLinear } from 'd3-scale';
@@ -226,19 +227,20 @@ export namespace Chart {
     y1Scale,
     percentiles,
   }: DrawDotsArguments): void => {
-    const payload = percentiles.map((percentile: number, index: number) => {
-      const percentileMap = {
-        0: 0.1,
-        1: 0.5,
-        2: 0.9,
-      };
+    const payload: DrawHelper.Point[] = percentiles.map(
+      (percentile: number, index: number) => {
+        const percentileMap = {
+          0: 0.1,
+          1: 0.5,
+          2: 0.9,
+        };
 
-      return {
-        x: percentile,
-        y: percentileMap[index],
-        value: percentile,
-      };
-    });
+        return {
+          x: percentile,
+          y: percentileMap[index],
+        };
+      },
+    );
 
     /** Пока точки не отображаем */
     // svg
@@ -264,6 +266,19 @@ export namespace Chart {
       .attr('dy', '0.35em')
       .attr('x', (d: any) => xScale(d.x) + 34)
       .attr('y', (d: any) => y1Scale(d.y))
-      .text((d: any) => String(d.value).split('.')[0]);
+      .text((d: any) => String(d.x).split('.')[0]);
+  };
+
+  export const getPayload = (
+    cdf: number[],
+    sample: number[],
+  ): DrawHelper.Point[] => {
+    const maxSample = d3.max(sample) || 0;
+    const stepPerSample = maxSample / cdf.length;
+
+    return cdf.map((currentCdf: number, index) => ({
+      x: index * stepPerSample,
+      y: currentCdf,
+    }));
   };
 }

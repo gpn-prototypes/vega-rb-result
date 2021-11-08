@@ -199,6 +199,7 @@ class ProjectService implements IProjectService {
 
   async getHistogramData(
     domainEntityNames: string[],
+    bins: number,
   ): Promise<ResultHistogramsStructure> {
     const { data: responseData } = await this.client
       .watchQuery<Query>({
@@ -208,6 +209,7 @@ class ProjectService implements IProjectService {
         },
         variables: {
           domainEntityNames,
+          bins,
         },
         fetchPolicy: 'no-cache',
       })
