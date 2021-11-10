@@ -2,8 +2,8 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { RbErrorCodes } from '@app/generated/graphql';
 import useGetError from '@app/hooks/useGetError';
 import { ErrorWrapper } from '@app/types/typesTable';
+import { IconAlert } from '@consta/uikit/IconAlert';
 import { Item, SnackBar } from '@consta/uikit/SnackBar';
-import { IconAlert } from '@gpn-prototypes/vega-ui';
 import { defaultTo, get } from 'lodash/fp';
 
 import { cnTableErrorAlert } from './cn-table-error-alert';

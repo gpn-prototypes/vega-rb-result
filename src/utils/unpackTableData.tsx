@@ -1,4 +1,6 @@
 import React from 'react';
+import { ColumnExpanderComponent } from '@app/components/Expander/ColumnExpanderComponent';
+import { LocalStorageKey } from '@app/constants/LocalStorageKeyConstants';
 
 import {
   Column,
@@ -17,8 +19,9 @@ import {
   getDecimalByColumns,
   getDecimalRows,
 } from '../store/table/tableReducers';
-import { GridCollection } from '../types/typesTable';
+import { DecimalFixed, GridCollection } from '../types/typesTable';
 
+import { LocalStorageHelper } from './LocalStorageHelper';
 import { getNumberWithSpaces } from './StringHelper';
 
 const isHasParentAll = (parents: Parent[]): boolean => {
@@ -49,6 +52,9 @@ export const prepareColumns = (
     visible,
     geoType,
     decimal,
+    isRisk,
+    control,
+    columnAccessorGroup,
     renderCell,
   }: Column<RbDomainEntityInput>): Column<RbDomainEntityInput> => {
     return {
@@ -61,6 +67,9 @@ export const prepareColumns = (
       visible,
       geoType,
       decimal,
+      isRisk,
+      control,
+      columnAccessorGroup,
       renderCell,
     };
   };
@@ -108,46 +117,113 @@ export const prepareColumns = (
     },
   );
 
-  const preparedAttributes = attributes.map((attribute: ResultAttribute) => {
-    const column: Column<RbDomainEntityInput> = getPreparedColumn({
-      title: [attribute.shortName, attribute.units].filter(Boolean).join(', '),
-      accessor: attribute.code as keyof RbDomainEntityInput,
-      align: attribute.code === 'PERCENTILE' ? 'left' : 'right',
-      visible: attribute?.visible,
-      geoType: attribute?.geoType,
-      decimal: attribute?.decimal || DEFAULT_DECIMAL_FIXED,
-      renderCell: (row: Row<RbDomainEntityInput>) => {
-        /** Заполняем коды и названия с учетом родителей, нужно для отправки данных в отображение гистограм */
-        const codeWithParents = domainEntities
-          .map((entity: ResultDomainEntity) => entity.code)
-          .join(',');
-        const nameWithParents = domainEntities
-          .map((entity: ResultDomainEntity) => row[entity.code]?.value || '')
-          .join(',');
+  const firstMain = attributes.filter(
+    (innerAttribute: ResultAttribute, index: number) =>
+      index === 0 && !innerAttribute.isRisk,
+  );
 
-        const value = row[attribute.code]?.formattedValue;
+  const firstRisk = attributes
+    .filter(
+      (innerAttribute: ResultAttribute, index: number) => innerAttribute.isRisk,
+    )
+    .filter((_, index: number) => index === 0);
 
-        const formattedValue =
-          // eslint-disable-next-line no-restricted-globals
-          isNaN(value) || value === undefined
-            ? value
-            : getNumberWithSpaces(value);
+  const getColumnAccessorGroup = (attribute: ResultAttribute) => {
+    if (firstMain?.length > 0 && firstMain[0].code === attribute.code) {
+      return attributes
+        .filter(
+          (innerAttribute: ResultAttribute, index: number) =>
+            index !== 0 && !innerAttribute.isRisk,
+        )
+        .map((innerAttribute: ResultAttribute) => innerAttribute.code as any);
+    }
 
-        return (
-          <div
-            className={getClass(row, attribute)}
-            id={attribute.code}
-            data-code={codeWithParents}
-            data-name={nameWithParents}
-          >
-            {formattedValue || ''}
-          </div>
-        );
-      },
-    });
+    if (firstRisk?.length > 0 && firstRisk[0].code === attribute.code) {
+      return attributes
+        .filter(
+          (innerAttribute: ResultAttribute, index: number) =>
+            innerAttribute.isRisk,
+        )
+        .filter((_, index: number) => index !== 0)
+        .map((innerAttribute: ResultAttribute) => innerAttribute.code as any);
+    }
 
-    return column;
-  });
+    return undefined;
+  };
+
+  const getColumnControl = (attribute: ResultAttribute) => {
+    if (
+      (firstMain?.length > 0 && firstMain[0].code === attribute.code) ||
+      (firstRisk?.length > 0 && firstRisk[0].code === attribute.code)
+    ) {
+      return ({ column }) => <ColumnExpanderComponent column={column} />;
+    }
+
+    return undefined;
+  };
+
+  /** Берем значение из localstorage. Если его нет, то берем из бекенда */
+  const getDecimalValue = (attribute: ResultAttribute): number => {
+    const decimalFromLocalStorage: DecimalFixed | null =
+      LocalStorageHelper.getParsed<DecimalFixed>(LocalStorageKey.DecimalFixed);
+    if (
+      decimalFromLocalStorage &&
+      decimalFromLocalStorage[attribute.code] !== undefined
+    ) {
+      return decimalFromLocalStorage[attribute.code];
+    }
+
+    return attribute?.decimal !== undefined
+      ? attribute?.decimal
+      : DEFAULT_DECIMAL_FIXED;
+  };
+
+  const preparedAttributes = attributes.map(
+    (attribute: ResultAttribute, index: number) => {
+      const column: Column<RbDomainEntityInput> = getPreparedColumn({
+        title: [attribute.shortName, attribute.units]
+          .filter(Boolean)
+          .join(', '),
+        accessor: attribute.code as keyof RbDomainEntityInput,
+        align: attribute.code === 'PERCENTILE' ? 'left' : 'right',
+        visible: attribute?.visible,
+        geoType: attribute?.geoType,
+        control: getColumnControl(attribute),
+        columnAccessorGroup: getColumnAccessorGroup(attribute),
+        decimal: getDecimalValue(attribute),
+        renderCell: (row: Row<RbDomainEntityInput>) => {
+          /** Заполняем коды и названия с учетом родителей, нужно для отправки данных в отображение гистограм */
+          const codeWithParents = domainEntities
+            .map((entity: ResultDomainEntity) => entity.code)
+            .join(',');
+          const nameWithParents = domainEntities
+            .map((entity: ResultDomainEntity) => row[entity.code]?.value || '')
+            .join(',');
+
+          const value = row[attribute.code]?.formattedValue;
+
+          const formattedValue =
+            // eslint-disable-next-line no-restricted-globals
+            isNaN(value) || value === undefined
+              ? value
+              : getNumberWithSpaces(value);
+
+          return (
+            <div
+              className={getClass(row, attribute)}
+              id={attribute.code}
+              data-code={codeWithParents}
+              data-name={nameWithParents}
+            >
+              {formattedValue || ''}
+            </div>
+          );
+        },
+      });
+
+      return column;
+    },
+  );
 
   return [...preparedEntities, ...preparedAttributes];
 };

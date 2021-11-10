@@ -1,5 +1,9 @@
 import { EFluidType } from '@app/constants/Enums';
-import { GridActiveRow, GridCollection } from '@app/types/typesTable';
+import {
+  GridActiveRow,
+  GridCollection,
+  HiddenColumns,
+} from '@app/types/typesTable';
 import actionCreatorFactory from 'typescript-fsa';
 
 const factory = actionCreatorFactory('table');
@@ -20,4 +24,5 @@ export const TableActions = {
   resetSidebarRow: factory('RESET_SIDEBAR_ROW'),
   setDecimalFixed:
     factory<TableSetDecimalFixedActionPayload>('SET_DECIMAL_FIXED'),
+  setHiddenColumns: factory<HiddenColumns>('SET_HIDDEN_COLUMNS'),
 };

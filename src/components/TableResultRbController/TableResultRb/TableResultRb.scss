@@ -2,7 +2,7 @@
   height: 100%;
 
   .TableCell_isHeader {
-    min-width: 120px;
+    min-width: 80px;
 
     font-size: var(--size-text-xs);
     font-weight: 400;
@@ -10,6 +10,12 @@
     text-transform: inherit;
 
     color: var(--color-typo-primary);
+
+    &:nth-child(6) {
+      & > div {
+        padding-right: 48px;
+      }
+    }
   }
 
   .TableCell:not(.TableCell_isHeader) {

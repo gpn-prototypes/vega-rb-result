@@ -20,6 +20,7 @@ import './TableResultRb.scss';
 interface Props {
   rows: Row<RbDomainEntityInput>[];
   columns: Column<RbDomainEntityInput>[];
+  actualColumns: Column<RbDomainEntityInput>[];
   filter: TreeFilter;
 }
 
@@ -67,7 +68,12 @@ const menuItems = (): MenuContextItem[] => [
   },
 ];
 
-export const TableResultRb: React.FC<Props> = ({ rows, columns, filter }) => {
+export const TableResultRb: React.FC<Props> = ({
+  rows,
+  columns,
+  actualColumns,
+  filter,
+}) => {
   const dispatch = useDispatch();
   const rowRef = useRef(null);
   const [filteredRows, setFilteredRows] =
@@ -100,15 +106,15 @@ export const TableResultRb: React.FC<Props> = ({ rows, columns, filter }) => {
    */
   useEffect(() => {
     let filteredRowsData = rows;
-    let filteredColumnsData = columns;
+    let filteredColumnsData = actualColumns;
 
     if (filter?.columnKeys?.length > 0 && filter?.rowsIdx?.length > 0) {
-      filteredColumnsData = columns.filter(
+      filteredColumnsData = filteredColumnsData.filter(
         (column: Column<RbDomainEntityInput>) =>
           !filter.columnKeys.includes(column.accessor),
       );
 
-      filteredRowsData = rows.filter(
+      filteredRowsData = filteredRowsData.filter(
         (row: Row<RbDomainEntityInput>, index: number) => {
           return filter.rowsIdx.includes(index);
         },
@@ -132,7 +138,15 @@ export const TableResultRb: React.FC<Props> = ({ rows, columns, filter }) => {
 
     setFilteredRows(filteredRowsData);
     setFilteredColumns(filteredColumnsData);
-  }, [filter, rows, columns, fluidType, setFilteredRows, setFilteredColumns]);
+  }, [
+    filter,
+    rows,
+    columns,
+    actualColumns,
+    fluidType,
+    setFilteredRows,
+    setFilteredColumns,
+  ]);
 
   /** Отлавливаем активный класс */
   useEffect(() => {

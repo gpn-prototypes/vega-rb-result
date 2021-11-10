@@ -19,7 +19,8 @@ export const Table: React.FC = () => {
     setIsLoading(true);
 
     loadTableData(dispatch)
-      .catch(() => {
+      .catch((e) => {
+        console.error('Error when load table data', e);
         /** Придумать механизм редиректа между проектами */
         history.push(window.location.pathname.replace('/rb-result', '/rb'));
       })
@@ -30,11 +31,12 @@ export const Table: React.FC = () => {
     };
   });
 
-  return isLoading ? (
+  return isLoading || !reduxTableData.actualColumns ? (
     <Loader />
   ) : (
     <TableResultRb
       columns={reduxTableData.columns}
+      actualColumns={reduxTableData.actualColumns}
       rows={reduxTableData.rows}
       filter={filterData}
     />

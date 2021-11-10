@@ -12,6 +12,8 @@ export namespace Chart {
     yScale: ScaleLinear<number, number>;
     y1Scale: ScaleLinear<number, number>;
     y2Scale: ScaleLinear<number, number>;
+    probabilityDensityXScale: ScaleLinear<number, number, never>;
+    probabilityDensityYScale: ScaleLinear<number, number, never>;
   }
 
   export interface MainAxis {
@@ -27,6 +29,7 @@ export namespace Chart {
   export interface GetScaleArguments {
     bins: Bin<number, number>[];
     numberOfIterationBin: number[];
+    pdf: DrawHelper.Point[];
   }
 
   export interface GetMainAxisArguments {
@@ -39,7 +42,6 @@ export namespace Chart {
     y1Scale: ScaleLinear<number, number>;
     y2Scale: ScaleLinear<number, number>;
     payload: Chart.Payload;
-    numberOfIterationBin: number[];
   }
 
   export interface DrawHistogramArguments {
@@ -54,6 +56,13 @@ export namespace Chart {
     percentiles: number[];
     xScale: ScaleLinear<number, number>;
     y1Scale: ScaleLinear<number, number>;
+  }
+
+  export interface DrawSurvivalLineArguments {
+    svg: Selection<null, unknown, null, undefined>;
+    pdf: DrawHelper.Point[];
+    probabilityDensityXScale: ScaleLinear<number, number, never>;
+    probabilityDensityYScale: ScaleLinear<number, number, never>;
   }
 
   export interface Margin {
@@ -73,10 +82,12 @@ export namespace Chart {
   export const Width = 545;
   export const DefaultHeight = 279;
   export const Height = 279;
+  export const DefaultY2TickCount = 5;
 
   export const getScales = ({
     bins,
     numberOfIterationBin,
+    pdf,
   }: GetScaleArguments): Scale => {
     const xScale: ScaleLinear<number, number> = d3
       .scaleLinear()
@@ -94,15 +105,45 @@ export namespace Chart {
       .domain([0, 1])
       .range([Height - Margin.bottom, Margin.top]);
 
+    const step = Math.round(numberOfIterationBin.length / 5);
+    const normalizedBin: number[] = Array(5)
+      .fill(1)
+      .map((_, index) => {
+        const currentBin = numberOfIterationBin[index * step];
+        return currentBin <= 1000 ? 1000 : Math.round(currentBin / 1000) * 1000;
+      });
+
     const y2Scale: ScaleLinear<number, number> = d3
       .scaleLinear()
-      .domain([
-        d3.min(numberOfIterationBin) || 0,
-        d3.max(numberOfIterationBin) || 0,
-      ])
+      .domain([d3.min(normalizedBin) || 0, d3.max(normalizedBin) || 0])
       .range([Height - Margin.bottom, Margin.top]);
 
-    return { xScale, yScale, y1Scale, y2Scale };
+    const probabilityDensityXScale = DrawHelper.getScale(
+      DrawHelper.getDomain(pdf, DrawHelper.getX),
+      DrawHelper.xScalePosition({
+        left: Chart.Margin.left,
+        right: Chart.Margin.right,
+        width: Chart.Width,
+      }),
+    );
+
+    const probabilityDensityYScale = DrawHelper.getScale(
+      DrawHelper.getDomain(pdf, DrawHelper.getY),
+      DrawHelper.yScalePosition({
+        top: Chart.Margin.top,
+        bottom: Chart.Margin.bottom,
+        height: Chart.Height,
+      }),
+    );
+
+    return {
+      xScale,
+      yScale,
+      y1Scale,
+      y2Scale,
+      probabilityDensityXScale,
+      probabilityDensityYScale,
+    };
   };
 
   export const getMainAxis = ({
@@ -155,7 +196,6 @@ export namespace Chart {
     y1Scale,
     y2Scale,
     payload,
-    numberOfIterationBin,
   }: GetDummyAxisArguments): DummyAxis => {
     const y1Axis = (g) =>
       g
@@ -179,7 +219,7 @@ export namespace Chart {
         .call(
           d3
             .axisRight(y2Scale)
-            .ticks(numberOfIterationBin.length)
+            .ticks(DefaultY2TickCount)
             .tickSize(-(Width - Margin.left - Margin.right)),
         )
         .call((innerG) => innerG.select('.domain').remove())
@@ -262,7 +302,6 @@ export namespace Chart {
       .selectAll('text')
       .data(payload)
       .join('text')
-      .attr('class', 'chart__text')
       .attr('dy', '0.35em')
       .attr('x', (d: any) => xScale(d.x) + 34)
       .attr('y', (d: any) => y1Scale(d.y))
@@ -280,5 +319,75 @@ export namespace Chart {
       x: index * stepPerSample,
       y: currentCdf,
     }));
+  };
+
+  export const DrawSurvivalLine = ({
+    probabilityDensityXScale,
+    probabilityDensityYScale,
+    svg,
+    pdf,
+  }: DrawSurvivalLineArguments): void => {
+    const area = d3
+      .area<DrawHelper.Point>()
+      .x((d) => probabilityDensityXScale(DrawHelper.getX(d)) as number)
+      .y0(Chart.Height)
+      .y1((d) => probabilityDensityYScale(DrawHelper.getY(d)) as number);
+
+    const graphArea = svg.append('g');
+    const defs = svg.append('defs');
+
+    const bgGradient = defs
+      .append('linearGradient')
+      .attr('id', `main-content-bg-gradient`)
+      .attr('gradientTransform', 'rotate(90)');
+
+    bgGradient
+      .append('stop')
+      .attr('stop-color', 'rgba(41, 176, 255, 0.4)')
+      .attr('offset', '0%');
+    bgGradient
+      .append('stop')
+      .attr('stop-color', 'rgba(64,112,140,0)')
+      .attr('offset', '100%');
+
+    defs
+      .append('clipPath')
+      .attr('id', `main-content-clip-line-path`)
+      .append('path')
+      .attr('d', area(pdf) as string)
+      .attr('class', 'value-line');
+    console.log(pdf, area(pdf));
+    const clipPath = graphArea
+      .append('g')
+      .attr('clip-path', `url(#main-content-clip-line-path)`);
+
+    clipPath
+      .append('rect')
+      .attr('x', 0)
+      .attr('y', 0)
+      .attr('width', Chart.Width)
+      .attr('height', Chart.Height)
+      .style('fill', 'url(#main-content-bg-gradient)');
+
+    graphArea
+      .append('path')
+      .attr('class', 'pdfLine')
+      .datum(pdf)
+      .attr('fill', 'none')
+      .attr('stroke', '#0AA5FF')
+      .call((g) =>
+        g
+          .selectAll('.tick:not(:first-of-type) line')
+          .attr('stroke-opacity', 0.5)
+          .attr('stroke-dasharray', '2,2'),
+      )
+      .attr('stroke-width', 2)
+      .attr(
+        'd',
+        d3
+          .line<DrawHelper.Point>()
+          .x((d) => probabilityDensityXScale(DrawHelper.getX(d)) as number)
+          .y((d) => probabilityDensityYScale(DrawHelper.getY(d)) as number),
+      );
   };
 }

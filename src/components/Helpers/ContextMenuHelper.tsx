@@ -152,7 +152,7 @@ export const CustomContextMenu: React.FC<ContextMenuProps> = ({
                 onChange={handleInputChange}
                 value={inputValue}
                 size="s"
-                min={1}
+                min={25}
                 max={99}
               />
 

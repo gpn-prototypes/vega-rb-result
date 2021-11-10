@@ -3,4 +3,5 @@ export enum LocalStorageKey {
   ShowHistogram = 'ShowHistogram',
   OpenSensitiveAnalysis = 'OpenSensitiveAnalysis',
   ResultId = 'ResultId',
+  HiddenColumns = 'HiddenColumns',
 }

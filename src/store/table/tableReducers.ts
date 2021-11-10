@@ -9,6 +9,7 @@ import {
   DecimalFixed,
   GridActiveRow,
   GridCollection,
+  HiddenColumns,
 } from '@app/types/typesTable';
 import { LocalStorageHelper } from '@app/utils/LocalStorageHelper';
 import { reducerWithInitialState } from 'typescript-fsa-reducers';
@@ -21,16 +22,22 @@ import {
 const decimalFromLocalStorage: DecimalFixed | null =
   LocalStorageHelper.getParsed<DecimalFixed>(LocalStorageKey.DecimalFixed);
 
+const hiddenColumnsFromLocalStorage: HiddenColumns | null =
+  LocalStorageHelper.getParsed<HiddenColumns>(LocalStorageKey.HiddenColumns);
+
 export const DEFAULT_DECIMAL_FIXED = 3;
 
 export const tableInitialState: GridCollection = {
   columns: [],
+  actualColumns: [],
   rows: [],
   version: 0,
   activeRow: undefined,
   sidebarRow: undefined,
   fluidType: EFluidType.ALL,
   decimalFixed: decimalFromLocalStorage !== null ? decimalFromLocalStorage : {},
+  hiddenColumns:
+    hiddenColumnsFromLocalStorage !== null ? hiddenColumnsFromLocalStorage : {},
 };
 
 export const getDecimalRows = (
@@ -84,18 +91,57 @@ export const getDecimalByColumns = (
   return decimalFixed;
 };
 
+export const getActualColumns = (
+  state: GridCollection,
+  payload: HiddenColumns = hiddenColumnsFromLocalStorage,
+): Column<RbDomainEntityInput>[] => {
+  const findColumnByAccessor = (
+    accessor: string,
+  ): Column<RbDomainEntityInput> | undefined => {
+    const found = state.columns.find(
+      (column: Column<RbDomainEntityInput>) => column.accessor === accessor,
+    );
+
+    if (found === undefined) {
+      return undefined;
+    }
+
+    return found;
+  };
+
+  let actualColumns = [...state.columns];
+
+  Object.keys(payload).forEach((key: string) => {
+    if (payload[key] === true) {
+      const hiddenColumnsGroup = findColumnByAccessor(key)?.columnAccessorGroup;
+
+      actualColumns = actualColumns.filter(
+        (column: Column<RbDomainEntityInput>) => {
+          return !hiddenColumnsGroup?.includes(column.accessor);
+        },
+      );
+    }
+  });
+
+  return actualColumns;
+};
+
 export const TableReducers = reducerWithInitialState<GridCollection>(
   tableInitialState,
 )
   .case(TableActions.resetState, () => tableInitialState)
   .case(
     TableActions.initState,
-    (state: GridCollection, payload: GridCollection) => ({
-      ...state,
-      rows: payload.rows,
-      columns: payload.columns,
-      version: payload.version,
-    }),
+    (state: GridCollection, payload: GridCollection) => {
+      console.log(222);
+      return {
+        ...state,
+        rows: payload.rows,
+        columns: payload.columns,
+        actualColumns: getActualColumns(payload),
+        version: payload.version,
+      };
+    },
   )
   .case(
     TableActions.setActiveRow,
@@ -135,8 +181,9 @@ export const TableReducers = reducerWithInitialState<GridCollection>(
 
       /** Получаем из localstorage, либо из данных таблицы */
       const value =
-        decimalFixed[payload.columnCode] ||
-        getDecimalByColumns(state.columns)[payload.columnCode];
+        decimalFixed[payload.columnCode] !== undefined
+          ? decimalFixed[payload.columnCode]
+          : getDecimalByColumns(state.columns)[payload.columnCode];
 
       decimalFixed[payload.columnCode] =
         payload.type === 'plus' ? value + 1 : value - 1;
@@ -150,6 +197,21 @@ export const TableReducers = reducerWithInitialState<GridCollection>(
         ...state,
         decimalFixed,
         rows: getDecimalRows(state.rows, decimalFixed),
+      };
+    },
+  )
+  .case(
+    TableActions.setHiddenColumns,
+    (state: GridCollection, payload: HiddenColumns) => {
+      LocalStorageHelper.setParsed<HiddenColumns>(
+        LocalStorageKey.HiddenColumns,
+        payload,
+      );
+
+      return {
+        ...state,
+        actualColumns: getActualColumns(state, payload),
+        hiddenColumns: payload,
       };
     },
   );

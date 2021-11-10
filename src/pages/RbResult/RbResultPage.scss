@@ -1,3 +1,11 @@
+.main {
+  overflow-x: hidden;
+
+  & > div {
+    display: block !important;
+  }
+}
+
 .RbResultPage {
   position: relative;
 
@@ -78,7 +86,7 @@
   }
 
   &__table {
-    height: 470px;
+    height: 430px;
 
     &_full {
       height: calc(100vh - 100px);

@@ -7,6 +7,7 @@ import { loadHistogramData } from '@app/services/histogramService';
 import histogramDuck from '@app/store/histogramDuck';
 import { RootState } from '@app/store/types';
 import { GridActiveRow, GridCollection } from '@app/types/typesTable';
+import { Text } from '@consta/uikit/Text';
 import { Loader, useMount } from '@gpn-prototypes/vega-ui';
 
 import ChartComponent from './chart/Chart';
@@ -48,6 +49,9 @@ export const HistogramComponent: React.FC<Props> = ({ grid }) => {
   );
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [previousNumberOfRows, setPreviousNumberOfRows] = useState<number>(
+    DEFAULT_NUMBER_OF_ROWS,
+  );
   const [isShowStatistic, setIsShowStatistic] = useState<boolean>(false);
   const [numberOfRows, setNumberOfRows] = useState<number>(
     DEFAULT_NUMBER_OF_ROWS,
@@ -63,7 +67,7 @@ export const HistogramComponent: React.FC<Props> = ({ grid }) => {
     loadHistogramData(
       dispatch,
       [String((grid.rows[0][grid.columns[0].accessor] as any)?.value)],
-      DEFAULT_NUMBER_OF_ROWS,
+      numberOfRows,
     ).then(() => setIsLoading(false));
 
     return () => {
@@ -74,27 +78,35 @@ export const HistogramComponent: React.FC<Props> = ({ grid }) => {
   const loadData = useCallback(
     (innerActiveRow: GridActiveRow | undefined) => {
       if (
-        innerActiveRow?.title &&
-        previousActiveRow?.title !== innerActiveRow.title
+        innerActiveRow?.code === previousActiveRow?.code &&
+        numberOfRows === previousNumberOfRows
       ) {
-        setIsLoading(true);
-
-        loadHistogramData(
-          dispatch,
-          innerActiveRow.title.split(','),
-          numberOfRows,
-        ).then(() => {
-          setIsLoading(false);
-
-          setPreviousActiveRow(innerActiveRow);
-        });
+        return;
       }
+
+      setIsLoading(true);
+
+      loadHistogramData(
+        dispatch,
+        innerActiveRow
+          ? innerActiveRow.title.split(',')
+          : [String((grid.rows[0][grid.columns[0].accessor] as any)?.value)],
+        numberOfRows,
+      ).then(() => {
+        setIsLoading(false);
+
+        setPreviousActiveRow(innerActiveRow);
+        setPreviousNumberOfRows(numberOfRows);
+      });
     },
     [
       numberOfRows,
+      previousNumberOfRows,
       previousActiveRow,
+      grid,
       dispatch,
       setIsLoading,
+      setPreviousNumberOfRows,
       setPreviousActiveRow,
     ],
   );
@@ -150,27 +162,43 @@ export const HistogramComponent: React.FC<Props> = ({ grid }) => {
     </div>
   );
 
+  const topContent =
+    histogramsPayload?.length > 0 ? (
+      <div>
+        <div>
+          <VerticalMoreContextMenu
+            menuItems={() => (() => menuItems)()}
+            title="Гистограмма запасов"
+            onChange={handleChange}
+            onClick={handleClick}
+          />
+        </div>
+        {histograms}
+      </div>
+    ) : (
+      <Text>Данные не найдены</Text>
+    );
+
+  const statistic = isShowStatistic && (
+    <div className="histogram__statistic-wrapper">
+      <div className="histogram__statistic">
+        <HistogramStatisticComponent />
+      </div>
+
+      <div className="histogram__statistic">
+        <HistogramStatisticComponent />
+      </div>
+    </div>
+  );
+
   return (
     <div className="histogram">
-      <div>
-        <VerticalMoreContextMenu
-          menuItems={() => (() => menuItems)()}
-          title="Гистограмма запасов"
-          onChange={handleChange}
-          onClick={handleClick}
-        />
-      </div>
-      {isLoading ? <Loader className="histogram__loader" /> : histograms}
-
-      {isShowStatistic && (
-        <div className="histogram__statistic-wrapper">
-          <div className="histogram__statistic">
-            <HistogramStatisticComponent />
-          </div>
-
-          <div className="histogram__statistic">
-            <HistogramStatisticComponent />
-          </div>
+      {isLoading ? (
+        <Loader className="histogram__loader" />
+      ) : (
+        <div>
+          {topContent}
+          {statistic}
         </div>
       )}
     </div>

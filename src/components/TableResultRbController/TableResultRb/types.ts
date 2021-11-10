@@ -1,5 +1,5 @@
 import { RbDomainEntityInput, Visible } from '@app/generated/graphql';
-import { TableRow } from '@consta/uikit/Table';
+import { TableControl, TableRow } from '@consta/uikit/Table';
 
 export interface Column<T = any> {
   sortable?: boolean;
@@ -11,9 +11,12 @@ export interface Column<T = any> {
   align?: 'left' | 'right';
   visible?: Visible;
   geoType?: string;
+  isRisk?: boolean;
   decimal?: number;
   width?: number;
   getComparisonValue?: (row: Row[Column['accessor']]) => string;
+  control?: ({ column }: TableControl<any>) => React.ReactNode;
+  columnAccessorGroup?: (keyof RbDomainEntityInput | 'id')[];
 }
 
 export type Row<T = any> = TableRow &
