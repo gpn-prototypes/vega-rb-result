@@ -304,7 +304,7 @@ export namespace Chart {
       .data(payload)
       .join('text')
       .attr('dy', '0.35em')
-      .attr('x', (d: any) => xScale(d.x) + 34)
+      .attr('x', (d: any) => xScale(d.x))
       .attr('y', (d: any) => y1Scale(d.y))
       .text((d: any) => String(d.x).split('.')[0]);
   };

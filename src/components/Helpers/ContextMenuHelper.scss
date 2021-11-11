@@ -39,9 +39,9 @@
     font-size: 14px;
     line-height: 20px;
 
-    color: var(--color-typo-primary);
-
     cursor: pointer;
+
+    color: var(--color-typo-primary);
   }
 
   &__left {
@@ -49,9 +49,9 @@
   }
 
   &__disabled {
-    color: var(--color-control-typo-disable);
-
     pointer-events: none;
+
+    color: var(--color-control-typo-disable);
   }
 
   &__switch {

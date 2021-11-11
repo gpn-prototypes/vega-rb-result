@@ -10,8 +10,6 @@ import { IconRemove } from '@consta/uikit/IconRemove';
 
 import { Column } from '../TableResultRbController/TableResultRb/types';
 
-import './ColumnExpanderComponent.scss';
-
 interface Props {
   column: Column<RbDomainEntityInput>;
 }

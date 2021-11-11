@@ -49,16 +49,16 @@
     padding-top: var(--space-l);
     padding-left: var(--size-text-m);
 
-    min-width: 1210px;
-
     display: flex;
+
+    min-width: 1210px;
 
     &_hide {
       display: none;
     }
   }
 
-  &__table {
+  &__table-content {
     min-width: 1210px;
   }
 
@@ -78,17 +78,17 @@
   }
 
   &__icon {
-    cursor: pointer;
-
     margin-left: var(--space-m);
+
+    cursor: pointer;
   }
 
   &__top {
+    margin: var(--space-s) var(--space-m);
+
     display: flex;
     justify-content: space-between;
     align-items: center;
-
-    margin: var(--space-s) var(--space-m);
   }
 
   &__table {
