@@ -63,6 +63,7 @@ export namespace Chart {
     pdf: DrawHelper.Point[];
     probabilityDensityXScale: ScaleLinear<number, number, never>;
     probabilityDensityYScale: ScaleLinear<number, number, never>;
+    id: string;
   }
 
   export interface Margin {
@@ -326,6 +327,7 @@ export namespace Chart {
     probabilityDensityYScale,
     svg,
     pdf,
+    id,
   }: DrawSurvivalLineArguments): void => {
     const area = d3
       .area<DrawHelper.Point>()
@@ -338,7 +340,7 @@ export namespace Chart {
 
     const bgGradient = defs
       .append('linearGradient')
-      .attr('id', `main-content-bg-gradient`)
+      .attr('id', `main-content-bg-gradient_${id}`)
       .attr('gradientTransform', 'rotate(90)');
 
     bgGradient
@@ -352,14 +354,14 @@ export namespace Chart {
 
     defs
       .append('clipPath')
-      .attr('id', `main-content-clip-line-path`)
+      .attr('id', `main-content-clip-line-path_${id}`)
       .append('path')
       .attr('d', area(pdf) as string)
       .attr('class', 'value-line');
-    console.log(pdf, area(pdf));
+
     const clipPath = graphArea
       .append('g')
-      .attr('clip-path', `url(#main-content-clip-line-path)`);
+      .attr('clip-path', `url(#main-content-clip-line-path_${id})`);
 
     clipPath
       .append('rect')
@@ -367,7 +369,7 @@ export namespace Chart {
       .attr('y', 0)
       .attr('width', Chart.Width)
       .attr('height', Chart.Height)
-      .style('fill', 'url(#main-content-bg-gradient)');
+      .style('fill', `url(#main-content-bg-gradient_${id})`);
 
     graphArea
       .append('path')

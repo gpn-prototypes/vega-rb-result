@@ -1,9 +1,9 @@
 .main {
   overflow-x: hidden;
 
-  & > div {
-    display: block !important;
-  }
+  // & > div {
+  //   display: block !important;
+  // }
 }
 
 .RbResultPage {
@@ -49,11 +49,17 @@
     padding-top: var(--space-l);
     padding-left: var(--size-text-m);
 
+    min-width: 1210px;
+
     display: flex;
 
     &_hide {
       display: none;
     }
+  }
+
+  &__table {
+    min-width: 1210px;
   }
 
   &__analysis {

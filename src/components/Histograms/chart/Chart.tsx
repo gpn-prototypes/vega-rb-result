@@ -8,7 +8,9 @@ import { Chart } from './drawUtils';
 
 import './Chart.scss';
 
-const ChartComponent: React.FC<Histogram & { numberOfRows: number }> = ({
+const ChartComponent: React.FC<
+  Histogram & { numberOfRows: number; id: string }
+> = ({
   title,
   subtitle,
   percentiles,
@@ -16,6 +18,7 @@ const ChartComponent: React.FC<Histogram & { numberOfRows: number }> = ({
   numberOfIterationBin,
   numberOfRows,
   cdf,
+  id,
 }) => {
   const d3Container = useRef(null);
 
@@ -72,6 +75,7 @@ const ChartComponent: React.FC<Histogram & { numberOfRows: number }> = ({
       probabilityDensityYScale,
       svg,
       pdf,
+      id,
     });
 
     /** Добавляем все оси на гистограмму */
@@ -85,7 +89,7 @@ const ChartComponent: React.FC<Histogram & { numberOfRows: number }> = ({
 
     /** Рисуем фиктивную ось Y, справа */
     svg.append('g').call(y2Axis);
-  }, [sample, percentiles, numberOfIterationBin, numberOfRows, cdf]);
+  }, [sample, percentiles, numberOfIterationBin, numberOfRows, cdf, id]);
 
   useEffect(() => {
     if (d3Container.current) {

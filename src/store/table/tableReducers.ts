@@ -133,7 +133,6 @@ export const TableReducers = reducerWithInitialState<GridCollection>(
   .case(
     TableActions.initState,
     (state: GridCollection, payload: GridCollection) => {
-      console.log(222);
       return {
         ...state,
         rows: payload.rows,

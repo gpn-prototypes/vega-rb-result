@@ -78,7 +78,7 @@ export const HistogramComponent: React.FC<Props> = ({ grid }) => {
   const loadData = useCallback(
     (innerActiveRow: GridActiveRow | undefined) => {
       if (
-        innerActiveRow?.code === previousActiveRow?.code &&
+        innerActiveRow?.title === previousActiveRow?.title &&
         numberOfRows === previousNumberOfRows
       ) {
         return;
@@ -146,7 +146,7 @@ export const HistogramComponent: React.FC<Props> = ({ grid }) => {
 
   const histograms = (
     <div className="histogram__content">
-      {histogramsPayload?.map((histogram: Histogram) => {
+      {histogramsPayload?.map((histogram: Histogram, index: number) => {
         return (
           <ChartComponent
             title={histogram.title}
@@ -156,6 +156,7 @@ export const HistogramComponent: React.FC<Props> = ({ grid }) => {
             numberOfIterationBin={histogram.numberOfIterationBin}
             cdf={histogram.cdf}
             numberOfRows={numberOfRows}
+            id={index.toString()}
           />
         );
       })}

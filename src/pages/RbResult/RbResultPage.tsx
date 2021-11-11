@@ -205,7 +205,7 @@ const RbResultPage: React.FC = () => {
             <SplitPanes.Pane aria-label="table">
               <div className="content">
                 <div>
-                  <div>
+                  <div className="result__table">
                     <div className="result__top">
                       <ChoiceGroup
                         value={fluidType}
