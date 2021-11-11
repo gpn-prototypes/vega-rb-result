@@ -4,13 +4,10 @@ import histogramDuck from '@app/store/histogramDuck';
 
 export async function loadHistogramData(
   dispatch: Dispatch<unknown>,
-  domainEntityCodes: string[],
   domainEntityNames: string[],
+  bins: number,
 ): Promise<void> {
-  const data = await projectService.getHistogramData(
-    domainEntityCodes,
-    domainEntityNames,
-  );
+  const data = await projectService.getHistogramData(domainEntityNames, bins);
 
   if (data) {
     dispatch(

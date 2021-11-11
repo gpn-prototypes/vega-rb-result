@@ -154,26 +154,19 @@ export const GET_TABLE_TEMPLATE = gql`
 `;
 
 export const GET_HISTOGRAM_RESULT_RB = gql`
-  query GetTableResultRb(
-    $projectId: ID!
-    $domainEntityCodes: [ID!]
-    $domainEntityNames: [String!]
-  ) {
+  query GetTableResultRb($domainEntityNames: [String!], $bins: Int) {
     project {
       resourceBase {
         result {
           histograms {
-            getHistograms(
-              projectId: $projectId
-              domainEntityCodes: $domainEntityCodes
-              domainEntityNames: $domainEntityNames
-            ) {
+            getHistograms(domainEntityNames: $domainEntityNames, bins: $bins) {
               histograms {
                 title
                 subtitle
                 percentiles
                 sample
                 numberOfIterationBin
+                cdf
               }
             }
           }
@@ -184,15 +177,12 @@ export const GET_HISTOGRAM_RESULT_RB = gql`
 `;
 
 export const GET_SENSITIVE_ANALYSIS_RESULT_RB = gql`
-  query GetTableResultRb($projectId: ID!, $domainEntityNames: [String!]) {
+  query GetTableResultRb($domainEntityNames: [String!]) {
     project {
       resourceBase {
         result {
           histograms {
-            getSensitivityAnalysis(
-              projectId: $projectId
-              domainEntityNames: $domainEntityNames
-            ) {
+            getSensitivityAnalysis(domainEntityNames: $domainEntityNames) {
               title
               names
               sample
@@ -207,15 +197,12 @@ export const GET_SENSITIVE_ANALYSIS_RESULT_RB = gql`
 `;
 
 export const GET_SENSITIVE_ANALYSIS_STATISTIC_RESULT_RB = gql`
-  query GetTableResultRb($projectId: ID!, $domainEntityNames: [String!]) {
+  query GetTableResultRb($domainEntityNames: [String!]) {
     project {
       resourceBase {
         result {
           histograms {
-            getSensitivityAnalysis(
-              projectId: $projectId
-              domainEntityNames: $domainEntityNames
-            ) {
+            getSensitivityAnalysis(domainEntityNames: $domainEntityNames) {
               title
               names
               sample
@@ -235,7 +222,7 @@ export const GET_TABLE_RESULT_RB = gql`
       resourceBase {
         result {
           resultTable {
-            template(projectId: "project_id") {
+            template {
               domainEntities {
                 code
                 name
@@ -250,6 +237,8 @@ export const GET_TABLE_RESULT_RB = gql`
                 name
                 shortName
                 units
+                geoType
+                decimal
                 visible {
                   calc
                   table

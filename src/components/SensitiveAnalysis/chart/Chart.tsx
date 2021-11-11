@@ -52,9 +52,7 @@ export const SensitiveAnalysisChartComponent: React.FC<
       percentale.forEach((percent: number, innerIndex: number) => {
         data.push({
           name: names[index],
-          /** Для показа множу маленькие значения */
-          value: percent < 100 ? percent * 1000 : percent,
-          // value: percent,
+          value: percent,
           category: innerIndex === 0 ? 0 : 1,
         });
       });

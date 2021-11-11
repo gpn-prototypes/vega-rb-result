@@ -7,7 +7,7 @@ import {
   loadSensitiveAnalysisStatistic,
 } from '@app/services/sensitiveAnalysisService';
 import sensitiveAnalysisDuck from '@app/store/sensitiveAnalysisDuck';
-import tableDuck from '@app/store/tableDuck';
+import { TableActions } from '@app/store/table/tableActions';
 import { RootState } from '@app/store/types';
 import { GridActiveRow } from '@app/types/typesTable';
 import { Button } from '@consta/uikit/Button';
@@ -60,7 +60,7 @@ export const SensitiveAnalysisComponent: React.FC<Props> = ({ sidebarRow }) => {
 
     return () => {
       dispatch(sensitiveAnalysisDuck.actions.resetState());
-      dispatch(tableDuck.actions.resetSidebarRow());
+      dispatch(TableActions.resetSidebarRow());
     };
   });
 
@@ -107,7 +107,7 @@ export const SensitiveAnalysisComponent: React.FC<Props> = ({ sidebarRow }) => {
   };
 
   const handleClose = () => {
-    dispatch(tableDuck.actions.resetSidebarRow());
+    dispatch(TableActions.resetSidebarRow());
   };
 
   const getAvailableNames = (): string[] => {
@@ -155,7 +155,7 @@ export const SensitiveAnalysisComponent: React.FC<Props> = ({ sidebarRow }) => {
         {/* График */}
         <div className="sensitive-analysis__title">
           <VerticalMoreContextMenu
-            menuItems={menuItems}
+            menuItems={() => (() => menuItems)()}
             title="Анализ чувствительности"
             onChange={handleChange}
             onClick={handleClick}

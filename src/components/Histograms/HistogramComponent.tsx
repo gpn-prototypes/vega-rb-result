@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { VerticalMoreContextMenu } from '@app/components/Helpers/ContextMenuHelper';
 import { Histogram } from '@app/generated/graphql';
@@ -7,6 +7,7 @@ import { loadHistogramData } from '@app/services/histogramService';
 import histogramDuck from '@app/store/histogramDuck';
 import { RootState } from '@app/store/types';
 import { GridActiveRow, GridCollection } from '@app/types/typesTable';
+import { Text } from '@consta/uikit/Text';
 import { Loader, useMount } from '@gpn-prototypes/vega-ui';
 
 import ChartComponent from './chart/Chart';
@@ -48,6 +49,9 @@ export const HistogramComponent: React.FC<Props> = ({ grid }) => {
   );
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [previousNumberOfRows, setPreviousNumberOfRows] = useState<number>(
+    DEFAULT_NUMBER_OF_ROWS,
+  );
   const [isShowStatistic, setIsShowStatistic] = useState<boolean>(false);
   const [numberOfRows, setNumberOfRows] = useState<number>(
     DEFAULT_NUMBER_OF_ROWS,
@@ -62,8 +66,8 @@ export const HistogramComponent: React.FC<Props> = ({ grid }) => {
   useMount(() => {
     loadHistogramData(
       dispatch,
-      [grid.columns[0].accessor],
-      [String(grid.rows[0][grid.columns[0].accessor])],
+      [String((grid.rows[0][grid.columns[0].accessor] as any)?.value)],
+      numberOfRows,
     ).then(() => setIsLoading(false));
 
     return () => {
@@ -71,22 +75,46 @@ export const HistogramComponent: React.FC<Props> = ({ grid }) => {
     };
   });
 
-  /** Отлавливаем выбор ячейки, выбор ячейки происходит по клику на таблице и по клику по ноде в дереве */
-  useEffect(() => {
-    if (activeRow?.code && previousActiveRow?.code !== activeRow.code) {
+  const loadData = useCallback(
+    (innerActiveRow: GridActiveRow | undefined) => {
+      if (
+        innerActiveRow?.title === previousActiveRow?.title &&
+        numberOfRows === previousNumberOfRows
+      ) {
+        return;
+      }
+
       setIsLoading(true);
 
       loadHistogramData(
         dispatch,
-        activeRow.code.split(','),
-        activeRow.title.split(','),
+        innerActiveRow
+          ? innerActiveRow.title.split(',')
+          : [String((grid.rows[0][grid.columns[0].accessor] as any)?.value)],
+        numberOfRows,
       ).then(() => {
         setIsLoading(false);
 
-        setPreviousActiveRow(activeRow);
+        setPreviousActiveRow(innerActiveRow);
+        setPreviousNumberOfRows(numberOfRows);
       });
-    }
-  }, [activeRow, previousActiveRow, dispatch, setPreviousActiveRow]);
+    },
+    [
+      numberOfRows,
+      previousNumberOfRows,
+      previousActiveRow,
+      grid,
+      dispatch,
+      setIsLoading,
+      setPreviousNumberOfRows,
+      setPreviousActiveRow,
+    ],
+  );
+
+  /** Отлавливаем выбор ячейки, выбор ячейки происходит по клику на таблице и по клику по ноде в дереве */
+  useEffect(() => {
+    loadData(activeRow);
+  }, [activeRow, loadData]);
 
   const handleChange = (item: MenuContextItem) => {
     if (item.code === 'stat') {
@@ -107,6 +135,8 @@ export const HistogramComponent: React.FC<Props> = ({ grid }) => {
 
     if (item.code === 'numberOfRows') {
       setNumberOfRows(item.choice?.value || DEFAULT_NUMBER_OF_ROWS);
+
+      loadData(activeRow);
     }
   };
 
@@ -116,7 +146,7 @@ export const HistogramComponent: React.FC<Props> = ({ grid }) => {
 
   const histograms = (
     <div className="histogram__content">
-      {histogramsPayload?.map((histogram: Histogram) => {
+      {histogramsPayload?.map((histogram: Histogram, index: number) => {
         return (
           <ChartComponent
             title={histogram.title}
@@ -124,34 +154,52 @@ export const HistogramComponent: React.FC<Props> = ({ grid }) => {
             percentiles={histogram.percentiles}
             sample={histogram.sample}
             numberOfIterationBin={histogram.numberOfIterationBin}
+            cdf={histogram.cdf}
             numberOfRows={numberOfRows}
+            id={index.toString()}
           />
         );
       })}
     </div>
   );
 
+  const topContent =
+    histogramsPayload?.length > 0 ? (
+      <div>
+        <div>
+          <VerticalMoreContextMenu
+            menuItems={() => (() => menuItems)()}
+            title="Гистограмма запасов"
+            onChange={handleChange}
+            onClick={handleClick}
+          />
+        </div>
+        {histograms}
+      </div>
+    ) : (
+      <Text>Данные не найдены</Text>
+    );
+
+  const statistic = isShowStatistic && (
+    <div className="histogram__statistic-wrapper">
+      <div className="histogram__statistic">
+        <HistogramStatisticComponent />
+      </div>
+
+      <div className="histogram__statistic">
+        <HistogramStatisticComponent />
+      </div>
+    </div>
+  );
+
   return (
     <div className="histogram">
-      <div>
-        <VerticalMoreContextMenu
-          menuItems={menuItems}
-          title="Гистограмма запасов"
-          onChange={handleChange}
-          onClick={handleClick}
-        />
-      </div>
-      {isLoading ? <Loader className="histogram__loader" /> : histograms}
-
-      {isShowStatistic && (
-        <div className="histogram__statistic-wrapper">
-          <div className="histogram__statistic">
-            <HistogramStatisticComponent />
-          </div>
-
-          <div className="histogram__statistic">
-            <HistogramStatisticComponent />
-          </div>
+      {isLoading ? (
+        <Loader className="histogram__loader" />
+      ) : (
+        <div>
+          {topContent}
+          {statistic}
         </div>
       )}
     </div>

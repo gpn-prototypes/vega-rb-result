@@ -97,13 +97,19 @@ export interface GridActiveRow {
   title: string;
 }
 
+export type DecimalFixed = Record<string, number>;
+export type HiddenColumns = Record<string, boolean>;
+
 export interface GridCollection {
   columns: Column<RbDomainEntityInput>[];
+  actualColumns?: Column<RbDomainEntityInput>[];
   rows: Row<RbDomainEntityInput>[];
   version: number;
   activeRow?: GridActiveRow | undefined;
   sidebarRow?: GridActiveRow | undefined;
   fluidType?: EFluidType;
+  decimalFixed?: DecimalFixed;
+  hiddenColumns?: HiddenColumns;
 }
 
 export interface FilteredGridDataKeys {

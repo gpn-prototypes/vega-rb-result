@@ -1,3 +1,11 @@
+.main {
+  overflow-x: hidden;
+
+  // & > div {
+  //   display: block !important;
+  // }
+}
+
 .RbResultPage {
   position: relative;
 
@@ -15,8 +23,6 @@
 }
 
 .content {
-  padding: 0 var(--size-text-m);
-
   overflow-x: auto;
 }
 
@@ -38,15 +44,22 @@
   max-height: calc(100vh - 100px);
 }
 
-.FluidTypesChoiceGroup {
-  margin: var(--size-text-2xs) 0;
-}
-
 .result {
   &__graphs {
-    margin-top: var(--space-l);
+    padding-top: var(--space-l);
+    padding-left: var(--size-text-m);
 
     display: flex;
+
+    min-width: 1210px;
+
+    &_hide {
+      display: none;
+    }
+  }
+
+  &__table-content {
+    min-width: 1210px;
   }
 
   &__analysis {
@@ -59,4 +72,35 @@
 
     min-width: 736px;
   }
+
+  &__icons {
+    margin-left: var(--space-m);
+  }
+
+  &__icon {
+    margin-left: var(--space-m);
+
+    cursor: pointer;
+  }
+
+  &__top {
+    margin: var(--space-s) var(--space-m);
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &__table {
+    height: 430px;
+
+    &_full {
+      height: calc(100vh - 100px);
+    }
+  }
+}
+
+// TODO: Удалить, это дубли vega-ui, нужно убрать везде vega-ui тогда можно будет удалить
+.ChoiceGroup-Label:first-child::after {
+  width: inherit !important;
 }

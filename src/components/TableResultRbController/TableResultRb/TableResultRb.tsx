@@ -1,14 +1,16 @@
-import React, { useEffect, useLayoutEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { EFluidType } from '@app/constants/Enums';
-import {
-  AttributeCode,
-  DomainEntityCode,
-} from '@app/constants/GeneralConstants';
+import { CustomContextMenu } from '@app/components/Helpers/ContextMenuHelper';
+import { EFluidType, EFluidTypeCode } from '@app/constants/Enums';
+import { DomainEntityCode } from '@app/constants/GeneralConstants';
 import { RbDomainEntityInput } from '@app/generated/graphql';
-import tableDuck from '@app/store/tableDuck';
+import { MenuContextItem } from '@app/interfaces/ContextMenuInterface';
+import { TableActions } from '@app/store/table/tableActions';
 import { RootState, TreeFilter } from '@app/store/types';
-import { GridActiveRow } from '@app/types/typesTable';
+import { DecimalFixed, GridActiveRow } from '@app/types/typesTable';
+import { IconAdd } from '@consta/uikit/IconAdd';
+import { IconRemove } from '@consta/uikit/IconRemove';
+import { Position } from '@consta/uikit/Popover';
 import { Table } from '@consta/uikit/Table';
 
 import { Column, Row } from './types';
@@ -18,6 +20,7 @@ import './TableResultRb.scss';
 interface Props {
   rows: Row<RbDomainEntityInput>[];
   columns: Column<RbDomainEntityInput>[];
+  actualColumns: Column<RbDomainEntityInput>[];
   filter: TreeFilter;
 }
 
@@ -52,34 +55,66 @@ const setActiveClass = (title: string) => {
     });
 };
 
-export const TableResultRb: React.FC<Props> = ({ rows, columns, filter }) => {
+const menuItems = (): MenuContextItem[] => [
+  {
+    code: 'remove',
+    name: 'Уменьшить разрядность',
+    icon: () => <IconRemove size="s" />,
+  },
+  {
+    code: 'add',
+    name: 'Увеличить разрядность',
+    icon: () => <IconAdd size="s" />,
+  },
+];
+
+export const TableResultRb: React.FC<Props> = ({
+  rows,
+  columns,
+  actualColumns,
+  filter,
+}) => {
   const dispatch = useDispatch();
+  const rowRef = useRef(null);
   const [filteredRows, setFilteredRows] =
     useState<Row<RbDomainEntityInput>[]>(rows);
   const [filteredColumns, setFilteredColumns] =
     useState<Column<RbDomainEntityInput>[]>(columns);
+  const [visible, setContextMenu] = useState<boolean>(false);
+  const [currentColumnCode, setCurrentColumnCode] = useState<string>('');
+  const [position, setPosition] = useState<Position>({ x: 0, y: 0 });
+
   const activeRow: GridActiveRow | undefined = useSelector(
     ({ table }: RootState) => table.activeRow,
   );
   const fluidType: EFluidType | undefined = useSelector(
     ({ table }: RootState) => table.fluidType,
   );
+  const decimalFixed: DecimalFixed | undefined = useSelector(
+    ({ table }: RootState) => table.decimalFixed,
+  );
+  const openSensitiveAnalysis: boolean = useSelector(
+    ({ settings }: RootState) => settings.openSensitiveAnalysis,
+  );
+  const showHistogram: boolean = useSelector(
+    ({ settings }: RootState) => settings.showHistogram,
+  );
 
+  /**
+   * Сортировка данных по клику на элемент древа
+   * Нам необходимо убрать лишние колонки и отображать строки по переданным индексам
+   */
   useEffect(() => {
-    /**
-     * Сортировка данных по клику на элемент древа
-     * Нам необходимо убрать лишние колонки и отображать строки по переданным индексам
-     */
     let filteredRowsData = rows;
-    let filteredColumnsData = columns;
+    let filteredColumnsData = actualColumns;
 
     if (filter?.columnKeys?.length > 0 && filter?.rowsIdx?.length > 0) {
-      filteredColumnsData = columns.filter(
+      filteredColumnsData = filteredColumnsData.filter(
         (column: Column<RbDomainEntityInput>) =>
           !filter.columnKeys.includes(column.accessor),
       );
 
-      filteredRowsData = rows.filter(
+      filteredRowsData = filteredRowsData.filter(
         (row: Row<RbDomainEntityInput>, index: number) => {
           return filter.rowsIdx.includes(index);
         },
@@ -87,46 +122,81 @@ export const TableResultRb: React.FC<Props> = ({ rows, columns, filter }) => {
     }
 
     /** Фильтрация данных по типу флюида */
-    filteredRowsData = filteredRowsData.filter(
-      (row: Row<RbDomainEntityInput>) => {
-        if (fluidType === EFluidType.ALL) {
+    filteredColumnsData = filteredColumnsData.filter(
+      (column: Column<RbDomainEntityInput>) => {
+        if (
+          fluidType === EFluidType.ALL ||
+          fluidType === undefined ||
+          !column?.geoType
+        ) {
           return true;
         }
 
-        return row[AttributeCode.GeoType] === fluidType;
+        return column?.geoType === EFluidTypeCode[fluidType];
       },
     );
 
     setFilteredRows(filteredRowsData);
     setFilteredColumns(filteredColumnsData);
-  }, [filter, rows, columns, fluidType, setFilteredRows, setFilteredColumns]);
+  }, [
+    filter,
+    rows,
+    columns,
+    actualColumns,
+    fluidType,
+    setFilteredRows,
+    setFilteredColumns,
+  ]);
 
+  /** Отлавливаем активный класс */
   useEffect(() => {
     setActiveClass(activeRow?.title || '');
   }, [activeRow]);
 
-  /** Хак:
-   * В таблице мы добавили классы для ячеек, где их нужно объединить.
-   * Тут мы их находим и добавляем к ячейке таблицы эти классы, чтоб убрать borders.
-   * Хак нужен потому что мы не управляем напрямую таблицей. И нам нужно изнутри поменять класс у ячейки
-   */
-  useLayoutEffect(() => {
-    document.querySelectorAll('._no-right').forEach((element: Element) => {
-      const parentTd = element.parentElement?.parentElement;
+  const onContextMenuClick = useCallback(
+    (event, element: Element, text: string) => {
+      event.preventDefault();
 
-      /** Необходимо не устанавливать ликвидацию бордера, если пред. элемент "Всего" */
-      const isPreviousAll = () => {
-        const previousTd = parentTd?.previousElementSibling;
-        const previousAllElement = previousTd?.querySelector('._all');
+      const rect = element.getBoundingClientRect();
 
-        return previousAllElement !== null;
-      };
+      setCurrentColumnCode(
+        columns.find(
+          (column: Column<RbDomainEntityInput>) => column.title === text,
+        )?.accessor || '',
+      );
 
-      if (!isPreviousAll()) {
-        parentTd?.classList.add('_no-right-border');
-      }
-    });
-  });
+      setPosition({
+        x: rect.left,
+        y: rect.bottom,
+      });
+
+      setContextMenu(true);
+    },
+    [setPosition, setContextMenu, setCurrentColumnCode, columns],
+  );
+
+  /** Добавляем обработчик клика по шапке таблицы */
+  useEffect(() => {
+    document
+      .querySelectorAll('.TableCell_isHeader')
+      .forEach((element: Element) => {
+        const rightSelector = element.querySelector(
+          '.TableCell-Wrapper_horizontalAlign_right',
+        );
+        const text = rightSelector?.textContent || '';
+        const blackListNames = ['Категория', 'Флюид'];
+
+        /** Показываем контекстное меню, в случае когда это числа, а числа у нас по правому краю */
+        if (rightSelector === null || blackListNames.includes(text)) {
+          return;
+        }
+
+        const htmlElement = element as HTMLElement;
+
+        htmlElement.oncontextmenu = (event) =>
+          onContextMenuClick(event, element, text);
+      });
+  }, [onContextMenuClick]);
 
   const handleClickRow = ({
     id,
@@ -147,12 +217,43 @@ export const TableResultRb: React.FC<Props> = ({ rows, columns, filter }) => {
 
     /** Отправляем активную строку в стору, это нужно для обновления данных в графиках */
     if (code && title) {
-      dispatch(tableDuck.actions.setActiveRow({ code, title }));
+      if (showHistogram) {
+        dispatch(TableActions.setActiveRow({ code, title: title || '' }));
+      }
 
-      if (code.indexOf(DomainEntityCode.Layer) > -1) {
-        dispatch(tableDuck.actions.setSidebarRow({ code, title }));
+      if (
+        code.indexOf(DomainEntityCode.Mine) > -1 &&
+        (title || '').indexOf('Всего') === -1 &&
+        openSensitiveAnalysis
+      ) {
+        dispatch(TableActions.setSidebarRow({ code, title: title || '' }));
       }
     }
+  };
+
+  const handleContextMenuClick = (item: MenuContextItem): void => {
+    dispatch(
+      TableActions.setDecimalFixed({
+        type: item.code === 'add' ? 'plus' : 'minus',
+        columnCode: currentColumnCode || '',
+      }),
+    );
+  };
+
+  const isContextMenuDisabled = (item: MenuContextItem) => {
+    if (!decimalFixed) {
+      return false;
+    }
+
+    if (item.code === 'add' && decimalFixed[currentColumnCode || ''] > 7) {
+      return true;
+    }
+
+    if (item.code === 'remove' && decimalFixed[currentColumnCode || ''] < 1) {
+      return true;
+    }
+
+    return false;
   };
 
   return (
@@ -163,12 +264,23 @@ export const TableResultRb: React.FC<Props> = ({ rows, columns, filter }) => {
         verticalAlign="center"
         activeRow={{ id: undefined, onChange: handleClickRow }}
         size="s"
-        zebraStriped="odd"
         className="TableResultRb"
         borderBetweenColumns
         borderBetweenRows
+        stickyHeader
         isResizable
       />
+
+      {visible && (
+        <CustomContextMenu
+          menuItems={() => menuItems()}
+          ref={rowRef}
+          onClick={handleContextMenuClick}
+          setIsOpenContextMenu={(isVisible) => setContextMenu(isVisible)}
+          position={position}
+          getDisabled={isContextMenuDisabled}
+        />
+      )}
     </div>
   );
 };

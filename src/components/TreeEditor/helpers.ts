@@ -9,8 +9,8 @@ import { Column, Row } from '../TableResultRbController/TableResultRb/types';
 
 import { CellPosition, TreeItemData } from './types';
 
-const getTreeNodeItem = <T = any>(
-  row: Row<T>,
+const getTreeNodeItem = (
+  row: Record<string, Row<RbDomainEntityInput>>,
   rowIdx: number,
   columnIdx: number,
   columnKey?: string,
@@ -35,7 +35,7 @@ const getTreeNodeItem = <T = any>(
         ),
       )?.id;
 
-  const name = row[columnKey || ''] || '? (заглушка)';
+  const name = row[columnKey || '']?.value || '? (заглушка)';
 
   return {
     name: name as string,
@@ -113,7 +113,7 @@ export function mergeObjectsInUnique<T>(array: T[], properties: string[]): T[] {
 export function getNodeListFromTableData<T>(
   data: {
     columns: Column<RbDomainEntityInput>[];
-    rows: Row<RbDomainEntityInput>[];
+    rows: Record<string, Row<RbDomainEntityInput>>[];
   },
   projectName: string,
 ): TreeItem<TreeItemData>[] {
@@ -130,15 +130,17 @@ export function getNodeListFromTableData<T>(
       name: title,
     }));
 
-  const filledRows = rows.filter((row) => {
-    if (row.isAll) {
-      return false;
-    }
+  const filledRows = rows.filter(
+    (row: Record<string, Row<RbDomainEntityInput>>) => {
+      if (row.isAll) {
+        return false;
+      }
 
-    return structurecolumnKeys.some(
-      ({ key, name }) => key !== 'id' && row[key || ''],
-    );
-  });
+      return structurecolumnKeys.some(
+        ({ key, name }) => key !== 'id' && row[key]?.value,
+      );
+    },
+  );
 
   const nodes: TreeItem<TreeItemData>[] = [];
 

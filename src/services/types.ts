@@ -16,6 +16,8 @@ export type CachedProjectData = {
   structure: ProjectStructure;
 };
 
+export type CalculationResponse = { filename: string; data: Blob };
+
 export interface DomainObjectsDelta {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any;

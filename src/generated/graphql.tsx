@@ -2965,6 +2965,9 @@ export type ResultAttribute = {
   name: Scalars['String'];
   shortName: Scalars['String'];
   units: Scalars['String'];
+  decimal: Scalars['Int'];
+  geoType: Scalars['String'];
+  isRisk: Scalars['Boolean'];
   visible: Visible;
 };
 
@@ -3000,6 +3003,7 @@ export type ResultProjectStructure = {
 export type Histogram = {
   percentiles: number[];
   sample: number[];
+  cdf: number[];
   numberOfIterationBin: number[];
   subtitle: string;
   title: string;
