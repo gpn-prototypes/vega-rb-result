@@ -68,7 +68,7 @@ export const CustomContextMenu: React.FC<ContextMenuProps> = ({
   getDisabled,
 }) => {
   const [isOpenEdit, setIsOpenEdit] = useState<boolean>(false);
-  const [inputValue, setValue] = useState(null);
+  const [inputValue, setValue] = useState<number>(50);
   const handleInputChange = ({ value }) => setValue(value);
 
   /** Обработка клика по контекстному меню */
@@ -150,16 +150,16 @@ export const CustomContextMenu: React.FC<ContextMenuProps> = ({
               <TextField
                 placeholder="Укажите количество"
                 onChange={handleInputChange}
-                value={inputValue}
+                value={(inputValue || 0).toString()}
                 size="s"
-                min={25}
-                max={99}
+                view="default"
               />
 
               <Button
                 label="Указать вручную"
                 size="s"
                 onClick={() => handleInputSave()}
+                disabled={inputValue <= 10 || inputValue >= 10000}
                 className="menu__button"
               />
             </div>

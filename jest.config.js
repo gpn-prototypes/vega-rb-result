@@ -28,5 +28,6 @@ module.exports = {
   moduleNameMapper: {
     ...config.moduleNameMapper,
     '^@vega(.*)$': '<rootDir>/src$1',
+    '^@app(.*)$': '<rootDir>/src$1',
   },
 };

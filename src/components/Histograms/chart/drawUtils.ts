@@ -14,6 +14,9 @@ export namespace Chart {
     y2Scale: ScaleLinear<number, number>;
     probabilityDensityXScale: ScaleLinear<number, number, never>;
     probabilityDensityYScale: ScaleLinear<number, number, never>;
+    cumulativeXScale: ScaleLinear<number, number, never>;
+    cumulativeYScale: ScaleLinear<number, number, never>;
+    preparedPercentiles: DrawHelper.Point[];
   }
 
   export interface MainAxis {
@@ -29,7 +32,8 @@ export namespace Chart {
   export interface GetScaleArguments {
     bins: Bin<number, number>[];
     numberOfIterationBin: number[];
-    pdf: DrawHelper.Point[];
+    cdf: DrawHelper.Point[];
+    percentiles: number[];
   }
 
   export interface GetMainAxisArguments {
@@ -53,16 +57,28 @@ export namespace Chart {
 
   export interface DrawDotsArguments {
     svg: Selection<null, unknown, null, undefined>;
-    percentiles: number[];
+    percentiles: DrawHelper.Point[];
     xScale: ScaleLinear<number, number>;
     y1Scale: ScaleLinear<number, number>;
   }
 
-  export interface DrawSurvivalLineArguments {
+  export interface DrawCdfLineWithGradientArguments {
     svg: Selection<null, unknown, null, undefined>;
-    pdf: DrawHelper.Point[];
+    cdf: DrawHelper.Point[];
     probabilityDensityXScale: ScaleLinear<number, number, never>;
     probabilityDensityYScale: ScaleLinear<number, number, never>;
+    id: string;
+  }
+
+  export interface DrawCdfLineWithGridArguments {
+    svg: Selection<null, unknown, null, undefined>;
+    cdf: DrawHelper.Point[];
+    percentiles: DrawHelper.Point[];
+    cumulativeXScale: ScaleLinear<number, number, never>;
+    probabilityDensityXScale: ScaleLinear<number, number, never>;
+    xScale: ScaleLinear<number, number>;
+    sample: number[];
+    cumulativeYScale: ScaleLinear<number, number, never>;
     id: string;
   }
 
@@ -85,10 +101,14 @@ export namespace Chart {
   export const Height = 279;
   export const DefaultY2TickCount = 5;
 
+  type D3Selection = d3.Selection<null, unknown, null, undefined>;
+  type D3ScaleLinear = d3.ScaleLinear<number, number>;
+
   export const getScales = ({
     bins,
     numberOfIterationBin,
-    pdf,
+    cdf,
+    percentiles,
   }: GetScaleArguments): Scale => {
     const xScale: ScaleLinear<number, number> = d3
       .scaleLinear()
@@ -120,7 +140,7 @@ export namespace Chart {
       .range([Height - Margin.bottom, Margin.top]);
 
     const probabilityDensityXScale = DrawHelper.getScale(
-      DrawHelper.getDomain(pdf, DrawHelper.getX),
+      DrawHelper.getDomain(cdf, DrawHelper.getX),
       DrawHelper.xScalePosition({
         left: Chart.Margin.left,
         right: Chart.Margin.right,
@@ -129,12 +149,44 @@ export namespace Chart {
     );
 
     const probabilityDensityYScale = DrawHelper.getScale(
-      DrawHelper.getDomain(pdf, DrawHelper.getY),
+      DrawHelper.getDomain(cdf, DrawHelper.getY),
       DrawHelper.yScalePosition({
         top: Chart.Margin.top,
         bottom: Chart.Margin.bottom,
         height: Chart.Height,
       }),
+    );
+
+    const cumulativeXScale = DrawHelper.getScale(
+      DrawHelper.getDomain(cdf, DrawHelper.getX),
+      DrawHelper.xScalePosition({
+        left: Chart.Margin.left,
+        right: Chart.Margin.right,
+        width: Chart.Width,
+      }),
+    );
+    const cumulativeYScale = DrawHelper.getScale(
+      DrawHelper.getDomain(cdf, DrawHelper.getY),
+      DrawHelper.yScalePosition({
+        top: Chart.Margin.top,
+        bottom: Chart.Margin.bottom,
+        height: Chart.Height,
+      }),
+    );
+
+    const preparedPercentiles: DrawHelper.Point[] = percentiles.map(
+      (percentile: number, index: number) => {
+        const percentileMap = {
+          0: 0.1,
+          1: 0.5,
+          2: 0.9,
+        };
+
+        return {
+          x: percentile,
+          y: percentileMap[index],
+        };
+      },
     );
 
     return {
@@ -144,6 +196,9 @@ export namespace Chart {
       y2Scale,
       probabilityDensityXScale,
       probabilityDensityYScale,
+      cumulativeXScale,
+      cumulativeYScale,
+      preparedPercentiles,
     };
   };
 
@@ -224,19 +279,14 @@ export namespace Chart {
             .tickSize(-(Width - Margin.left - Margin.right)),
         )
         .call((innerG) => innerG.select('.domain').remove())
-        .attr('class', 'chart__text')
-        /** Line */
-        .call((nestedG) => nestedG.selectAll('.tick line'))
-        .attr('stroke-dasharray', 3)
-        .attr('stroke', 'rgba(246, 251, 253, 0.28)')
-
+        .attr('class', 'chart__text chart__grid')
         /** Text */
         .call((innerG) =>
           innerG
             .selectAll('.tick text')
-            .attr('x', 45)
+            .attr('y', -10)
+            .attr('x', 50)
             .clone()
-            .attr('x', 45)
             .text(payload.y),
         )
         .call((nestedG) => nestedG.select('.tick:first-of-type line').remove());
@@ -252,7 +302,7 @@ export namespace Chart {
   }: DrawHistogramArguments): void => {
     svg
       .append('g')
-      .attr('fill', 'rgba(86, 185, 242, 1)')
+      .attr('fill', 'rgba(86, 185, 242, 0.5)')
       .selectAll('rect')
       .data(bins)
       .join('rect')
@@ -268,21 +318,6 @@ export namespace Chart {
     y1Scale,
     percentiles,
   }: DrawDotsArguments): void => {
-    const payload: DrawHelper.Point[] = percentiles.map(
-      (percentile: number, index: number) => {
-        const percentileMap = {
-          0: 0.1,
-          1: 0.5,
-          2: 0.9,
-        };
-
-        return {
-          x: percentile,
-          y: percentileMap[index],
-        };
-      },
-    );
-
     /** Пока точки не отображаем */
     // svg
     //   .append('g')
@@ -301,7 +336,7 @@ export namespace Chart {
       .append('g')
       .attr('class', 'chart__dot-text')
       .selectAll('text')
-      .data(payload)
+      .data(percentiles)
       .join('text')
       .attr('dy', '0.35em')
       .attr('x', (d: any) => xScale(d.x))
@@ -322,13 +357,13 @@ export namespace Chart {
     }));
   };
 
-  export const DrawSurvivalLine = ({
+  export const DrawCdfLineWithGradient = ({
     probabilityDensityXScale,
     probabilityDensityYScale,
     svg,
-    pdf,
+    cdf,
     id,
-  }: DrawSurvivalLineArguments): void => {
+  }: DrawCdfLineWithGradientArguments): void => {
     const area = d3
       .area<DrawHelper.Point>()
       .x((d) => probabilityDensityXScale(DrawHelper.getX(d)) as number)
@@ -356,7 +391,7 @@ export namespace Chart {
       .append('clipPath')
       .attr('id', `main-content-clip-line-path_${id}`)
       .append('path')
-      .attr('d', area(pdf) as string)
+      .attr('d', area(cdf) as string)
       .attr('class', 'value-line');
 
     const clipPath = graphArea
@@ -374,7 +409,7 @@ export namespace Chart {
     graphArea
       .append('path')
       .attr('class', 'pdfLine')
-      .datum(pdf)
+      .datum(cdf)
       .attr('fill', 'none')
       .attr('stroke', '#0AA5FF')
       .call((g) =>
@@ -390,6 +425,114 @@ export namespace Chart {
           .line<DrawHelper.Point>()
           .x((d) => probabilityDensityXScale(DrawHelper.getX(d)) as number)
           .y((d) => probabilityDensityYScale(DrawHelper.getY(d)) as number),
+      );
+  };
+
+  export const drawTicksX = (svg: D3Selection, scale: D3ScaleLinear): void => {
+    svg.append('g').call((g) =>
+      g
+        .attr('transform', `translate(0,${Height - Margin.bottom})`)
+        .attr('class', 'chart__axis_bottom')
+        .call(
+          d3
+            .axisBottom(scale)
+            .ticks(Width / 80)
+            .tickSize(5)
+            .tickFormat(() => ''),
+        ),
+    );
+    svg.append('g').call((g) =>
+      g
+        .attr('transform', `translate(0,${Height - Margin.bottom})`)
+        .attr('class', 'chart__grid')
+        .call(d3.axisBottom(scale).ticks(5).tickSize(-Height)),
+    );
+  };
+
+  export const drawTicksY = (svg: D3Selection, scale: D3ScaleLinear): void => {
+    svg.append('g').call((g) =>
+      g
+        .attr('transform', `translate(${Margin.left},0)`)
+        .attr('class', 'chart__axis chart__axis_left')
+        .call(
+          d3
+            .axisLeft(scale)
+            .ticks(Width / 80)
+            .tickSize(5)
+            .tickFormat(
+              (domainValue) => domainValue.toString(),
+              // (domainValue) => `${roundTo(3, domainValue as number)}`,
+            ),
+        ),
+    );
+  };
+
+  export const DrawCdfLineWithGrid = ({
+    cumulativeXScale,
+    probabilityDensityXScale,
+    xScale,
+    cumulativeYScale,
+    svg,
+    cdf,
+    id,
+    sample,
+    percentiles,
+  }: DrawCdfLineWithGridArguments): void => {
+    const projectionLinesFromPoint = (
+      point: DrawHelper.Point,
+      data: DrawHelper.Point[],
+    ) => {
+      svg
+        .append('path')
+        .datum([
+          { x: d3.min(sample), y: point.y },
+          point,
+          { x: point.x, y: d3.min(data, DrawHelper.getY) },
+        ])
+        .attr('class', 'chart__projection-lines')
+        .attr(
+          'd',
+          d3
+            .line<any>()
+            .x((d) => xScale(DrawHelper.getX(d)) as number)
+            .y((d) => cumulativeYScale(DrawHelper.getY(d)) as number),
+        );
+    };
+
+    drawTicksY(svg, cumulativeYScale);
+
+    if (percentiles.length) {
+      svg
+        .selectAll('points')
+        .data(percentiles)
+        .enter()
+        .append('text')
+        .text((d) => DrawHelper.getX(d).toFixed(0))
+        .attr('class', 'chart__dot-text')
+        .attr('x', (d) => xScale(DrawHelper.getX(d)) as number)
+        .attr('y', (d) => cumulativeYScale(DrawHelper.getY(d)) as number)
+        .attr('transform', `translate(5, 0)`);
+
+      percentiles.forEach((percentile) => {
+        projectionLinesFromPoint(percentile, cdf);
+      });
+    }
+
+    const graphArea = svg.append('g');
+
+    graphArea
+      .append('path')
+      .attr('class', 'sfLine')
+      .datum(cdf)
+      .attr('fill', 'none')
+      .attr('stroke', '#F38B00')
+      .attr('stroke-width', 2)
+      .attr(
+        'd',
+        d3
+          .line<DrawHelper.Point>()
+          .x((d) => cumulativeXScale(DrawHelper.getX(d)) as number)
+          .y((d) => cumulativeYScale(DrawHelper.getY(d)) as number),
       );
   };
 }

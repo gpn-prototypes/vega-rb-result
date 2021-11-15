@@ -136,8 +136,26 @@ export const TableResultRb: React.FC<Props> = ({
       },
     );
 
+    if (
+      filteredColumnsData.find((column: Column<RbDomainEntityInput>) =>
+        Boolean(column.geoType),
+      ) === undefined
+    ) {
+      filteredRowsData = [];
+    }
+
     setFilteredRows(filteredRowsData);
     setFilteredColumns(filteredColumnsData);
+
+    /** DIrty hack */
+    document.querySelectorAll('.TableHeader-Сontrol').forEach((el) => {
+      const parent = el.parentElement?.parentElement as HTMLElement;
+      const parentCell = el.parentElement?.parentElement
+        ?.parentElement as HTMLElement;
+
+      parent.style.paddingRight = '48px';
+      parentCell.style.minWidth = '140px';
+    });
   }, [
     filter,
     rows,
@@ -268,6 +286,7 @@ export const TableResultRb: React.FC<Props> = ({
         borderBetweenColumns
         borderBetweenRows
         stickyHeader
+        stickyColumns={1}
         isResizable
       />
 

@@ -8,7 +8,7 @@ export interface Column<T = any> {
   renderCell?: (row: Row<T>) => React.ReactNode;
   mergeCells?: boolean;
   isResizable?: boolean;
-  align?: 'left' | 'right';
+  align?: 'left' | 'right' | 'center';
   visible?: Visible;
   geoType?: string;
   isRisk?: boolean;
