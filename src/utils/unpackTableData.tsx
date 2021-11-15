@@ -30,6 +30,8 @@ const isHasParentAll = (parents: Parent[]): boolean => {
   );
 };
 
+export type ViewType = 'attribute' | 'risk';
+
 /** Подготовка колонок */
 export const prepareColumns = (
   data: ResultProjectStructure,
@@ -49,6 +51,7 @@ export const prepareColumns = (
     title,
     accessor,
     align,
+    mergeCells,
     visible,
     geoType,
     decimal,
@@ -61,7 +64,7 @@ export const prepareColumns = (
       title,
       accessor,
       align,
-      mergeCells: true,
+      mergeCells: mergeCells !== undefined ? mergeCells : true,
       isResizable: true,
       getComparisonValue: (row: Row<RbDomainEntityInput>) => row?.value || '',
       visible,
@@ -117,32 +120,35 @@ export const prepareColumns = (
     },
   );
 
+  /** Первая колонка аттрибутов */
   const firstMain = attributes.filter(
     (innerAttribute: ResultAttribute, index: number) =>
-      index === 0 && !innerAttribute.isRisk,
-  );
+      innerAttribute.viewType === 'attribute',
+  )[0];
 
-  const firstRisk = attributes
-    .filter(
-      (innerAttribute: ResultAttribute, index: number) => innerAttribute.isRisk,
-    )
-    .filter((_, index: number) => index === 0);
+  /** Первая колонка рисков */
+  const firstRisk = attributes.filter(
+    (innerAttribute: ResultAttribute, index: number) =>
+      innerAttribute.viewType === 'risk',
+  )[0];
 
+  const isAttributeFirst = (attribute: ResultAttribute) =>
+    firstMain && firstMain.code === attribute.code;
+
+  const isRiskFirst = (attribute: ResultAttribute) =>
+    firstRisk && firstRisk.code === attribute.code;
+
+  const isAttributeOrRiskFirst = (attribute: ResultAttribute) =>
+    isAttributeFirst(attribute) || isRiskFirst(attribute);
+
+  /** Получение группы колонок, которые можно скрывать */
   const getColumnAccessorGroup = (attribute: ResultAttribute) => {
-    if (firstMain?.length > 0 && firstMain[0].code === attribute.code) {
+    if (isAttributeOrRiskFirst(attribute)) {
       return attributes
         .filter(
           (innerAttribute: ResultAttribute, index: number) =>
-            index !== 0 && !innerAttribute.isRisk,
-        )
-        .map((innerAttribute: ResultAttribute) => innerAttribute.code as any);
-    }
-
-    if (firstRisk?.length > 0 && firstRisk[0].code === attribute.code) {
-      return attributes
-        .filter(
-          (innerAttribute: ResultAttribute, index: number) =>
-            innerAttribute.isRisk,
+            innerAttribute.viewType ===
+            (isAttributeFirst(attribute) ? 'attribute' : 'risk'),
         )
         .filter((_, index: number) => index !== 0)
         .map((innerAttribute: ResultAttribute) => innerAttribute.code as any);
@@ -151,11 +157,9 @@ export const prepareColumns = (
     return undefined;
   };
 
+  /** Первая колонка аттрибутов */
   const getColumnControl = (attribute: ResultAttribute) => {
-    if (
-      (firstMain?.length > 0 && firstMain[0].code === attribute.code) ||
-      (firstRisk?.length > 0 && firstRisk[0].code === attribute.code)
-    ) {
+    if (isAttributeOrRiskFirst(attribute)) {
       return ({ column }) => <ColumnExpanderComponent column={column} />;
     }
 
@@ -188,6 +192,7 @@ export const prepareColumns = (
         align: attribute.code === 'PERCENTILE' ? 'left' : 'right',
         visible: attribute?.visible,
         geoType: attribute?.geoType,
+        mergeCells: false,
         control: getColumnControl(attribute),
         columnAccessorGroup: getColumnAccessorGroup(attribute),
         decimal: getDecimalValue(attribute),
@@ -268,13 +273,6 @@ export const prepareRows = (
             value: attributeValue.values[percIndex],
             formattedValue,
           };
-
-          if (
-            attributeValue.code === 'ngzngr_GCoS' ||
-            attributeValue.code === 'ngzngr'
-          ) {
-            row[percIndex].isRisk = true;
-          }
 
           /** Устанавливаем кастомные флаги, для того чтобы менять отображение таблицы */
           if (isHasParentAll(domainObject.parents)) {

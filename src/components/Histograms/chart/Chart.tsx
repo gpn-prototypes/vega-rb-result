@@ -37,7 +37,7 @@ const ChartComponent: React.FC<
     );
 
     /** Получение данных для линии выживаемости */
-    const pdf = Chart.getPayload(cdf, sample);
+    const preparedCdf = Chart.getPayload(cdf, sample);
 
     /** Получаем основные данные и их распределение на гистограмме */
     const {
@@ -45,19 +45,23 @@ const ChartComponent: React.FC<
       yScale,
       y1Scale,
       y2Scale,
+      cumulativeXScale,
+      cumulativeYScale,
+      preparedPercentiles,
       probabilityDensityXScale,
-      probabilityDensityYScale,
+      // probabilityDensityYScale,
     } = Chart.getScales({
       bins,
       numberOfIterationBin,
-      pdf,
+      cdf: preparedCdf,
+      percentiles,
     });
 
     /** Получаем основные оси, на основе них будет сопастовление с данными выше */
     const { xAxis, yAxis } = Chart.getMainAxis({ xScale, yScale, payload });
 
     /** Получаем дополнительные(фейковые) оси, которые не привязанны к данным */
-    const { y1Axis, y2Axis } = Chart.getDummyAxis({
+    const { y2Axis } = Chart.getDummyAxis({
       y1Scale,
       y2Scale,
       payload,
@@ -67,15 +71,26 @@ const ChartComponent: React.FC<
     Chart.DrawHistogram({ bins, svg, xScale, yScale });
 
     /** Рисуем точки на основе данных */
-    Chart.DrawDots({ svg, xScale, y1Scale, percentiles });
+    // Chart.DrawDots({ svg, xScale, y1Scale, percentiles: preparedPercentiles });
 
     /** Рисуем линию выживаемости */
-    Chart.DrawSurvivalLine({
+    // Chart.DrawCdfLineWithGradient({
+    //   probabilityDensityXScale,
+    //   probabilityDensityYScale,
+    //   svg,
+    //   pdf,
+    //   id,
+    // });
+    Chart.DrawCdfLineWithGrid({
+      cumulativeXScale,
+      cumulativeYScale,
+      xScale,
       probabilityDensityXScale,
-      probabilityDensityYScale,
+      sample,
       svg,
-      pdf,
+      cdf: preparedCdf,
       id,
+      percentiles: preparedPercentiles,
     });
 
     /** Добавляем все оси на гистограмму */
@@ -85,7 +100,7 @@ const ChartComponent: React.FC<
     svg.append('g').call(yAxis);
 
     /** Рисуем фиктивную ось Y, слева */
-    svg.append('g').call(y1Axis);
+    // svg.append('g').call(y1Axis);
 
     /** Рисуем фиктивную ось Y, справа */
     svg.append('g').call(y2Axis);

@@ -244,6 +244,7 @@ export const GET_TABLE_RESULT_RB = gql`
                   table
                   tree
                 }
+                viewType
               }
               domainObjects {
                 parents {

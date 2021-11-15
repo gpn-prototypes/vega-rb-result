@@ -27,7 +27,7 @@ module.exports = (webpackConfigEnv) => {
 
   return webpackMerge.smart(defaultConfig, {
     entry: ['./src/singleSpaEntry.tsx'],
-    mode: 'development',
+    mode: 'production',
     devtool: 'source-map',
     module: {
       rules: [

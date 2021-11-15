@@ -5,21 +5,14 @@
 
   border-radius: 4px;
 
-  &__Percentiles {
-    &__Text {
-      font-size: var(--size-text-xs);
-      fill: var(--color-typo-primary);
-    }
-  }
-
-  &__ProjectionLines {
+  &__projection-lines {
     opacity: 0.3;
     fill: none;
     stroke: var(--color-typo-warning);
     stroke-width: 1;
   }
 
-  &__Grid {
+  &__grid {
     line {
       stroke: var(--color-control-typo-primary);
       stroke-dasharray: 1, 3;
@@ -41,7 +34,7 @@
     }
   }
 
-  &__Axis {
+  &__axis {
     fill: none;
 
     .domain {
@@ -57,22 +50,12 @@
       line-height: var(--line-height-text-xs);
     }
 
-    &_position_bottom line {
+    &_bottom line {
       transform: translateY(1px);
     }
 
-    &_position_left text {
+    &_left text {
       color: var(--color-typo-warning);
-    }
-
-    &_position_right text {
-      color: var(--color-typo-normal);
-
-      transform: translateX(5px);
-    }
-
-    &_position_right path {
-      stroke-width: 0;
     }
   }
 

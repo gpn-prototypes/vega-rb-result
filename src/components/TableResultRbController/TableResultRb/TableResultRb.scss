@@ -10,12 +10,6 @@
     text-transform: inherit;
 
     color: var(--color-typo-primary);
-
-    &:nth-child(6) {
-      & > div {
-        padding-right: 48px;
-      }
-    }
   }
 
   .TableCell:not(.TableCell_isHeader) {

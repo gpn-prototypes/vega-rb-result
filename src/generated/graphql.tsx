@@ -2967,7 +2967,7 @@ export type ResultAttribute = {
   units: Scalars['String'];
   decimal: Scalars['Int'];
   geoType: Scalars['String'];
-  isRisk: Scalars['Boolean'];
+  viewType: Scalars['String'];
   visible: Visible;
 };
 
