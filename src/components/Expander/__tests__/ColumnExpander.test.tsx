@@ -39,19 +39,21 @@ describe('ColumnExpander', () => {
 
   test('Ожидаем, что по умолчанию у нас показывается иконка скрытия(минус)', async () => {
     expect(
-      screen.getByRole('span').classList.contains('IconRemove'),
+      screen.getByRole('button').getElementsByClassName('IconRemove'),
     ).toBeTruthy();
   });
 
   test('Ожидаем, что при клике, у нас смениться иконка на показ(плюс)', async () => {
     expect(
-      screen.getByRole('span').classList.contains('IconRemove'),
+      screen.getByRole('button').getElementsByClassName('IconRemove'),
     ).toBeTruthy();
 
     await act(async () => {
       fireEvent.click(screen.getByRole('button'));
     });
 
-    expect(screen.getByRole('span').classList.contains('IconAdd')).toBeTruthy();
+    expect(
+      screen.getByRole('button').getElementsByClassName('IconAdd'),
+    ).toBeTruthy();
   });
 });

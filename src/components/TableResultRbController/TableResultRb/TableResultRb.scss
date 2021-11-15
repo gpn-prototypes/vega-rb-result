@@ -12,11 +12,6 @@
     color: var(--color-typo-primary);
   }
 
-  .TableCell:not(.TableCell_isHeader) {
-    font-size: var(--font-size);
-    line-height: var(--row-height);
-  }
-
   ._all {
     font-weight: 600;
   }
