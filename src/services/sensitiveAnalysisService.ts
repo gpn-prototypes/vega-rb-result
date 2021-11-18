@@ -28,7 +28,7 @@ export async function loadSensitiveAnalysisStatistic(
   if (data) {
     dispatch(
       sensitiveAnalysisDuck.actions.setSensitiveAnalysisStatistic(
-        data.getSensitivityAnalysis,
+        data.getSensitivityAnalysisStatistics,
       ),
     );
   }

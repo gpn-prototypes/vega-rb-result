@@ -1,9 +1,9 @@
 import { RbDomainEntityInput, Visible } from '@app/generated/graphql';
 import { TableControl, TableRow } from '@consta/uikit/Table';
 
-export interface Column<T = any> {
+export interface Column<T = any, U = keyof RbDomainEntityInput | 'id'> {
   sortable?: boolean;
-  accessor: keyof RbDomainEntityInput | 'id';
+  accessor: U;
   title: string;
   renderCell?: (row: Row<T>) => React.ReactNode;
   mergeCells?: boolean;

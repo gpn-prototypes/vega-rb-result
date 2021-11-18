@@ -1,4 +1,7 @@
-import { SensitiveAnalysis } from '@app/interfaces/SensitiveAnalysisInterface';
+import {
+  SensitiveAnalysis,
+  SensitiveAnalysisStatistic,
+} from '@app/interfaces/SensitiveAnalysisInterface';
 
 export type Maybe<T> = T | null;
 export type Exact<T extends { [key: string]: unknown }> = {
@@ -3019,6 +3022,11 @@ export type ResultHistogramsStructure = {
 export type SensitivityAnalysisStructure = {
   __typename?: 'HistogramResultQuery';
   getSensitivityAnalysis: SensitiveAnalysis;
+};
+
+export type SensitivityAnalysisStatisticStructure = {
+  __typename?: 'HistogramResultQuery';
+  getSensitivityAnalysisStatistics: SensitiveAnalysisStatistic;
 };
 
 export type ResultTableQuery = {

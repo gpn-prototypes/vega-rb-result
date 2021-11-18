@@ -185,7 +185,7 @@ export const GET_SENSITIVE_ANALYSIS_RESULT_RB = gql`
             getSensitivityAnalysis(domainEntityNames: $domainEntityNames) {
               title
               names
-              sample
+              resultMinMax
               percentiles
               zeroPoint
             }
@@ -202,12 +202,25 @@ export const GET_SENSITIVE_ANALYSIS_STATISTIC_RESULT_RB = gql`
       resourceBase {
         result {
           histograms {
-            getSensitivityAnalysis(domainEntityNames: $domainEntityNames) {
-              title
-              names
-              sample
-              percentiles
-              zeroPoint
+            getSensitivityAnalysisStatistics(
+              domainEntityNames: $domainEntityNames
+            ) {
+              headers {
+                code
+                name
+                decimal
+                children {
+                  code
+                  name
+                  decimal
+                }
+              }
+              rows {
+                cells {
+                  code
+                  value
+                }
+              }
             }
           }
         }

@@ -19,6 +19,7 @@ import {
   Query,
   ResultHistogramsStructure,
   ResultProjectStructure,
+  SensitivityAnalysisStatisticStructure,
   SensitivityAnalysisStructure,
 } from '@app/generated/graphql';
 import {
@@ -251,7 +252,7 @@ class ProjectService implements IProjectService {
 
   async getSensitiveAnalysisStatistic(
     domainEntityNames: string[],
-  ): Promise<SensitivityAnalysisStructure> {
+  ): Promise<SensitivityAnalysisStatisticStructure> {
     const { data: responseData } = await this.client
       .watchQuery<Query>({
         query: GET_SENSITIVE_ANALYSIS_STATISTIC_RESULT_RB,

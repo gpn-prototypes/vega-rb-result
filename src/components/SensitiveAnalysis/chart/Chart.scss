@@ -113,6 +113,10 @@
 
     &_start {
       text-anchor: start;
+
+      text {
+        text-anchor: start;
+      }
     }
   }
 

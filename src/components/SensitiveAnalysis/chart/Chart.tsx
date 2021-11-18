@@ -12,7 +12,7 @@ const PER_ELEMENT_HEIGHT = 66.6;
 
 export const SensitiveAnalysisChartComponent: React.FC<
   SensitiveAnalysis & { availableNames: string[] }
-> = ({ names, percentiles, sample, zeroPoint, availableNames }) => {
+> = ({ names, percentiles, resultMinMax, zeroPoint, availableNames }) => {
   const d3Container = useRef(null);
 
   /**
@@ -31,7 +31,11 @@ export const SensitiveAnalysisChartComponent: React.FC<
 
     setCurrentPercentiles(result);
 
-    setCurrentHeight(result.length * PER_ELEMENT_HEIGHT);
+    setCurrentHeight(
+      result.length * PER_ELEMENT_HEIGHT > 150
+        ? result.length * PER_ELEMENT_HEIGHT
+        : 150,
+    );
   }, [
     availableNames,
     percentiles,
@@ -48,11 +52,14 @@ export const SensitiveAnalysisChartComponent: React.FC<
 
     const data: SensitiveAnalysisChart.Payload[] = [];
 
-    currentPercentiles.forEach((percentale: number[], index: number) => {
-      percentale.forEach((percent: number, innerIndex: number) => {
+    resultMinMax.forEach((result: number[], index: number) => {
+      result.forEach((currentResult: number, innerIndex: number) => {
         data.push({
           name: names[index],
-          value: percent,
+          value:
+            innerIndex === 0
+              ? zeroPoint - currentResult
+              : currentResult - zeroPoint,
           category: innerIndex === 0 ? 0 : 1,
         });
       });
@@ -66,7 +73,7 @@ export const SensitiveAnalysisChartComponent: React.FC<
 
     const { xScale, x1Scale, yScale } = SensitiveAnalysisChart.getAxisScale({
       series,
-      sample,
+      resultMinMax,
       bias,
     });
 
@@ -75,10 +82,12 @@ export const SensitiveAnalysisChartComponent: React.FC<
       x1Scale,
       yScale,
       options,
-      sample,
+      resultMinMax,
       currentPercentiles,
       bias,
       series,
+      zeroPoint,
+      data,
     });
 
     /**
@@ -130,7 +139,11 @@ export const SensitiveAnalysisChartComponent: React.FC<
       .attr('x', (d) => xScale(d[0]))
       .attr('y', ({ data: [name] }: any) => yScale(name) || 0)
       .attr('rx', (d) => 2)
-      .attr('width', (d) => xScale(d[1]) - xScale(d[0]))
+      .attr('width', (d) => {
+        console.log(11, d, xScale(d[1]), xScale(d[0]));
+
+        return xScale(d[1]) - xScale(d[0]);
+      })
       .attr('height', yScale.bandwidth())
       .append('title');
 
@@ -138,13 +151,13 @@ export const SensitiveAnalysisChartComponent: React.FC<
     svg.append('g').call(y2Axis);
     svg.append('g').call(y3Axis);
     svg.append('g').call(xAxis);
-  }, [sample, currentPercentiles, names]);
+  }, [resultMinMax, currentPercentiles, names, zeroPoint]);
 
   useEffect(() => {
     if (d3Container.current) {
       draw();
     }
-  }, [draw, sample]);
+  }, [draw]);
 
   return (
     <div className="chart">
