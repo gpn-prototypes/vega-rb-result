@@ -1,6 +1,10 @@
 .table {
   height: 100%;
 
+  .TableCell_isControl {
+    min-width: 120px !important;
+  }
+
   .TableCell_isHeader {
     min-width: 80px;
 

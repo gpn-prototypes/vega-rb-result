@@ -14,6 +14,7 @@ export interface Column<T = any, U = keyof RbDomainEntityInput | 'id'> {
   isRisk?: boolean;
   decimal?: number;
   width?: number;
+  hidden?: boolean;
   getComparisonValue?: (row: Row[Column['accessor']]) => string;
   control?: ({ column }: TableControl<any>) => React.ReactNode;
   columnAccessorGroup?: (keyof RbDomainEntityInput | 'id')[];
@@ -24,6 +25,7 @@ export type Row<T = any> = TableRow &
     code: string;
     value: string;
     formattedValue: string;
+    geoFluidType?: string;
     isAll?: boolean;
     isRisk?: boolean;
   };

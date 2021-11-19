@@ -2992,7 +2992,7 @@ export type ResultDomainObject = {
   __typename?: 'ResultDomainObject';
   parents: Array<Parent>;
   geoCategory: GeoCategory;
-  geoType: GeoType;
+  geoFluidType: GeoType;
   attributeValues: Array<ResultAttributeValue>;
 };
 
@@ -3010,6 +3010,18 @@ export type Histogram = {
   numberOfIterationBin: number[];
   subtitle: string;
   title: string;
+};
+
+export type HistogramStatisticValues = {
+  name: string;
+  value: string;
+};
+
+export type HistogramStatistic = {
+  title: string;
+  decimal: number;
+  percentiles: HistogramStatisticValues[];
+  mathStats: HistogramStatisticValues[];
 };
 
 export type ResultHistogramsStructure = {

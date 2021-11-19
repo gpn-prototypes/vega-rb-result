@@ -97,8 +97,6 @@ export namespace SensitiveAnalysisChart {
       (d) => d.name,
     );
 
-    console.log({ series, bias, options, data });
-
     return { series, bias, options };
   }
 
@@ -249,8 +247,6 @@ export namespace SensitiveAnalysisChart {
     //     return zeroPoint.toFixed(3);
     //   }
 
-    //   console.log(x1Scale(value), value);
-
     //   return resultMinMax
     //     .flat(1)
     //     .reduce((prev, curr) => {
@@ -362,9 +358,7 @@ export namespace SensitiveAnalysisChart {
             .attr(
               'transform',
               ([name, min]) =>
-                `translate(0, ${
-                  (yScale(name) || 0) + yScale.bandwidth() - 21 / 2
-                })`,
+                `translate(0, ${(yScale(name) || 0) + yScale.bandwidth() / 2})`,
             ),
         )
         .call((nestedG) => nestedG.selectAll('.chart__text line').remove())

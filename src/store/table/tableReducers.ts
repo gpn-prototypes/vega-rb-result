@@ -40,8 +40,26 @@ export const tableInitialState: GridCollection = {
     hiddenColumnsFromLocalStorage !== null ? hiddenColumnsFromLocalStorage : {},
 };
 
+export const getDecimalByColumns = (
+  columns: Column<RbDomainEntityInput>[],
+): DecimalFixed => {
+  const decimalFixed: DecimalFixed = {};
+
+  columns
+    .filter(
+      (column: Column<RbDomainEntityInput>) => column.decimal !== undefined,
+    )
+    .forEach((column: Column<RbDomainEntityInput>) => {
+      decimalFixed[column.accessor] =
+        column.decimal !== undefined ? column.decimal : DEFAULT_DECIMAL_FIXED;
+    });
+
+  return decimalFixed;
+};
+
 export const getDecimalRows = (
   rows: Row<RbDomainEntityInput>[],
+  columns: Column<RbDomainEntityInput>[],
   decimalFixed: DecimalFixed = tableInitialState.decimalFixed || {},
 ): Row<RbDomainEntityInput>[] => {
   const resultRows = [...rows].map((row: Row<RbDomainEntityInput>) => {
@@ -63,7 +81,7 @@ export const getDecimalRows = (
             .toFixed(
               decimalFixed[rowKey] || decimalFixed[rowKey] === 0
                 ? decimalFixed[rowKey]
-                : DEFAULT_DECIMAL_FIXED,
+                : getDecimalByColumns(columns)[rowKey],
             )
             .toString();
     });
@@ -72,23 +90,6 @@ export const getDecimalRows = (
   });
 
   return resultRows;
-};
-
-export const getDecimalByColumns = (
-  columns: Column<RbDomainEntityInput>[],
-): DecimalFixed => {
-  const decimalFixed: DecimalFixed = {};
-
-  columns
-    .filter(
-      (column: Column<RbDomainEntityInput>) => column.decimal !== undefined,
-    )
-    .forEach((column: Column<RbDomainEntityInput>) => {
-      decimalFixed[column.accessor] =
-        column.decimal !== undefined ? column.decimal : DEFAULT_DECIMAL_FIXED;
-    });
-
-  return decimalFixed;
 };
 
 export const getActualColumns = (
@@ -195,7 +196,7 @@ export const TableReducers = reducerWithInitialState<GridCollection>(
       return {
         ...state,
         decimalFixed,
-        rows: getDecimalRows(state.rows, decimalFixed),
+        rows: getDecimalRows(state.rows, state.columns, decimalFixed),
       };
     },
   )

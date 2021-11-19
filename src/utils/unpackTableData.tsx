@@ -274,6 +274,9 @@ export const prepareRows = (
             formattedValue,
           };
 
+          /** Установка типа флюида в общий флоу */
+          row[percIndex].geoFluidType = String(domainObject.geoFluidType);
+
           /** Устанавливаем кастомные флаги, для того чтобы менять отображение таблицы */
           if (isHasParentAll(domainObject.parents)) {
             if (isAllEmitted) {
@@ -289,6 +292,7 @@ export const prepareRows = (
               code: attributeValue.code,
               value: parent.name,
               formattedValue: parent.name.toString(),
+              geoFluidType: domainObject.geoFluidType,
             };
           });
         });
@@ -301,7 +305,9 @@ export const prepareRows = (
     rowNumber += addRowsNum;
   });
 
-  return [...getDecimalRows(preparedRows, getDecimalByColumns(columns))];
+  return [
+    ...getDecimalRows(preparedRows, columns, getDecimalByColumns(columns)),
+  ];
 };
 
 export function unpackTableData(

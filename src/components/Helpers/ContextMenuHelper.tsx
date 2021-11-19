@@ -55,7 +55,7 @@ export const ItemWithChoice: React.FC<{
   getDisabled?: (item: MenuContextItem) => boolean;
 }> = ({ menuItem, onChange, getDisabled, setIsOpenContextMenu }) => {
   const [isOpenEdit, setIsOpenEdit] = useState<boolean>(
-    menuItem.choice?.values.includes(menuItem.choice.value || 0) || false,
+    !menuItem.choice?.values.includes(menuItem.choice.value || 0) || false,
   );
   const [inputValue, setValue] = useState<number>(menuItem.choice?.value || 50);
   const handleInputChange = ({ value }) => setValue(value);
