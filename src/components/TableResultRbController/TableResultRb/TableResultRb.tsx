@@ -68,6 +68,36 @@ const menuItems = (): MenuContextItem[] => [
   },
 ];
 
+/** Проверка, есть ли в отфильтрованных строках данные с учетом фильтрации колонок */
+const isHasAnyValuesInFilteredRows = (
+  columns: Column<RbDomainEntityInput>[],
+  rows: Row<RbDomainEntityInput>[],
+): boolean => {
+  return (
+    /**
+     * Пробегаемся по всем колонкам и в каждой колонке, исключая колонки без geoType
+     * В каждой строке ищем наличие свойства по названию колонки
+     * Если хоть одна такая есть - считаем, что данные есть
+     */
+    columns
+      .filter(
+        (column: Column<RbDomainEntityInput>) =>
+          column.geoType !== '' && column.geoType !== undefined,
+      )
+      .find((column: Column<RbDomainEntityInput>) => {
+        let isHasAnyValue = false;
+
+        rows.forEach((row: Row<RbDomainEntityInput>) => {
+          if (row[column.accessor] !== undefined) {
+            isHasAnyValue = true;
+          }
+        });
+
+        return isHasAnyValue;
+      }) !== undefined
+  );
+};
+
 export const TableResultRb: React.FC<Props> = ({
   rows,
   columns,
@@ -154,7 +184,9 @@ export const TableResultRb: React.FC<Props> = ({
     if (
       filteredColumnsData.find((column: Column<RbDomainEntityInput>) =>
         Boolean(column.geoType),
-      ) === undefined
+      ) === undefined ||
+      isHasAnyValuesInFilteredRows(filteredColumnsData, filteredRowsData) ===
+        false
     ) {
       filteredRowsData = [];
     }

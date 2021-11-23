@@ -292,7 +292,7 @@ export const prepareRows = (
               code: attributeValue.code,
               value: parent.name,
               formattedValue: parent.name.toString(),
-              geoFluidType: domainObject.geoFluidType,
+              geoFluidType: domainObject?.geoFluidType,
             };
           });
         });

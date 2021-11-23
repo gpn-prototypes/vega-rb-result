@@ -1,6 +1,12 @@
 .table {
   height: 100%;
 
+  .TableCell {
+    &:not(.TableCell_isHeader) {
+      --buttons-wrapper-size: 0px;
+    }
+  }
+
   .TableCell_isControl {
     min-width: 120px !important;
   }

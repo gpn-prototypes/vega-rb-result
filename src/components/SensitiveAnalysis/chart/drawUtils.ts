@@ -128,8 +128,7 @@ export namespace SensitiveAnalysisChart {
 
     const x1Scale = d3
       .scaleLinear()
-      // .domain([(d3.min(sample) || 0) - 0.001, (d3.max(sample) || 0) + 0.001])
-      .domain([(d3.min(sample) || 0) - 0.0027, (d3.max(sample) || 0) + 0.0027])
+      .domain([d3.min(sample) || 0, d3.max(sample) || 0])
       .range([
         SensitiveAnalysisChart.Margin.left,
         SensitiveAnalysisChart.Width + SensitiveAnalysisChart.Margin.right,
