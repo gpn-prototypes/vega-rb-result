@@ -3,7 +3,8 @@
 
   .TableCell {
     &:not(.TableCell_isHeader) {
-      --buttons-wrapper-size: 0;
+      /* stylelint-disable-next-line length-zero-no-unit */
+      --buttons-wrapper-size: 0px;
     }
   }
 
