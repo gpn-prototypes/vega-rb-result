@@ -176,6 +176,36 @@ export const GET_HISTOGRAM_RESULT_RB = gql`
   }
 `;
 
+export const GET_HISTOGRAM_STATISTICS_RESULT_RB = gql`
+  query GetTableResultRb($domainEntityNames: [String!], $bins: Int) {
+    project {
+      resourceBase {
+        result {
+          histograms {
+            getHistogramReservesStatistics(
+              domainEntityNames: $domainEntityNames
+              bins: $bins
+            ) {
+              statistics {
+                title
+                decimal
+                percentiles {
+                  name
+                  value
+                }
+                mathStats {
+                  name
+                  value
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
 export const GET_SENSITIVE_ANALYSIS_RESULT_RB = gql`
   query GetTableResultRb($domainEntityNames: [String!]) {
     project {
@@ -185,7 +215,7 @@ export const GET_SENSITIVE_ANALYSIS_RESULT_RB = gql`
             getSensitivityAnalysis(domainEntityNames: $domainEntityNames) {
               title
               names
-              sample
+              resultMinMax
               percentiles
               zeroPoint
             }
@@ -202,12 +232,25 @@ export const GET_SENSITIVE_ANALYSIS_STATISTIC_RESULT_RB = gql`
       resourceBase {
         result {
           histograms {
-            getSensitivityAnalysis(domainEntityNames: $domainEntityNames) {
-              title
-              names
-              sample
-              percentiles
-              zeroPoint
+            getSensitivityAnalysisStatistics(
+              domainEntityNames: $domainEntityNames
+            ) {
+              headers {
+                code
+                name
+                decimal
+                children {
+                  code
+                  name
+                  decimal
+                }
+              }
+              rows {
+                cells {
+                  code
+                  value
+                }
+              }
             }
           }
         }
@@ -247,6 +290,7 @@ export const GET_TABLE_RESULT_RB = gql`
                 viewType
               }
               domainObjects {
+                geoFluidType
                 parents {
                   code
                   name

@@ -12,7 +12,7 @@ const PER_ELEMENT_HEIGHT = 66.6;
 
 export const SensitiveAnalysisChartComponent: React.FC<
   SensitiveAnalysis & { availableNames: string[] }
-> = ({ names, percentiles, sample, zeroPoint, availableNames }) => {
+> = ({ names, percentiles, resultMinMax, zeroPoint, availableNames }) => {
   const d3Container = useRef(null);
 
   /**
@@ -31,7 +31,11 @@ export const SensitiveAnalysisChartComponent: React.FC<
 
     setCurrentPercentiles(result);
 
-    setCurrentHeight(result.length * PER_ELEMENT_HEIGHT);
+    setCurrentHeight(
+      result.length * PER_ELEMENT_HEIGHT > 150
+        ? result.length * PER_ELEMENT_HEIGHT
+        : 150,
+    );
   }, [
     availableNames,
     percentiles,
@@ -48,15 +52,31 @@ export const SensitiveAnalysisChartComponent: React.FC<
 
     const data: SensitiveAnalysisChart.Payload[] = [];
 
-    currentPercentiles.forEach((percentale: number[], index: number) => {
-      percentale.forEach((percent: number, innerIndex: number) => {
-        data.push({
-          name: names[index],
-          value: percent,
-          category: innerIndex === 0 ? 0 : 1,
+    resultMinMax
+      .sort((a: number[], b: number[]) => {
+        if (a[0] === b[0]) {
+          return a[1] - b[1];
+        }
+
+        return b[0] - a[0];
+      })
+      .reverse()
+      .forEach((result: number[], index: number) => {
+        result.forEach((currentResult: number, innerIndex: number) => {
+          if (!availableNames.includes(names[index])) {
+            return;
+          }
+
+          data.push({
+            name: names[index],
+            value:
+              innerIndex === 0
+                ? zeroPoint - currentResult
+                : currentResult - zeroPoint,
+            category: innerIndex === 0 ? 0 : 1,
+          });
         });
       });
-    });
 
     const { series, bias, options } = SensitiveAnalysisChart.getAxisData(data);
 
@@ -66,7 +86,7 @@ export const SensitiveAnalysisChartComponent: React.FC<
 
     const { xScale, x1Scale, yScale } = SensitiveAnalysisChart.getAxisScale({
       series,
-      sample,
+      resultMinMax,
       bias,
     });
 
@@ -75,46 +95,13 @@ export const SensitiveAnalysisChartComponent: React.FC<
       x1Scale,
       yScale,
       options,
-      sample,
+      resultMinMax,
       currentPercentiles,
       bias,
       series,
+      zeroPoint,
+      data,
     });
-
-    /**
-     * У нас отвязана ось X от графика. Но нам нужно, чтоб фиктивная ось X
-     * Была связана с графиком, поэтому необходимо двигать X положения баров в графике
-     * Для этого мы находим все элементы оси X, парсим, получая значения и позицию
-     * После этого, нам необходимо высчитать процент zeroPoint от следующего шага
-     * После получения процента, мы множим пред. позицию и выставляем начальную позицию баров
-     */
-    /** TODO: Под вопросом, нужно ли */
-    // setTimeout(() => {
-    //   const xAxisResult: { value: number; xPos: number }[] = [];
-
-    //   document
-    //     .querySelectorAll('.chart__xAxis g')
-    //     .forEach((element: Element) => {
-    //       const xPos = (element.getAttribute('transform') || '')
-    //         .replace('translate(', '')
-    //         .replace(')', '')
-    //         .split(',')[0];
-
-    //       xAxisResult.push({
-    //         value: Number(element.textContent),
-    //         xPos: Number(xPos),
-    //       });
-    //     });
-
-    //   const nextFromZeroPoint = xAxisResult.findIndex((innerX) => {
-    //     return innerX.value >= zeroPoint;
-    //   });
-    //   const zeroPointMultiplier = Math.round(
-    //     100 - (zeroPoint / xAxisResult[nextFromZeroPoint].value) * 100,
-    //   );
-    //   const prevFromZeroPointXPos = xAxisResult[nextFromZeroPoint - 1].xPos;
-    //   const zeroPointXPos = prevFromZeroPointXPos * zeroPointMultiplier;
-    // });
 
     svg
       .append('g')
@@ -138,13 +125,13 @@ export const SensitiveAnalysisChartComponent: React.FC<
     svg.append('g').call(y2Axis);
     svg.append('g').call(y3Axis);
     svg.append('g').call(xAxis);
-  }, [sample, currentPercentiles, names]);
+  }, [resultMinMax, currentPercentiles, names, availableNames, zeroPoint]);
 
   useEffect(() => {
     if (d3Container.current) {
       draw();
     }
-  }, [draw, sample]);
+  }, [draw, currentPercentiles]);
 
   return (
     <div className="chart">

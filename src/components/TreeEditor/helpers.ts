@@ -5,12 +5,15 @@ import arrayToTree from 'array-to-tree';
 import { get, groupBy, mergeWith } from 'lodash/fp';
 import { v4 as uuid } from 'uuid';
 
-import { Column, Row } from '../TableResultRbController/TableResultRb/types';
+import {
+  Column,
+  RowEntity,
+} from '../TableResultRbController/TableResultRb/types';
 
 import { CellPosition, TreeItemData } from './types';
 
 const getTreeNodeItem = (
-  row: Record<string, Row<RbDomainEntityInput>>,
+  row: RowEntity,
   rowIdx: number,
   columnIdx: number,
   columnKey?: string,
@@ -35,7 +38,9 @@ const getTreeNodeItem = (
         ),
       )?.id;
 
-  const name = row[columnKey || '']?.value || '? (заглушка)';
+  const name = !columnKey
+    ? '? (заглушка)'
+    : row[columnKey]?.value || '? (заглушка)';
 
   return {
     name: name as string,
@@ -113,7 +118,7 @@ export function mergeObjectsInUnique<T>(array: T[], properties: string[]): T[] {
 export function getNodeListFromTableData<T>(
   data: {
     columns: Column<RbDomainEntityInput>[];
-    rows: Record<string, Row<RbDomainEntityInput>>[];
+    rows: RowEntity[];
   },
   projectName: string,
 ): TreeItem<TreeItemData>[] {
@@ -130,17 +135,15 @@ export function getNodeListFromTableData<T>(
       name: title,
     }));
 
-  const filledRows = rows.filter(
-    (row: Record<string, Row<RbDomainEntityInput>>) => {
-      if (row.isAll) {
-        return false;
-      }
+  const filledRows = rows.filter((row: RowEntity) => {
+    if (row.isAll) {
+      return false;
+    }
 
-      return structurecolumnKeys.some(
-        ({ key, name }) => key !== 'id' && row[key]?.value,
-      );
-    },
-  );
+    return structurecolumnKeys.some(
+      ({ key, name }) => key !== 'id' && row[key]?.value,
+    );
+  });
 
   const nodes: TreeItem<TreeItemData>[] = [];
 

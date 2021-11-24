@@ -1,7 +1,7 @@
 import React, { ReactText } from 'react';
 import {
   Column,
-  Row,
+  RowEntity,
 } from '@app/components/TableResultRbController/TableResultRb/types';
 import { EFluidType } from '@app/constants/Enums';
 import {
@@ -103,7 +103,7 @@ export type HiddenColumns = Record<string, boolean>;
 export interface GridCollection {
   columns: Column<RbDomainEntityInput>[];
   actualColumns?: Column<RbDomainEntityInput>[];
-  rows: Row<RbDomainEntityInput>[];
+  rows: RowEntity[];
   version: number;
   activeRow?: GridActiveRow | undefined;
   sidebarRow?: GridActiveRow | undefined;

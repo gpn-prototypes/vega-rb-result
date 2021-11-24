@@ -1,6 +1,17 @@
 .table {
   height: 100%;
 
+  .TableCell {
+    &:not(.TableCell_isHeader) {
+      /* stylelint-disable-next-line length-zero-no-unit */
+      --buttons-wrapper-size: 0px;
+    }
+  }
+
+  .TableCell_isControl {
+    min-width: 120px !important;
+  }
+
   .TableCell_isHeader {
     min-width: 80px;
 

@@ -1,6 +1,6 @@
 import {
   Column,
-  Row,
+  RowEntity,
 } from '@app/components/TableResultRbController/TableResultRb/types';
 import { EFluidType } from '@app/constants/Enums';
 import { LocalStorageKey } from '@app/constants/LocalStorageKeyConstants';
@@ -40,40 +40,6 @@ export const tableInitialState: GridCollection = {
     hiddenColumnsFromLocalStorage !== null ? hiddenColumnsFromLocalStorage : {},
 };
 
-export const getDecimalRows = (
-  rows: Row<RbDomainEntityInput>[],
-  decimalFixed: DecimalFixed = tableInitialState.decimalFixed || {},
-): Row<RbDomainEntityInput>[] => {
-  const resultRows = [...rows].map((row: Row<RbDomainEntityInput>) => {
-    const decimalRow = {};
-
-    Object.keys(row).forEach((rowKey: string) => {
-      decimalRow[rowKey] = row[rowKey];
-
-      const { value } = row[rowKey];
-
-      if (!value) {
-        return;
-      }
-
-      // eslint-disable-next-line no-restricted-globals
-      decimalRow[rowKey].formattedValue = isNaN(value)
-        ? value
-        : Number(value)
-            .toFixed(
-              decimalFixed[rowKey] || decimalFixed[rowKey] === 0
-                ? decimalFixed[rowKey]
-                : DEFAULT_DECIMAL_FIXED,
-            )
-            .toString();
-    });
-
-    return decimalRow as Row<RbDomainEntityInput>;
-  });
-
-  return resultRows;
-};
-
 export const getDecimalByColumns = (
   columns: Column<RbDomainEntityInput>[],
 ): DecimalFixed => {
@@ -89,6 +55,41 @@ export const getDecimalByColumns = (
     });
 
   return decimalFixed;
+};
+
+export const getDecimalRows = (
+  rows: RowEntity[],
+  columns: Column<RbDomainEntityInput>[],
+  decimalFixed: DecimalFixed = tableInitialState.decimalFixed || {},
+): RowEntity[] => {
+  const resultRows = [...rows].map((row: RowEntity) => {
+    const decimalRow = {};
+
+    Object.keys(row).forEach((rowKey: string) => {
+      decimalRow[rowKey] = row[rowKey];
+
+      const { value } = row[rowKey];
+
+      if (!value) {
+        return;
+      }
+
+      // eslint-disable-next-line no-restricted-globals
+      decimalRow[rowKey].formattedValue = isNaN(Number(value))
+        ? value
+        : Number(value)
+            .toFixed(
+              decimalFixed[rowKey] || decimalFixed[rowKey] === 0
+                ? decimalFixed[rowKey]
+                : getDecimalByColumns(columns)[rowKey],
+            )
+            .toString();
+    });
+
+    return decimalRow as RowEntity;
+  });
+
+  return resultRows;
 };
 
 export const getActualColumns = (
@@ -195,7 +196,7 @@ export const TableReducers = reducerWithInitialState<GridCollection>(
       return {
         ...state,
         decimalFixed,
-        rows: getDecimalRows(state.rows, decimalFixed),
+        rows: getDecimalRows(state.rows, state.columns, decimalFixed),
       };
     },
   )

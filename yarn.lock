@@ -1266,10 +1266,10 @@
     react-transition-group "^4.4.1"
     tslib "^1.13.0"
 
-"@consta/uikit@3.9.1":
-  version "3.9.1"
-  resolved "https://registry.yarnpkg.com/@consta/uikit/-/uikit-3.9.1.tgz#b0d7f9575bbdc05dc264eedd0ee059f3e9030588"
-  integrity sha512-Dz4J1cyjjhkUqdaviI5sUFV7ItQqc0EQnA975cdRT+9J2Xf4CliwTlL6/OfJF9BE+PBochlrBnLxVIzQrYSAVw==
+"@consta/uikit@3.9.3":
+  version "3.9.3"
+  resolved "https://registry.yarnpkg.com/@consta/uikit/-/uikit-3.9.3.tgz#e0cf663385ecb70ec62dc4b6e29a840465b4a6d1"
+  integrity sha512-Yn3UfWqUC8Q1RZ2tb34ZB9Gv3uD0tC6WbEOgMgB6k65XVEjJwI2lc5h/LTw7tlIQu9Xi9RE6GSnT1QjPyfHx2A==
   dependencies:
     "@bem-react/classname" "^1.5.8"
     "@bem-react/classnames" "^1.3.9"

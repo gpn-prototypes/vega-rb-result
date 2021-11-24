@@ -20,16 +20,15 @@ import competitiveAccessDuck from '@app/store/competitiveAccessDuck';
 import { NotifyActions } from '@app/store/notify/notifyActions';
 import projectDuck from '@app/store/projectDuck';
 import { SettingsActions } from '@app/store/settings/settingsActions';
-import {
-  openSensitiveAnalysisFromLocalStorage,
-  showHistogramFromLocalStorage,
-} from '@app/store/settings/settingsReducers';
+import { openSensitiveAnalysisFromLocalStorage } from '@app/store/settings/settingsReducers';
 import { TableActions } from '@app/store/table/tableActions';
 import { RootState } from '@app/store/types';
 import { GridActiveRow, GridCollection } from '@app/types/typesTable';
 import { LocalStorageHelper } from '@app/utils/LocalStorageHelper';
 import { ChoiceGroup } from '@consta/uikit/ChoiceGroup';
+import { IconCollapse } from '@consta/uikit/IconCollapse';
 import { IconDownload } from '@consta/uikit/IconDownload';
+import { IconExpand } from '@consta/uikit/IconExpand';
 import { IconSettings } from '@consta/uikit/IconSettings';
 import { Position } from '@consta/uikit/Popover';
 import { Sidebar } from '@consta/uikit/Sidebar';
@@ -39,11 +38,6 @@ import { SplitPanes, useInterval } from '@gpn-prototypes/vega-ui';
 import './RbResultPage.scss';
 
 const payloadMenuItems: MenuContextItem[] = [
-  {
-    name: 'Показывать гистограмму',
-    code: 'histogram',
-    switch: (() => showHistogramFromLocalStorage)(),
-  },
   {
     name: 'Открывать анализ чувствительности',
     code: 'analysis',
@@ -128,12 +122,6 @@ const RbResultPage: React.FC = () => {
     const currentItem = updatedMenuItems.find((cur) => cur.code === item.code);
 
     switch (currentItem?.code) {
-      case 'histogram': {
-        dispatch(SettingsActions.setShowHistogram(Boolean(currentItem.switch)));
-
-        break;
-      }
-
       case 'analysis': {
         dispatch(
           SettingsActions.setOpenSensitiveAnalysis(Boolean(currentItem.switch)),
@@ -224,6 +212,24 @@ const RbResultPage: React.FC = () => {
                             onClick={() => downloadResult()}
                             size="m"
                           />
+                        </span>
+
+                        <span className="result__icon">
+                          {showHistogram ? (
+                            <IconExpand
+                              onClick={() =>
+                                dispatch(
+                                  SettingsActions.setShowHistogram(false),
+                                )
+                              }
+                            />
+                          ) : (
+                            <IconCollapse
+                              onClick={() =>
+                                dispatch(SettingsActions.setShowHistogram(true))
+                              }
+                            />
+                          )}
                         </span>
 
                         <span ref={settingsRef} className="result__icon">

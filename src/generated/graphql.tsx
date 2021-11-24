@@ -1,4 +1,7 @@
-import { SensitiveAnalysis } from '@app/interfaces/SensitiveAnalysisInterface';
+import {
+  SensitiveAnalysis,
+  SensitiveAnalysisStatistic,
+} from '@app/interfaces/SensitiveAnalysisInterface';
 
 export type Maybe<T> = T | null;
 export type Exact<T extends { [key: string]: unknown }> = {
@@ -2989,7 +2992,7 @@ export type ResultDomainObject = {
   __typename?: 'ResultDomainObject';
   parents: Array<Parent>;
   geoCategory: GeoCategory;
-  geoType: GeoType;
+  geoFluidType: GeoType;
   attributeValues: Array<ResultAttributeValue>;
 };
 
@@ -3009,6 +3012,18 @@ export type Histogram = {
   title: string;
 };
 
+export type HistogramStatisticValues = {
+  name: string;
+  value: string;
+};
+
+export type HistogramStatistic = {
+  title: string;
+  decimal: number;
+  percentiles: HistogramStatisticValues[];
+  mathStats: HistogramStatisticValues[];
+};
+
 export type ResultHistogramsStructure = {
   __typename?: 'HistogramsResult';
   getHistograms: {
@@ -3019,6 +3034,11 @@ export type ResultHistogramsStructure = {
 export type SensitivityAnalysisStructure = {
   __typename?: 'HistogramResultQuery';
   getSensitivityAnalysis: SensitiveAnalysis;
+};
+
+export type SensitivityAnalysisStatisticStructure = {
+  __typename?: 'HistogramResultQuery';
+  getSensitivityAnalysisStatistics: SensitiveAnalysisStatistic;
 };
 
 export type ResultTableQuery = {

@@ -5,6 +5,7 @@ import { LocalStorageKey } from '@app/constants/LocalStorageKeyConstants';
 import {
   Column,
   Row,
+  RowEntity,
 } from '../components/TableResultRbController/TableResultRb/types';
 import {
   Parent,
@@ -39,7 +40,7 @@ export const prepareColumns = (
   const { domainEntities, attributes } = data;
 
   const getClass = (
-    row: Row<RbDomainEntityInput>,
+    row: RowEntity,
     domainEntity: ResultDomainEntity | ResultAttribute,
   ): string => {
     const baseClass = row.isAll ? '_all' : '';
@@ -66,7 +67,7 @@ export const prepareColumns = (
       align,
       mergeCells: mergeCells !== undefined ? mergeCells : true,
       isResizable: true,
-      getComparisonValue: (row: Row<RbDomainEntityInput>) => row?.value || '',
+      getComparisonValue: (row: Row) => row?.value || '',
       visible,
       geoType,
       decimal,
@@ -84,7 +85,7 @@ export const prepareColumns = (
         accessor: domainEntity.code as keyof RbDomainEntityInput,
         visible: domainEntity?.visible,
         align: 'left',
-        renderCell: (row: Row<RbDomainEntityInput>) => {
+        renderCell: (row: RowEntity) => {
           /** Заполняем коды и названия с учетом родителей, нужно для отправки данных в отображение гистограм */
           const codeWithParents =
             index === 0
@@ -196,7 +197,7 @@ export const prepareColumns = (
         control: getColumnControl(attribute),
         columnAccessorGroup: getColumnAccessorGroup(attribute),
         decimal: getDecimalValue(attribute),
-        renderCell: (row: Row<RbDomainEntityInput>) => {
+        renderCell: (row: RowEntity) => {
           /** Заполняем коды и названия с учетом родителей, нужно для отправки данных в отображение гистограм */
           const codeWithParents = domainEntities
             .map((entity: ResultDomainEntity) => entity.code)
@@ -209,7 +210,7 @@ export const prepareColumns = (
 
           const formattedValue =
             // eslint-disable-next-line no-restricted-globals
-            isNaN(value) || value === undefined
+            isNaN(Number(value)) || value === undefined
               ? value
               : getNumberWithSpaces(value);
 
@@ -237,16 +238,16 @@ export const prepareColumns = (
 export const prepareRows = (
   { domainObjects, attributes }: ResultProjectStructure,
   columns: Column<RbDomainEntityInput>[],
-): Row<RbDomainEntityInput>[] => {
+): RowEntity[] => {
   let rowNumber = 1;
 
-  const preparedRows: Row<RbDomainEntityInput>[] = [];
+  const preparedRows: RowEntity[] = [];
 
   domainObjects.forEach((domainObject) => {
     let addRowsNum = 0;
 
     // Row - structure of three small rows
-    const row: Row<RbDomainEntityInput>[] = [];
+    const row: RowEntity[] = [];
     let isAllEmitted = false;
 
     domainObject.attributeValues.forEach(
@@ -254,7 +255,7 @@ export const prepareRows = (
         attributeValue.percentiles.forEach((percentile, percIndex) => {
           /** Проверяем, есть ли элемент, и если нет - создаем */
           if (!row[percIndex]) {
-            row[percIndex] = {} as Row<RbDomainEntityInput>;
+            row[percIndex] = {} as RowEntity;
           }
 
           /** Устанавливаем необходимые данные для ячеек */
@@ -270,9 +271,12 @@ export const prepareRows = (
           /** Установка значения по коду */
           row[percIndex][attributeValue.code] = {
             code: attributeValue.code,
-            value: attributeValue.values[percIndex],
-            formattedValue,
+            value: attributeValue.values[percIndex].toString(),
+            formattedValue: formattedValue.toString(),
           };
+
+          /** Установка типа флюида в общий флоу */
+          row[percIndex].geoFluidType = String(domainObject.geoFluidType);
 
           /** Устанавливаем кастомные флаги, для того чтобы менять отображение таблицы */
           if (isHasParentAll(domainObject.parents)) {
@@ -301,7 +305,9 @@ export const prepareRows = (
     rowNumber += addRowsNum;
   });
 
-  return [...getDecimalRows(preparedRows, getDecimalByColumns(columns))];
+  return [
+    ...getDecimalRows(preparedRows, columns, getDecimalByColumns(columns)),
+  ];
 };
 
 export function unpackTableData(
@@ -310,10 +316,7 @@ export function unpackTableData(
 ): GridCollection {
   const columns: Column<RbDomainEntityInput>[] =
     prepareColumns(projectStructure);
-  const rows: Row<RbDomainEntityInput>[] = prepareRows(
-    projectStructure,
-    columns,
-  );
+  const rows: RowEntity[] = prepareRows(projectStructure, columns);
 
   return {
     columns,

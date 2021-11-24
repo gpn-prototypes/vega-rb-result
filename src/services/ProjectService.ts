@@ -7,6 +7,7 @@ import { FetchPolicy } from '@apollo/client/core/watchQueryOptions';
 import { GET_RECENTLY_EDITED } from '@app/components/CompetitiveAccess/queries';
 import {
   GET_HISTOGRAM_RESULT_RB,
+  GET_HISTOGRAM_STATISTICS_RESULT_RB,
   GET_PROJECT_NAME,
   GET_SENSITIVE_ANALYSIS_RESULT_RB,
   GET_SENSITIVE_ANALYSIS_STATISTIC_RESULT_RB,
@@ -14,11 +15,13 @@ import {
   GET_TABLE_TEMPLATE,
 } from '@app/components/TableResultRbController/queries';
 import {
+  HistogramStatistic,
   ProjectInner,
   ProjectStructure,
   Query,
   ResultHistogramsStructure,
   ResultProjectStructure,
+  SensitivityAnalysisStatisticStructure,
   SensitivityAnalysisStructure,
 } from '@app/generated/graphql';
 import {
@@ -224,6 +227,40 @@ class ProjectService implements IProjectService {
     );
   }
 
+  async getHistogramStatisticsData(
+    domainEntityNames: string[],
+    bins: number,
+  ): Promise<HistogramStatistic[]> {
+    const { data: responseData } = await this.client
+      .watchQuery<Query>({
+        query: GET_HISTOGRAM_STATISTICS_RESULT_RB,
+        context: {
+          uri: getGraphqlUri(this.projectId),
+        },
+        variables: {
+          domainEntityNames,
+          bins,
+        },
+        fetchPolicy: 'no-cache',
+      })
+      .result();
+
+    this.trySetupWorkingProject(responseData);
+
+    return getOr(
+      None<HistogramStatistic[]>(),
+      [
+        'project',
+        'resourceBase',
+        'result',
+        'histograms',
+        'getHistogramReservesStatistics',
+        'statistics',
+      ],
+      responseData,
+    );
+  }
+
   async getSensitiveAnalysisData(
     domainEntityNames: string[],
   ): Promise<SensitivityAnalysisStructure> {
@@ -251,7 +288,7 @@ class ProjectService implements IProjectService {
 
   async getSensitiveAnalysisStatistic(
     domainEntityNames: string[],
-  ): Promise<SensitivityAnalysisStructure> {
+  ): Promise<SensitivityAnalysisStatisticStructure> {
     const { data: responseData } = await this.client
       .watchQuery<Query>({
         query: GET_SENSITIVE_ANALYSIS_STATISTIC_RESULT_RB,

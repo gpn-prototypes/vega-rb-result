@@ -11,9 +11,22 @@ export async function loadHistogramData(
 
   if (data) {
     dispatch(
-      histogramDuck.actions.setHistograms({
-        payload: data.getHistograms.histograms,
-      }),
+      histogramDuck.actions.setHistograms(data.getHistograms.histograms),
     );
+  }
+}
+
+export async function loadHistogramStatisticData(
+  dispatch: Dispatch<unknown>,
+  domainEntityNames: string[],
+  bins: number,
+): Promise<void> {
+  const statistics = await projectService.getHistogramStatisticsData(
+    domainEntityNames,
+    bins,
+  );
+
+  if (statistics) {
+    dispatch(histogramDuck.actions.setStatistics(statistics));
   }
 }

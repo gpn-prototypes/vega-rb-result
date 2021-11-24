@@ -87,28 +87,26 @@ export namespace SensitiveAnalysisChart {
       ) as any,
     );
 
-    const bias = d3
-      .rollups(
-        data,
-        (v) =>
-          d3.sum(
-            v,
-            (d: any) => d.value * Math.min(0, signs.get(d.category) as any),
-          ),
-        (d) => d.name,
-      )
-      .sort(([, a], [, b]) => d3.ascending(a, b));
+    const bias = d3.rollups(
+      data,
+      (v) =>
+        d3.sum(
+          v,
+          (d: any) => d.value * Math.min(0, signs.get(d.category) as any),
+        ),
+      (d) => d.name,
+    );
 
     return { series, bias, options };
   }
 
   export function getAxisScale({
     series,
-    sample,
+    resultMinMax,
     bias,
   }: {
     series: SensitiveAnalysisChart.Series;
-    sample: number[];
+    resultMinMax: number[][];
     bias: SensitiveAnalysisChart.Bias[];
   }): {
     xScale: d3.ScaleLinear<number, number, never>;
@@ -116,6 +114,7 @@ export namespace SensitiveAnalysisChart {
     yScale: d3.ScaleBand<string>;
   } {
     const offset = 50;
+    const sample = resultMinMax.flat(1);
 
     const xScale = d3
       .scaleLinear()
@@ -158,19 +157,23 @@ export namespace SensitiveAnalysisChart {
     x1Scale,
     yScale,
     options,
-    sample,
+    resultMinMax,
     currentPercentiles,
     bias,
     series,
+    zeroPoint,
+    data,
   }: {
     xScale: d3.ScaleLinear<number, number, never>;
     x1Scale: d3.ScaleLinear<number, number, never>;
     yScale: d3.ScaleBand<string>;
     options: Options;
-    sample: number[];
+    resultMinMax: number[][];
     currentPercentiles: number[][];
     bias: Bias[];
     series: Series;
+    zeroPoint: number;
+    data: SensitiveAnalysisChart.Payload[];
   }): {
     xAxis;
     yAxis;
@@ -180,6 +183,45 @@ export namespace SensitiveAnalysisChart {
     const formatValue = () => {
       const format = d3.format(options.format || '');
       return (innerX) => format(Math.abs(innerX));
+    };
+
+    const getPercentileByValue = (inputValue: number): string => {
+      const negativesData = data.filter(
+        (currentData) => currentData.category === 0,
+      );
+      const positivesData = data.filter(
+        (currentData) => currentData.category === 1,
+      );
+
+      const valueIndex = (
+        inputValue < 0 ? negativesData : positivesData
+      ).findIndex((currentData) => {
+        return inputValue < 0
+          ? currentData.value === inputValue * -1
+          : currentData.value === inputValue;
+      });
+
+      if (!currentPercentiles[valueIndex]) {
+        return '';
+      }
+
+      return currentPercentiles[valueIndex][inputValue < 0 ? 0 : 1].toFixed(3);
+
+      // const value =
+      //   inputValue < 0 ? inputValue * -1 + zeroPoint : inputValue + zeroPoint;
+
+      // resultMinMax.forEach((result: number[], index: number) => {
+      //   if (result.includes(value)) {
+      //     firstIndex = index;
+
+      //     secondIndex = result.findIndex(
+      //       (innerResult: number) =>
+      //         innerResult.toFixed(5) === value.toFixed(5),
+      //     );
+      //   }
+      // });
+
+      // return currentPercentiles[firstIndex][secondIndex].toFixed(3);
     };
 
     const getPositiveTickByNegativeValue = (negativeValue: number): number => {
@@ -192,11 +234,25 @@ export namespace SensitiveAnalysisChart {
 
         return index;
       };
+
       const rightBarSeries = series[1];
       const currentTick = rightBarSeries[findPositiveIndexByNegative()][1];
 
       return currentTick;
     };
+
+    // const getAxisTextByXScale = (value: number) => {
+    //   if (value === 0) {
+    //     return zeroPoint.toFixed(3);
+    //   }
+
+    //   return resultMinMax
+    //     .flat(1)
+    //     .reduce((prev, curr) => {
+    //       return Math.abs(curr - value) < Math.abs(prev - value) ? curr : prev;
+    //     })
+    //     .toFixed(3);
+    // };
 
     /** Добавление оси X, а так же добавление полосок */
     const xAxis = (g) =>
@@ -206,7 +262,7 @@ export namespace SensitiveAnalysisChart {
         .call(
           d3
             .axisTop(x1Scale)
-            .ticks(6)
+            .ticks(8)
             .tickFormat(formatValue())
             .tickSizeOuter(0),
         )
@@ -215,9 +271,15 @@ export namespace SensitiveAnalysisChart {
           innerG
             .selectAll('.tick')
             .call((nestedG) => nestedG.selectAll('.tick line').remove())
-            .attr('class', 'chart__text chart__text_middle')
-            .attr('text-anchor', 'middle')
-            .data(sample)
+            .call((nestedG) => nestedG.selectAll('.tick text').remove())
+            .call((nestedG) =>
+              nestedG
+                .append('text')
+                .attr('class', 'chart__text chart__text_middle')
+                .attr('text-anchor', 'middle')
+                .text((x: number) => x),
+            )
+            // .data(resultMinMax.flat(1))
             .append('line')
             .attr('transform', () => `translate(0, 20)`)
             .attr('y2', currentPercentiles.length * 66.6)
@@ -246,7 +308,7 @@ export namespace SensitiveAnalysisChart {
             .text('')
             .append('text')
             .attr('class', 'chart__text chart__text_white')
-            .text(([, value]) => value),
+            .text(([, value]) => getPercentileByValue(value)),
         )
         /** Установка позиции zero point */
         .call((innerG) =>
@@ -275,7 +337,7 @@ export namespace SensitiveAnalysisChart {
             .append('text')
             .attr('class', 'chart__text chart__text_start chart__text_white')
             .text(([, min]) => {
-              return getPositiveTickByNegativeValue(min);
+              return getPercentileByValue(getPositiveTickByNegativeValue(min));
             }),
         )
         .call((innerG) => innerG.select('.domain').attr('display', 'none'));
@@ -291,13 +353,11 @@ export namespace SensitiveAnalysisChart {
             .call((nestedG) => nestedG.select('.domain').remove())
             .selectAll('.tick')
             .data(bias)
-            .attr('class', 'chart__text')
+            .attr('class', 'chart__text chart__text_start')
             .attr(
               'transform',
               ([name, min]) =>
-                `translate(95, ${
-                  (yScale(name) || 0) + yScale.bandwidth() - 11 / 2
-                })`,
+                `translate(0, ${(yScale(name) || 0) + yScale.bandwidth() / 2})`,
             ),
         )
         .call((nestedG) => nestedG.selectAll('.chart__text line').remove())

@@ -6,7 +6,7 @@ import { TableEntities } from '@app/types/enumsTable';
 import { filter, flow, map, some } from 'lodash/fp';
 
 export const rowIsFulfilled = <T = any>(
-  row: Row<T>,
+  row: Row,
   columns: Column<Row>[],
   tableEntity: TableEntities = TableEntities.GEO_CATEGORY,
 ): boolean =>

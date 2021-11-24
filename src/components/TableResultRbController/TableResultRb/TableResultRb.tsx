@@ -13,12 +13,12 @@ import { IconRemove } from '@consta/uikit/IconRemove';
 import { Position } from '@consta/uikit/Popover';
 import { Table } from '@consta/uikit/Table';
 
-import { Column, Row } from './types';
+import { Column, RowEntity } from './types';
 
 import './TableResultRb.scss';
 
 interface Props {
-  rows: Row<RbDomainEntityInput>[];
+  rows: RowEntity[];
   columns: Column<RbDomainEntityInput>[];
   actualColumns: Column<RbDomainEntityInput>[];
   filter: TreeFilter;
@@ -68,6 +68,36 @@ const menuItems = (): MenuContextItem[] => [
   },
 ];
 
+/** Проверка, есть ли в отфильтрованных строках данные с учетом фильтрации колонок */
+const isHasAnyValuesInFilteredRows = (
+  columns: Column<RbDomainEntityInput>[],
+  rows: RowEntity[],
+): boolean => {
+  return (
+    /**
+     * Пробегаемся по всем колонкам и в каждой колонке, исключая колонки без geoType
+     * В каждой строке ищем наличие свойства по названию колонки
+     * Если хоть одна такая есть - считаем, что данные есть
+     */
+    columns
+      .filter(
+        (column: Column<RbDomainEntityInput>) =>
+          column.geoType !== '' && column.geoType !== undefined,
+      )
+      .find((column: Column<RbDomainEntityInput>) => {
+        let isHasAnyValue = false;
+
+        rows.forEach((row: RowEntity) => {
+          if (row[column.accessor] !== undefined) {
+            isHasAnyValue = true;
+          }
+        });
+
+        return isHasAnyValue;
+      }) !== undefined
+  );
+};
+
 export const TableResultRb: React.FC<Props> = ({
   rows,
   columns,
@@ -76,8 +106,7 @@ export const TableResultRb: React.FC<Props> = ({
 }) => {
   const dispatch = useDispatch();
   const rowRef = useRef(null);
-  const [filteredRows, setFilteredRows] =
-    useState<Row<RbDomainEntityInput>[]>(rows);
+  const [filteredRows, setFilteredRows] = useState<RowEntity[]>(rows);
   const [filteredColumns, setFilteredColumns] =
     useState<Column<RbDomainEntityInput>[]>(columns);
   const [visible, setContextMenu] = useState<boolean>(false);
@@ -115,13 +144,13 @@ export const TableResultRb: React.FC<Props> = ({
       );
 
       filteredRowsData = filteredRowsData.filter(
-        (row: Row<RbDomainEntityInput>, index: number) => {
+        (row: RowEntity, index: number) => {
           return filter.rowsIdx.includes(index);
         },
       );
     }
 
-    /** Фильтрация данных по типу флюида */
+    /** Фильтрация колонок по типу флюида */
     filteredColumnsData = filteredColumnsData.filter(
       (column: Column<RbDomainEntityInput>) => {
         if (
@@ -136,10 +165,25 @@ export const TableResultRb: React.FC<Props> = ({
       },
     );
 
+    /** Фильтрация строк по типу флюида */
+    filteredRowsData = filteredRowsData.filter((row: RowEntity) => {
+      if (
+        fluidType === EFluidType.ALL ||
+        fluidType === undefined ||
+        !row?.geoFluidType
+      ) {
+        return true;
+      }
+
+      return row?.geoFluidType === EFluidTypeCode[fluidType];
+    });
+
     if (
       filteredColumnsData.find((column: Column<RbDomainEntityInput>) =>
         Boolean(column.geoType),
-      ) === undefined
+      ) === undefined ||
+      isHasAnyValuesInFilteredRows(filteredColumnsData, filteredRowsData) ===
+        false
     ) {
       filteredRowsData = [];
     }
@@ -147,21 +191,32 @@ export const TableResultRb: React.FC<Props> = ({
     setFilteredRows(filteredRowsData);
     setFilteredColumns(filteredColumnsData);
 
-    /** DIrty hack */
-    document.querySelectorAll('.TableHeader-Сontrol').forEach((el) => {
-      const parent = el.parentElement?.parentElement as HTMLElement;
-      const parentCell = el.parentElement?.parentElement
-        ?.parentElement as HTMLElement;
+    if (filteredColumnsData.length > 0) {
+      const code = filteredColumnsData[0].accessor;
+      const title =
+        filteredRowsData.length > 0 ? filteredRowsData[0][code].value : '';
 
-      parent.style.paddingRight = '48px';
-      parentCell.style.minWidth = '140px';
-    });
+      /** Нам необходимо дождаться рендера новых колонок, что бы потом найти самую первую колонку и найти у него необходимы нам данные */
+      setTimeout(() => {
+        const element: HTMLElement | null = document.querySelector(
+          `[data-name*="${title}"]`,
+        );
+
+        const dataCode = element?.dataset?.code || '';
+        const dataTitle = element?.dataset?.name || '';
+
+        dispatch(
+          TableActions.setActiveRow({ code: dataCode, title: dataTitle }),
+        );
+      });
+    }
   }, [
     filter,
     rows,
     columns,
     actualColumns,
     fluidType,
+    dispatch,
     setFilteredRows,
     setFilteredColumns,
   ]);
@@ -277,7 +332,7 @@ export const TableResultRb: React.FC<Props> = ({
   return (
     <div className="table">
       <Table
-        rows={filteredRows}
+        rows={filteredRows as any}
         columns={filteredColumns}
         verticalAlign="center"
         activeRow={{ id: undefined, onChange: handleClickRow }}

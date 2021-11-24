@@ -11,7 +11,7 @@ import { Text } from '@consta/uikit/Text';
 import { Loader, useMount } from '@gpn-prototypes/vega-ui';
 
 import ChartComponent from './chart/Chart';
-import { HistogramStatisticComponent } from './statistic/HistogramStatisticComponent';
+import { HistogramStatisticsComponent } from './statistic/HistogramStatisticsComponent';
 
 import './HistogramComponent.scss';
 
@@ -37,6 +37,15 @@ const payloadMenuItems: MenuContextItem[] = [
     border: true,
   },
 ];
+
+const getDomainEntityNames = (
+  row: GridActiveRow | undefined,
+  grid: GridCollection,
+): string[] => {
+  return row !== undefined
+    ? row.title.split(',')
+    : [String((grid.rows[0][grid.columns[0].accessor] as any)?.value)];
+};
 
 export const HistogramComponent: React.FC<Props> = ({ grid }) => {
   const dispatch = useDispatch();
@@ -66,7 +75,7 @@ export const HistogramComponent: React.FC<Props> = ({ grid }) => {
   useMount(() => {
     loadHistogramData(
       dispatch,
-      [String((grid.rows[0][grid.columns[0].accessor] as any)?.value)],
+      getDomainEntityNames(undefined, grid),
       numberOfRows,
     ).then(() => setIsLoading(false));
 
@@ -88,9 +97,7 @@ export const HistogramComponent: React.FC<Props> = ({ grid }) => {
 
       loadHistogramData(
         dispatch,
-        innerActiveRow
-          ? innerActiveRow.title.split(',')
-          : [String((grid.rows[0][grid.columns[0].accessor] as any)?.value)],
+        getDomainEntityNames(innerActiveRow, grid),
         numberOfRows,
       ).then(() => {
         setIsLoading(false);
@@ -181,15 +188,10 @@ export const HistogramComponent: React.FC<Props> = ({ grid }) => {
     );
 
   const statistic = isShowStatistic && (
-    <div className="histogram__statistic-wrapper">
-      <div className="histogram__statistic">
-        <HistogramStatisticComponent />
-      </div>
-
-      <div className="histogram__statistic">
-        <HistogramStatisticComponent />
-      </div>
-    </div>
+    <HistogramStatisticsComponent
+      domainEntityNames={getDomainEntityNames(activeRow, grid)}
+      bins={numberOfRows}
+    />
   );
 
   return (

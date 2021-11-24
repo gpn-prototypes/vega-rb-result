@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { MenuContextItem } from '@app/interfaces/ContextMenuInterface';
-import { SensitiveAnalysis } from '@app/interfaces/SensitiveAnalysisInterface';
+import {
+  SensitiveAnalysis,
+  SensitiveAnalysisStatistic,
+} from '@app/interfaces/SensitiveAnalysisInterface';
 import {
   loadSensitiveAnalysisData,
   loadSensitiveAnalysisStatistic,
@@ -39,6 +42,10 @@ export const SensitiveAnalysisComponent: React.FC<Props> = ({ sidebarRow }) => {
   const sensitiveAnalysisData: SensitiveAnalysis | undefined = useSelector(
     ({ sensitiveAnalysis }: RootState) => sensitiveAnalysis.payload,
   );
+  const sensitiveAnalysisStatisticData: SensitiveAnalysisStatistic | undefined =
+    useSelector(
+      ({ sensitiveAnalysis }: RootState) => sensitiveAnalysis.statistic,
+    );
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isLoadingStatistic, setIsLoadingStatistic] = useState<boolean>(false);
@@ -126,7 +133,7 @@ export const SensitiveAnalysisComponent: React.FC<Props> = ({ sidebarRow }) => {
   const chart = sensitiveAnalysisData && (
     <SensitiveAnalysisChartComponent
       percentiles={sensitiveAnalysisData.percentiles}
-      sample={sensitiveAnalysisData.sample}
+      resultMinMax={sensitiveAnalysisData.resultMinMax}
       names={sensitiveAnalysisData.names}
       zeroPoint={sensitiveAnalysisData.zeroPoint}
       availableNames={getAvailableNames()}
@@ -138,11 +145,11 @@ export const SensitiveAnalysisComponent: React.FC<Props> = ({ sidebarRow }) => {
       <div>
         <div className="sensitive-analysis__title">Статистика</div>
 
-        {isLoadingStatistic || !sensitiveAnalysisData ? (
+        {isLoadingStatistic || !sensitiveAnalysisStatisticData ? (
           <Loader />
         ) : (
           <SensitiveAnalysisStatisticComponent
-            statistic={sensitiveAnalysisData}
+            statistic={sensitiveAnalysisStatisticData}
           />
         )}
       </div>
