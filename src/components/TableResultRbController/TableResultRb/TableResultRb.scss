@@ -3,7 +3,7 @@
 
   .TableCell {
     &:not(.TableCell_isHeader) {
-      --buttons-wrapper-size: 0px;
+      --buttons-wrapper-size: 0;
     }
   }
 
