@@ -7,7 +7,10 @@ import treeFilterDuck from '@app/store/treeDuck';
 import { RootState } from '@app/store/types';
 import { Text, Tree, useMount } from '@gpn-prototypes/vega-ui';
 
-import { Column, Row } from '../TableResultRbController/TableResultRb/types';
+import {
+  Column,
+  RowEntity,
+} from '../TableResultRbController/TableResultRb/types';
 
 import { getNodeListFromTableData, searchInTree } from './helpers';
 import { TargetData } from './types';
@@ -22,7 +25,7 @@ const icons = {
 
 interface StructureTreeEditorProps<T = any> {
   columns: Column<RbDomainEntityInput>[];
-  rows: Row<T>[];
+  rows: RowEntity[];
   isOpen: boolean;
 }
 

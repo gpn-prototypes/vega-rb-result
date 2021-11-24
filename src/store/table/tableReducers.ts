@@ -1,6 +1,6 @@
 import {
   Column,
-  Row,
+  RowEntity,
 } from '@app/components/TableResultRbController/TableResultRb/types';
 import { EFluidType } from '@app/constants/Enums';
 import { LocalStorageKey } from '@app/constants/LocalStorageKeyConstants';
@@ -58,11 +58,11 @@ export const getDecimalByColumns = (
 };
 
 export const getDecimalRows = (
-  rows: Row<RbDomainEntityInput>[],
+  rows: RowEntity[],
   columns: Column<RbDomainEntityInput>[],
   decimalFixed: DecimalFixed = tableInitialState.decimalFixed || {},
-): Row<RbDomainEntityInput>[] => {
-  const resultRows = [...rows].map((row: Row<RbDomainEntityInput>) => {
+): RowEntity[] => {
+  const resultRows = [...rows].map((row: RowEntity) => {
     const decimalRow = {};
 
     Object.keys(row).forEach((rowKey: string) => {
@@ -75,7 +75,7 @@ export const getDecimalRows = (
       }
 
       // eslint-disable-next-line no-restricted-globals
-      decimalRow[rowKey].formattedValue = isNaN(value)
+      decimalRow[rowKey].formattedValue = isNaN(Number(value))
         ? value
         : Number(value)
             .toFixed(
@@ -86,7 +86,7 @@ export const getDecimalRows = (
             .toString();
     });
 
-    return decimalRow as Row<RbDomainEntityInput>;
+    return decimalRow as RowEntity;
   });
 
   return resultRows;

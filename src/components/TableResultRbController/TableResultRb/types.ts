@@ -1,11 +1,27 @@
-import { RbDomainEntityInput, Visible } from '@app/generated/graphql';
-import { TableControl, TableRow } from '@consta/uikit/Table';
+import { RbDomainEntityIcons, Visible } from '@app/generated/graphql';
+import { TableControl } from '@consta/uikit/Table';
 
-export interface Column<T = any, U = keyof RbDomainEntityInput | 'id'> {
+export type RowEntity = Record<string, Row> & {
+  geoFluidType?: string;
+  isAll?: boolean;
+  id?: string;
+};
+
+export type Row = {
+  code: string;
+  value: string;
+  formattedValue: string;
+  visible?: { calc: boolean; tree: boolean; table: boolean };
+  icon?: RbDomainEntityIcons;
+  id?: string;
+  isAll?: boolean;
+  isRisk?: boolean;
+};
+export interface Column<T = any> {
   sortable?: boolean;
-  accessor: U;
+  accessor: string;
   title: string;
-  renderCell?: (row: Row<T>) => React.ReactNode;
+  renderCell?: (row: RowEntity) => React.ReactNode;
   mergeCells?: boolean;
   isResizable?: boolean;
   align?: 'left' | 'right' | 'center';
@@ -15,20 +31,10 @@ export interface Column<T = any, U = keyof RbDomainEntityInput | 'id'> {
   decimal?: number;
   width?: number;
   hidden?: boolean;
-  getComparisonValue?: (row: Row[Column['accessor']]) => string;
+  getComparisonValue?: (row: Row) => string;
   control?: ({ column }: TableControl<any>) => React.ReactNode;
-  columnAccessorGroup?: (keyof RbDomainEntityInput | 'id')[];
+  columnAccessorGroup?: string[];
 }
-
-export type Row<T = any> = TableRow &
-  T & {
-    code: string;
-    value: string;
-    formattedValue: string;
-    geoFluidType?: string;
-    isAll?: boolean;
-    isRisk?: boolean;
-  };
 
 export type FilterComponentProps = {
   onConfirm: (value: any) => void;

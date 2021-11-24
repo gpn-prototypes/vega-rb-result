@@ -13,12 +13,12 @@ import { IconRemove } from '@consta/uikit/IconRemove';
 import { Position } from '@consta/uikit/Popover';
 import { Table } from '@consta/uikit/Table';
 
-import { Column, Row } from './types';
+import { Column, RowEntity } from './types';
 
 import './TableResultRb.scss';
 
 interface Props {
-  rows: Row<RbDomainEntityInput>[];
+  rows: RowEntity[];
   columns: Column<RbDomainEntityInput>[];
   actualColumns: Column<RbDomainEntityInput>[];
   filter: TreeFilter;
@@ -71,7 +71,7 @@ const menuItems = (): MenuContextItem[] => [
 /** Проверка, есть ли в отфильтрованных строках данные с учетом фильтрации колонок */
 const isHasAnyValuesInFilteredRows = (
   columns: Column<RbDomainEntityInput>[],
-  rows: Row<RbDomainEntityInput>[],
+  rows: RowEntity[],
 ): boolean => {
   return (
     /**
@@ -87,7 +87,7 @@ const isHasAnyValuesInFilteredRows = (
       .find((column: Column<RbDomainEntityInput>) => {
         let isHasAnyValue = false;
 
-        rows.forEach((row: Row<RbDomainEntityInput>) => {
+        rows.forEach((row: RowEntity) => {
           if (row[column.accessor] !== undefined) {
             isHasAnyValue = true;
           }
@@ -106,8 +106,7 @@ export const TableResultRb: React.FC<Props> = ({
 }) => {
   const dispatch = useDispatch();
   const rowRef = useRef(null);
-  const [filteredRows, setFilteredRows] =
-    useState<Row<RbDomainEntityInput>[]>(rows);
+  const [filteredRows, setFilteredRows] = useState<RowEntity[]>(rows);
   const [filteredColumns, setFilteredColumns] =
     useState<Column<RbDomainEntityInput>[]>(columns);
   const [visible, setContextMenu] = useState<boolean>(false);
@@ -145,7 +144,7 @@ export const TableResultRb: React.FC<Props> = ({
       );
 
       filteredRowsData = filteredRowsData.filter(
-        (row: Row<RbDomainEntityInput>, index: number) => {
+        (row: RowEntity, index: number) => {
           return filter.rowsIdx.includes(index);
         },
       );
@@ -167,19 +166,17 @@ export const TableResultRb: React.FC<Props> = ({
     );
 
     /** Фильтрация строк по типу флюида */
-    filteredRowsData = filteredRowsData.filter(
-      (row: Row<RbDomainEntityInput>) => {
-        if (
-          fluidType === EFluidType.ALL ||
-          fluidType === undefined ||
-          !row?.geoFluidType
-        ) {
-          return true;
-        }
+    filteredRowsData = filteredRowsData.filter((row: RowEntity) => {
+      if (
+        fluidType === EFluidType.ALL ||
+        fluidType === undefined ||
+        !row?.geoFluidType
+      ) {
+        return true;
+      }
 
-        return row?.geoFluidType === EFluidTypeCode[fluidType];
-      },
-    );
+      return row?.geoFluidType === EFluidTypeCode[fluidType];
+    });
 
     if (
       filteredColumnsData.find((column: Column<RbDomainEntityInput>) =>
@@ -193,12 +190,33 @@ export const TableResultRb: React.FC<Props> = ({
 
     setFilteredRows(filteredRowsData);
     setFilteredColumns(filteredColumnsData);
+
+    if (filteredColumnsData.length > 0) {
+      const code = filteredColumnsData[0].accessor;
+      const title =
+        filteredRowsData.length > 0 ? filteredRowsData[0][code].value : '';
+
+      /** Нам необходимо дождаться рендера новых колонок, что бы потом найти самую первую колонку и найти у него необходимы нам данные */
+      setTimeout(() => {
+        const element: HTMLElement | null = document.querySelector(
+          `[data-name*="${title}"]`,
+        );
+
+        const dataCode = element?.dataset?.code || '';
+        const dataTitle = element?.dataset?.name || '';
+
+        dispatch(
+          TableActions.setActiveRow({ code: dataCode, title: dataTitle }),
+        );
+      });
+    }
   }, [
     filter,
     rows,
     columns,
     actualColumns,
     fluidType,
+    dispatch,
     setFilteredRows,
     setFilteredColumns,
   ]);
@@ -314,7 +332,7 @@ export const TableResultRb: React.FC<Props> = ({
   return (
     <div className="table">
       <Table
-        rows={filteredRows}
+        rows={filteredRows as any}
         columns={filteredColumns}
         verticalAlign="center"
         activeRow={{ id: undefined, onChange: handleClickRow }}

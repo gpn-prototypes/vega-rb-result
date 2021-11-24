@@ -1,7 +1,7 @@
 import React from 'react';
 import {
   Column,
-  Row,
+  RowEntity,
 } from '@app/components/TableResultRbController/TableResultRb/types';
 import {
   SensitiveAnalysisStatistic,
@@ -18,12 +18,12 @@ interface Props {
 const getMappedColumn = (
   header: SensitiveAnalysisStatisticHeaders,
   isLeft = true,
-): Column<any, string> => {
+): Column<any> => {
   return {
     title: header.name,
     accessor: header.code,
     align: isLeft ? 'left' : 'right',
-    renderCell: (row: Row) => {
+    renderCell: (row: RowEntity) => {
       if (header.decimal !== 0) {
         return Number(row[header.code])
           .toFixed(header.decimal || 3)
@@ -35,8 +35,10 @@ const getMappedColumn = (
   };
 };
 
-const getMappedRow = (cells: SensitiveAnalysisStatisticCell[]): Row => {
-  const row: Row = {};
+const getMappedRow = (
+  cells: SensitiveAnalysisStatisticCell[],
+): Record<string, string> => {
+  const row: Record<string, string> = {};
 
   cells.forEach((cell: SensitiveAnalysisStatisticCell) => {
     row[cell.code] = cell.value;
@@ -64,9 +66,9 @@ export const SensitiveAnalysisStatisticComponent: React.FC<Props> = ({
     },
   );
 
-  const rows: Row[] = statistic.rows.map(
+  const rows: Record<string, string>[] = statistic.rows.map(
     (row: SensitiveAnalysisStatisticRows) => getMappedRow(row.cells),
   );
 
-  return <Table columns={columns} rows={rows} zebraStriped="odd" />;
+  return <Table columns={columns} rows={rows as any} zebraStriped="odd" />;
 };
