@@ -52,7 +52,9 @@ export const SensitiveAnalysisChartComponent: React.FC<
 
     const data: SensitiveAnalysisChart.Payload[] = [];
 
-    resultMinMax
+    let cloneResultMinMax = [...resultMinMax];
+
+    cloneResultMinMax = resultMinMax
       .sort((a: number[], b: number[]) => {
         if (a[0] === b[0]) {
           return a[1] - b[1];
@@ -61,22 +63,22 @@ export const SensitiveAnalysisChartComponent: React.FC<
         return b[0] - a[0];
       })
       .reverse()
-      .forEach((result: number[], index: number) => {
-        result.forEach((currentResult: number, innerIndex: number) => {
-          if (!availableNames.includes(names[index])) {
-            return;
-          }
+      .filter((result: number[], index: number) =>
+        availableNames.includes(names[index]),
+      );
 
-          data.push({
-            name: names[index],
-            value:
-              innerIndex === 0
-                ? zeroPoint - currentResult
-                : currentResult - zeroPoint,
-            category: innerIndex === 0 ? 0 : 1,
-          });
+    cloneResultMinMax.forEach((result: number[], index: number) => {
+      result.forEach((currentResult: number, innerIndex: number) => {
+        data.push({
+          name: names[index],
+          value:
+            innerIndex === 0
+              ? zeroPoint - currentResult
+              : currentResult - zeroPoint,
+          category: innerIndex === 0 ? 0 : 1,
         });
       });
+    });
 
     const { series, bias, options } = SensitiveAnalysisChart.getAxisData(data);
 
@@ -86,7 +88,7 @@ export const SensitiveAnalysisChartComponent: React.FC<
 
     const { xScale, x1Scale, yScale } = SensitiveAnalysisChart.getAxisScale({
       series,
-      resultMinMax,
+      resultMinMax: cloneResultMinMax,
       bias,
     });
 
@@ -95,7 +97,7 @@ export const SensitiveAnalysisChartComponent: React.FC<
       x1Scale,
       yScale,
       options,
-      resultMinMax,
+      resultMinMax: cloneResultMinMax,
       currentPercentiles,
       bias,
       series,

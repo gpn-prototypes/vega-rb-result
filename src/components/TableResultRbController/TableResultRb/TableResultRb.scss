@@ -3,7 +3,8 @@
 
   .TableCell {
     &:not(.TableCell_isHeader) {
-      --buttons-wrapper-size: 0;
+      /* stylelint-disable-next-line length-zero-no-unit */
+      --buttons-wrapper-size: 0px;
     }
   }
 
@@ -13,12 +14,9 @@
 
   .TableCell_isHeader {
     min-width: 80px;
-
     font-size: var(--size-text-xs);
     font-weight: 400;
-
     text-transform: inherit;
-
     color: var(--color-typo-primary);
   }
 

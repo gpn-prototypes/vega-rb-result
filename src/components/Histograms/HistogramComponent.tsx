@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { VerticalMoreContextMenu } from '@app/components/Helpers/ContextMenuHelper';
+import { EFluidType } from '@app/constants/Enums';
 import { Histogram } from '@app/generated/graphql';
 import { MenuContextItem } from '@app/interfaces/ContextMenuInterface';
 import { loadHistogramData } from '@app/services/histogramService';
@@ -56,6 +57,9 @@ export const HistogramComponent: React.FC<Props> = ({ grid }) => {
   const activeRow: GridActiveRow | undefined = useSelector(
     ({ table }: RootState) => table.activeRow,
   );
+  const fluidType: string = useSelector(
+    ({ table }: RootState) => table.fluidType || EFluidType.ALL,
+  );
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [previousNumberOfRows, setPreviousNumberOfRows] = useState<number>(
@@ -77,7 +81,8 @@ export const HistogramComponent: React.FC<Props> = ({ grid }) => {
       dispatch,
       getDomainEntityNames(undefined, grid),
       numberOfRows,
-    ).then(() => setIsLoading(false));
+      fluidType,
+    ).finally(() => setIsLoading(false));
 
     return () => {
       dispatch(histogramDuck.actions.resetState());
@@ -99,7 +104,8 @@ export const HistogramComponent: React.FC<Props> = ({ grid }) => {
         dispatch,
         getDomainEntityNames(innerActiveRow, grid),
         numberOfRows,
-      ).then(() => {
+        fluidType,
+      ).finally(() => {
         setIsLoading(false);
 
         setPreviousActiveRow(innerActiveRow);
@@ -111,6 +117,7 @@ export const HistogramComponent: React.FC<Props> = ({ grid }) => {
       previousNumberOfRows,
       previousActiveRow,
       grid,
+      fluidType,
       dispatch,
       setIsLoading,
       setPreviousNumberOfRows,

@@ -154,12 +154,20 @@ export const GET_TABLE_TEMPLATE = gql`
 `;
 
 export const GET_HISTOGRAM_RESULT_RB = gql`
-  query GetTableResultRb($domainEntityNames: [String!], $bins: Int) {
+  query GetTableResultRb(
+    $domainEntityNames: [String!]
+    $bins: Int
+    $geoFluidType: String
+  ) {
     project {
       resourceBase {
         result {
           histograms {
-            getHistograms(domainEntityNames: $domainEntityNames, bins: $bins) {
+            getHistograms(
+              domainEntityNames: $domainEntityNames
+              bins: $bins
+              geoFluidType: $geoFluidType
+            ) {
               histograms {
                 title
                 subtitle
@@ -177,7 +185,11 @@ export const GET_HISTOGRAM_RESULT_RB = gql`
 `;
 
 export const GET_HISTOGRAM_STATISTICS_RESULT_RB = gql`
-  query GetTableResultRb($domainEntityNames: [String!], $bins: Int) {
+  query GetTableResultRb(
+    $domainEntityNames: [String!]
+    $bins: Int
+    $geoFluidType: String
+  ) {
     project {
       resourceBase {
         result {
@@ -185,6 +197,7 @@ export const GET_HISTOGRAM_STATISTICS_RESULT_RB = gql`
             getHistogramReservesStatistics(
               domainEntityNames: $domainEntityNames
               bins: $bins
+              geoFluidType: $geoFluidType
             ) {
               statistics {
                 title
