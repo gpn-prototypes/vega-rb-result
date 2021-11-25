@@ -8,7 +8,7 @@ export interface SettingStore {
 }
 
 export const SettingsActions = {
-  resetState: factory<SettingStore>('RESET_STATE'),
+  resetState: factory('RESET_STATE'),
   setShowHistogram: factory<boolean>('SET_SHOW_HISTOGRAM'),
   setOpenSensitiveAnalysis: factory<boolean>('SET_OPEN_SENSITIVE_ANALYSIS'),
 };

@@ -74,6 +74,9 @@
   }
 
   &__icons {
+    display: flex;
+    align-items: center;
+
     margin-left: var(--space-m);
   }
 
@@ -92,7 +95,7 @@
   }
 
   &__table {
-    height: 430px;
+    height: 425px;
 
     &_full {
       height: calc(100vh - 100px);
@@ -103,4 +106,8 @@
 // TODO: Удалить, это дубли vega-ui, нужно убрать везде vega-ui тогда можно будет удалить
 .ChoiceGroup-Label:first-child::after {
   width: inherit !important;
+}
+
+.Checkbox-Input::before {
+  z-index: 0 !important;
 }

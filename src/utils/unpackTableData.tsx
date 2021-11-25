@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { Dispatch } from 'react';
 import { ColumnExpanderComponent } from '@app/components/Expander/ColumnExpanderComponent';
 import { LocalStorageKey } from '@app/constants/LocalStorageKeyConstants';
+import { TableActions } from '@app/store/table/tableActions';
 
 import {
   Column,
@@ -32,6 +33,20 @@ const isHasParentAll = (parents: Parent[]): boolean => {
 };
 
 export type ViewType = 'attribute' | 'risk';
+
+const getNameWithParents = (
+  index: number,
+  row: RowEntity,
+  domainEntity: ResultDomainEntity,
+  domainEntities: ResultDomainEntity[],
+) => {
+  return index === 0
+    ? row[domainEntity.code]?.value
+    : domainEntities
+        .slice(0, index + 1)
+        .map((entity: ResultDomainEntity) => row[entity.code]?.value || '')
+        .join(',');
+};
 
 /** Подготовка колонок */
 export const prepareColumns = (
@@ -67,7 +82,13 @@ export const prepareColumns = (
       align,
       mergeCells: mergeCells !== undefined ? mergeCells : true,
       isResizable: true,
-      getComparisonValue: (row: Row) => row?.value || '',
+      getComparisonValue: (row: Row) => {
+        if (row.parentNames) {
+          return row.parentNames;
+        }
+
+        return row?.value || '';
+      },
       visible,
       geoType,
       decimal,
@@ -94,22 +115,17 @@ export const prepareColumns = (
                   .slice(0, index + 1)
                   .map((entity: ResultDomainEntity) => entity.code)
                   .join(',');
-          const nameWithParents =
-            index === 0
-              ? row[domainEntity.code]?.value
-              : domainEntities
-                  .slice(0, index + 1)
-                  .map(
-                    (entity: ResultDomainEntity) =>
-                      row[entity.code]?.value || '',
-                  )
-                  .join(',');
 
           return (
             <div
               className={getClass(row, domainEntity)}
               data-code={codeWithParents}
-              data-name={nameWithParents}
+              data-name={getNameWithParents(
+                index,
+                row,
+                domainEntity,
+                domainEntities,
+              )}
             >
               {row[domainEntity.code]?.value || ''}
             </div>
@@ -221,7 +237,8 @@ export const prepareColumns = (
               data-code={codeWithParents}
               data-name={nameWithParents}
             >
-              {formattedValue || ''}
+              {/* TODO: Сделать хелпер */}
+              {formattedValue === '0' ? '—' : formattedValue || '—'}
             </div>
           );
         },
@@ -236,7 +253,7 @@ export const prepareColumns = (
 
 /** Подготовка ячеек */
 export const prepareRows = (
-  { domainObjects, attributes }: ResultProjectStructure,
+  { domainObjects, attributes, domainEntities }: ResultProjectStructure,
   columns: Column<RbDomainEntityInput>[],
 ): RowEntity[] => {
   let rowNumber = 1;
@@ -288,11 +305,20 @@ export const prepareRows = (
           }
 
           /** Пробегаемся по родителям и устанавливаем как значение ячейки, в таблице они объединятся */
-          domainObject.parents.forEach((parent) => {
+          domainObject.parents.forEach((parent, indexParent: number) => {
+            const parentNames =
+              indexParent === 0
+                ? parent.name
+                : domainObject.parents
+                    .slice(0, indexParent + 1)
+                    .map((innerParent) => innerParent.name || '')
+                    .join(',');
+
             row[percIndex][parent.code] = {
               code: attributeValue.code,
               value: parent.name,
               formattedValue: parent.name.toString(),
+              parentNames,
             };
           });
         });
@@ -313,10 +339,15 @@ export const prepareRows = (
 export function unpackTableData(
   projectStructure: ResultProjectStructure,
   version: number,
+  dispatch: Dispatch<unknown>,
 ): GridCollection {
   const columns: Column<RbDomainEntityInput>[] =
     prepareColumns(projectStructure);
   const rows: RowEntity[] = prepareRows(projectStructure, columns);
+
+  dispatch(
+    TableActions.setEntitiesCount(projectStructure.domainEntities.length),
+  );
 
   return {
     columns,

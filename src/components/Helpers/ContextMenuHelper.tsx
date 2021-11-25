@@ -117,7 +117,7 @@ export const ItemWithChoice: React.FC<{
             <TextField
               placeholder="Укажите количество"
               onChange={handleInputChange}
-              value={(inputValue || 0).toString()}
+              value={inputValue.toString()}
               size="s"
               view="default"
             />

@@ -31,8 +31,38 @@ const ChartComponent: React.FC<
     /** Для создания чартов необходимо добавить в массив объект(это же js, комон) */
     const payload: Chart.Payload = Object.assign(sample, { x: '', y: '' });
 
+    /**
+     * Если указывать thresholds простым числом, то оп пытается вручную сагрегировать данные
+     * Тем самым, если значения у нас не сильно расходятся, то группировка будет плотнее/реже
+     *
+     * Данный метод генерирует thresholds в ручном режиме:
+     * Интернируем количество "бинов"(numberOfRows)
+     * Инициализируем первый шаг, а это минимальное значение данных
+     * Высчитываем шаг, который мы должны прибавить к первому(пред.) что бы получить релевантную картину
+     * И так n количество раз
+     * На выходе получаем массив, равный от количеству переданных "бинов"(numberOfRows) с верным интервалом по нашим данным
+     */
+    const minSample = d3.min(sample) || 0;
+    const maxSample = d3.max(sample) || 0;
+    const diff = maxSample - minSample;
+    const stepPerThresholds = diff / numberOfRows;
+
+    let firstStep = minSample;
+
+    const thresholds = new Array(numberOfRows)
+      .fill(1)
+      .map((_, index: number) => {
+        if (index === 0) {
+          return firstStep;
+        }
+
+        firstStep += stepPerThresholds;
+
+        return firstStep;
+      });
+
     /** Создание бинов, это "бары", которые будут отображаться на графике */
-    const bins: Bin<number, number>[] = d3.bin().thresholds(numberOfRows)(
+    const bins: Bin<number, number>[] = d3.bin().thresholds(thresholds)(
       payload,
     );
 
@@ -49,7 +79,6 @@ const ChartComponent: React.FC<
       cumulativeYScale,
       preparedPercentiles,
       probabilityDensityXScale,
-      // probabilityDensityYScale,
     } = Chart.getScales({
       bins,
       numberOfIterationBin,

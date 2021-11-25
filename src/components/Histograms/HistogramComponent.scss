@@ -10,7 +10,7 @@
 
     min-height: 244px;
 
-    grid-gap: 120px;
+    grid-gap: var(--space-m) 120px;
     grid-template-columns: 545px 545px;
   }
 

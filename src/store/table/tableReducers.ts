@@ -12,6 +12,7 @@ import {
   HiddenColumns,
 } from '@app/types/typesTable';
 import { LocalStorageHelper } from '@app/utils/LocalStorageHelper';
+import { MathHelper } from '@app/utils/MathHelper';
 import { reducerWithInitialState } from 'typescript-fsa-reducers';
 
 import {
@@ -38,6 +39,7 @@ export const tableInitialState: GridCollection = {
   decimalFixed: decimalFromLocalStorage !== null ? decimalFromLocalStorage : {},
   hiddenColumns:
     hiddenColumnsFromLocalStorage !== null ? hiddenColumnsFromLocalStorage : {},
+  entitiesCount: 0,
 };
 
 export const getDecimalByColumns = (
@@ -74,16 +76,15 @@ export const getDecimalRows = (
         return;
       }
 
+      const decimal =
+        decimalFixed[rowKey] || decimalFixed[rowKey] === 0
+          ? decimalFixed[rowKey]
+          : getDecimalByColumns(columns)[rowKey];
+
       // eslint-disable-next-line no-restricted-globals
       decimalRow[rowKey].formattedValue = isNaN(Number(value))
         ? value
-        : Number(value)
-            .toFixed(
-              decimalFixed[rowKey] || decimalFixed[rowKey] === 0
-                ? decimalFixed[rowKey]
-                : getDecimalByColumns(columns)[rowKey],
-            )
-            .toString();
+        : MathHelper.getNormalizerFixed(decimal, Number(value));
     });
 
     return decimalRow as RowEntity;
@@ -212,6 +213,15 @@ export const TableReducers = reducerWithInitialState<GridCollection>(
         ...state,
         actualColumns: getActualColumns(state, payload),
         hiddenColumns: payload,
+      };
+    },
+  )
+  .case(
+    TableActions.setEntitiesCount,
+    (state: GridCollection, payload: number) => {
+      return {
+        ...state,
+        entitiesCount: payload,
       };
     },
   );

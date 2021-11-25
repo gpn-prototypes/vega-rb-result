@@ -5,8 +5,11 @@ import { TableActions } from '@app/store/table/tableActions';
 
 import { unpackTableData } from '../utils/unpackTableData';
 
-const initAction = (template: ResultProjectStructure, version: number) =>
-  TableActions.initState(unpackTableData(template, version));
+const initAction = (
+  template: ResultProjectStructure,
+  version: number,
+  dispatch: Dispatch<unknown>,
+) => TableActions.initState(unpackTableData(template, version, dispatch));
 
 export async function loadTableData(
   dispatch: Dispatch<unknown>,
@@ -15,7 +18,7 @@ export async function loadTableData(
   const resourceBaseData = await projectService.getResourceBaseData();
 
   const dispatchOnInit = (structure: ResultProjectStructure) =>
-    dispatch(initAction(structure, projectVersion));
+    dispatch(initAction(structure, projectVersion, dispatch));
 
   if (resourceBaseData) {
     dispatchOnInit(resourceBaseData);

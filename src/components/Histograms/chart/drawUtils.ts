@@ -213,7 +213,9 @@ export namespace Chart {
         .call(
           d3
             .axisBottom(xScale)
-            .ticks(Width / 80)
+            .tickFormat((x) => `${Number(x).toFixed(0)}`)
+            .ticks(3)
+            .tickPadding(5)
             .tickSizeOuter(0),
         )
         .selectAll('.tick')
@@ -276,7 +278,8 @@ export namespace Chart {
           d3
             .axisRight(y2Scale)
             .ticks(DefaultY2TickCount)
-            .tickSize(-(Width - Margin.left - Margin.right)),
+            .tickSize(-(Width - Margin.left - Margin.right))
+            .tickFormat((x) => `${Number(x).toFixed(0)}`),
         )
         .call((innerG) => innerG.select('.domain').remove())
         .attr('class', 'chart__text chart__grid')

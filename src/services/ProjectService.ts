@@ -214,7 +214,7 @@ class ProjectService implements IProjectService {
         variables: {
           domainEntityNames,
           bins,
-          geoFluidType,
+          // geoFluidType,
         },
         fetchPolicy: 'no-cache',
       })
@@ -243,7 +243,7 @@ class ProjectService implements IProjectService {
         variables: {
           domainEntityNames,
           bins,
-          geoFluidType,
+          // geoFluidType,
         },
         fetchPolicy: 'no-cache',
       })

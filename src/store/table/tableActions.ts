@@ -25,4 +25,5 @@ export const TableActions = {
   setDecimalFixed:
     factory<TableSetDecimalFixedActionPayload>('SET_DECIMAL_FIXED'),
   setHiddenColumns: factory<HiddenColumns>('SET_HIDDEN_COLUMNS'),
+  setEntitiesCount: factory<number>('SET_ENTITIES_COUNT'),
 };

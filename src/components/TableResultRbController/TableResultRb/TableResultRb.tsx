@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { CustomContextMenu } from '@app/components/Helpers/ContextMenuHelper';
 import { EFluidType, EFluidTypeCode } from '@app/constants/Enums';
-import { DomainEntityCode } from '@app/constants/GeneralConstants';
 import { RbDomainEntityInput } from '@app/generated/graphql';
 import { MenuContextItem } from '@app/interfaces/ContextMenuInterface';
 import { TableActions } from '@app/store/table/tableActions';
@@ -115,6 +114,9 @@ export const TableResultRb: React.FC<Props> = ({
 
   const activeRow: GridActiveRow | undefined = useSelector(
     ({ table }: RootState) => table.activeRow,
+  );
+  const entitiesCount: number = useSelector(
+    ({ table }: RootState) => table.entitiesCount || 0,
   );
   const fluidType: EFluidType | undefined = useSelector(
     ({ table }: RootState) => table.fluidType,
@@ -295,7 +297,7 @@ export const TableResultRb: React.FC<Props> = ({
       }
 
       if (
-        code.indexOf(DomainEntityCode.Mine) > -1 &&
+        code.split(',').length === entitiesCount &&
         (title || '').indexOf('Всего') === -1 &&
         openSensitiveAnalysis
       ) {
@@ -341,7 +343,6 @@ export const TableResultRb: React.FC<Props> = ({
         borderBetweenColumns
         borderBetweenRows
         stickyHeader
-        stickyColumns={1}
         isResizable
       />
 

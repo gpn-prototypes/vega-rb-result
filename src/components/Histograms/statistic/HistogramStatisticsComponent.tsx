@@ -8,7 +8,9 @@ import {
 import { loadHistogramStatisticData } from '@app/services/histogramService';
 import { RootState } from '@app/store/types';
 import { GridActiveRow } from '@app/types/typesTable';
+import { MathHelper } from '@app/utils/MathHelper';
 import { Loader } from '@consta/uikit/Loader';
+import { Text } from '@consta/uikit/Text';
 import { useMount } from '@gpn-prototypes/vega-ui';
 
 import './HistogramStatisticsComponent.scss';
@@ -50,6 +52,7 @@ export const HistogramStatisticsComponent: React.FC<Props> = ({
 
   /** При каждом обновлении выбранной ячейки - обновляем данные */
   useEffect(() => {
+    console.log(11, activeRow);
     loadData();
   }, [activeRow, loadData]);
 
@@ -69,8 +72,11 @@ export const HistogramStatisticsComponent: React.FC<Props> = ({
       >
         <div className="histogram-statistics__row">{stat.name}</div>
         <div className="histogram-statistics__row histogram-statistics__row_last">
-          {innerStatistic.decimal
-            ? Number(stat.value).toFixed(innerStatistic.decimal).toString()
+          {innerStatistic.decimal !== undefined
+            ? MathHelper.getNormalizerFixed(
+                innerStatistic.decimal,
+                Number(stat.value),
+              )
             : stat.value}
         </div>
       </div>
@@ -83,9 +89,12 @@ export const HistogramStatisticsComponent: React.FC<Props> = ({
     <div className="histogram-statistics__wrapper">
       {statistics.map((innerStatistic: HistogramStatistic) => {
         return (
-          <div className="histogram-statistics__statistic">
-            <div>{getRows(innerStatistic)}</div>
-            <div>{getRows(innerStatistic, true)}</div>
+          <div>
+            <Text>{innerStatistic.title}</Text>
+            <div className="histogram-statistics__statistic">
+              <div>{getRows(innerStatistic)}</div>
+              <div>{getRows(innerStatistic, true)}</div>
+            </div>
           </div>
         );
       })}

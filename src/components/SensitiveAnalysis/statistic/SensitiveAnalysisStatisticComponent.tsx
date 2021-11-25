@@ -9,6 +9,7 @@ import {
   SensitiveAnalysisStatisticHeaders,
   SensitiveAnalysisStatisticRows,
 } from '@app/interfaces/SensitiveAnalysisInterface';
+import { MathHelper } from '@app/utils/MathHelper';
 import { Table } from '@consta/uikit/Table';
 
 interface Props {
@@ -24,10 +25,15 @@ const getMappedColumn = (
     accessor: header.code,
     align: isLeft ? 'left' : 'right',
     renderCell: (row: RowEntity) => {
+      if (Number(row[header.code]) === 0) {
+        return '—';
+      }
+
       if (header.decimal !== 0) {
-        return Number(row[header.code])
-          .toFixed(header.decimal || 3)
-          .toString();
+        return MathHelper.getNormalizerFixed(
+          header.decimal || 3,
+          Number(row[header.code]),
+        );
       }
 
       return row[header.code];
