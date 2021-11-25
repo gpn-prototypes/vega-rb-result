@@ -1,7 +1,7 @@
-import React, { Dispatch } from 'react';
+import React from 'react';
 import { ColumnExpanderComponent } from '@app/components/Expander/ColumnExpanderComponent';
 import { LocalStorageKey } from '@app/constants/LocalStorageKeyConstants';
-import { TableActions } from '@app/store/table/tableActions';
+import { Action } from 'redux';
 
 import {
   Column,
@@ -238,7 +238,7 @@ export const prepareColumns = (
               data-name={nameWithParents}
             >
               {/* TODO: Сделать хелпер */}
-              {formattedValue === '0' ? '—' : formattedValue || '—'}
+              {Number(formattedValue) === 0 ? '—' : formattedValue || '—'}
             </div>
           );
         },
@@ -306,6 +306,13 @@ export const prepareRows = (
 
           /** Пробегаемся по родителям и устанавливаем как значение ячейки, в таблице они объединятся */
           domainObject.parents.forEach((parent, indexParent: number) => {
+            const parentCodes =
+              indexParent === 0
+                ? parent.code
+                : domainObject.parents
+                    .slice(0, indexParent + 1)
+                    .map((innerParent) => innerParent.code || '')
+                    .join(',');
             const parentNames =
               indexParent === 0
                 ? parent.name
@@ -319,6 +326,7 @@ export const prepareRows = (
               value: parent.name,
               formattedValue: parent.name.toString(),
               parentNames,
+              parentCodes,
             };
           });
         });
@@ -339,15 +347,13 @@ export const prepareRows = (
 export function unpackTableData(
   projectStructure: ResultProjectStructure,
   version: number,
-  dispatch: Dispatch<unknown>,
+  setEntitiesCount: (count: number) => Action,
 ): GridCollection {
   const columns: Column<RbDomainEntityInput>[] =
     prepareColumns(projectStructure);
   const rows: RowEntity[] = prepareRows(projectStructure, columns);
 
-  dispatch(
-    TableActions.setEntitiesCount(projectStructure.domainEntities.length),
-  );
+  setEntitiesCount(projectStructure.domainEntities.length);
 
   return {
     columns,

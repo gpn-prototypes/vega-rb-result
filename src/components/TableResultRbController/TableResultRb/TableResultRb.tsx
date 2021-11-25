@@ -4,7 +4,10 @@ import { CustomContextMenu } from '@app/components/Helpers/ContextMenuHelper';
 import { EFluidType, EFluidTypeCode } from '@app/constants/Enums';
 import { RbDomainEntityInput } from '@app/generated/graphql';
 import { MenuContextItem } from '@app/interfaces/ContextMenuInterface';
-import { TableActions } from '@app/store/table/tableActions';
+import {
+  TableActions,
+  TableSetDecimalFixedActionPayload,
+} from '@app/store/table/tableActions';
 import { RootState, TreeFilter } from '@app/store/types';
 import { DecimalFixed, GridActiveRow } from '@app/types/typesTable';
 import { IconAdd } from '@consta/uikit/IconAdd';
@@ -104,6 +107,27 @@ export const TableResultRb: React.FC<Props> = ({
   filter,
 }) => {
   const dispatch = useDispatch();
+  const setActiveRow = useCallback(
+    ({ code, title }: GridActiveRow) =>
+      dispatch(TableActions.setActiveRow({ code, title })),
+    [dispatch],
+  );
+  const setSidebarRow = useCallback(
+    ({ code, title }: GridActiveRow) =>
+      dispatch(TableActions.setSidebarRow({ code, title: title || '' })),
+    [dispatch],
+  );
+  const setDecimalFixed = useCallback(
+    ({ type, columnCode }: TableSetDecimalFixedActionPayload) =>
+      dispatch(
+        TableActions.setDecimalFixed({
+          type,
+          columnCode,
+        }),
+      ),
+    [dispatch],
+  );
+
   const rowRef = useRef(null);
   const [filteredRows, setFilteredRows] = useState<RowEntity[]>(rows);
   const [filteredColumns, setFilteredColumns] =
@@ -153,17 +177,23 @@ export const TableResultRb: React.FC<Props> = ({
     }
 
     /** Фильтрация колонок по типу флюида */
-    filteredColumnsData = filteredColumnsData.filter(
+    filteredColumnsData = filteredColumnsData.map(
       (column: Column<RbDomainEntityInput>) => {
         if (
           fluidType === EFluidType.ALL ||
           fluidType === undefined ||
           !column?.geoType
         ) {
-          return true;
+          return column;
         }
 
-        return column?.geoType === EFluidTypeCode[fluidType];
+        const cloneColumn = { ...column };
+
+        if (column?.geoType === EFluidTypeCode[fluidType]) {
+          cloneColumn.hidden = true;
+        }
+
+        return cloneColumn;
       },
     );
 
@@ -194,23 +224,11 @@ export const TableResultRb: React.FC<Props> = ({
     setFilteredColumns(filteredColumnsData);
 
     if (filteredColumnsData.length > 0) {
-      const code = filteredColumnsData[0].accessor;
-      const title =
-        filteredRowsData.length > 0 ? filteredRowsData[0][code].value : '';
+      const { accessor } = filteredColumnsData[0];
+      const code = filteredRowsData[0][accessor].parentCodes || '';
+      const title = filteredRowsData[0][accessor].parentNames || '';
 
-      /** Нам необходимо дождаться рендера новых колонок, что бы потом найти самую первую колонку и найти у него необходимы нам данные */
-      setTimeout(() => {
-        const element: HTMLElement | null = document.querySelector(
-          `[data-name*="${title}"]`,
-        );
-
-        const dataCode = element?.dataset?.code || '';
-        const dataTitle = element?.dataset?.name || '';
-
-        dispatch(
-          TableActions.setActiveRow({ code: dataCode, title: dataTitle }),
-        );
-      });
+      setActiveRow({ code, title });
     }
   }, [
     filter,
@@ -218,7 +236,7 @@ export const TableResultRb: React.FC<Props> = ({
     columns,
     actualColumns,
     fluidType,
-    dispatch,
+    setActiveRow,
     setFilteredRows,
     setFilteredColumns,
   ]);
@@ -293,7 +311,7 @@ export const TableResultRb: React.FC<Props> = ({
     /** Отправляем активную строку в стору, это нужно для обновления данных в графиках */
     if (code && title) {
       if (showHistogram) {
-        dispatch(TableActions.setActiveRow({ code, title: title || '' }));
+        setActiveRow({ code, title: title || '' });
       }
 
       if (
@@ -301,18 +319,16 @@ export const TableResultRb: React.FC<Props> = ({
         (title || '').indexOf('Всего') === -1 &&
         openSensitiveAnalysis
       ) {
-        dispatch(TableActions.setSidebarRow({ code, title: title || '' }));
+        setSidebarRow({ code, title: title || '' });
       }
     }
   };
 
   const handleContextMenuClick = (item: MenuContextItem): void => {
-    dispatch(
-      TableActions.setDecimalFixed({
-        type: item.code === 'add' ? 'plus' : 'minus',
-        columnCode: currentColumnCode || '',
-      }),
-    );
+    setDecimalFixed({
+      type: item.code === 'add' ? 'plus' : 'minus',
+      columnCode: currentColumnCode || '',
+    });
   };
 
   const isContextMenuDisabled = (item: MenuContextItem) => {

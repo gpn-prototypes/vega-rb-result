@@ -1,9 +1,9 @@
-import { Dispatch } from 'react';
+import { Histogram, HistogramStatistic } from '@app/generated/graphql';
 import projectService from '@app/services/ProjectService';
-import histogramDuck from '@app/store/histogramDuck';
+import { Action } from 'redux';
 
 export async function loadHistogramData(
-  dispatch: Dispatch<unknown>,
+  setHistograms: (histograms: Histogram[]) => Action,
   domainEntityNames: string[],
   bins: number,
   geoFluidType: string,
@@ -15,14 +15,12 @@ export async function loadHistogramData(
   );
 
   if (data) {
-    dispatch(
-      histogramDuck.actions.setHistograms(data.getHistograms.histograms),
-    );
+    setHistograms(data.getHistograms.histograms);
   }
 }
 
 export async function loadHistogramStatisticData(
-  dispatch: Dispatch<unknown>,
+  setStatistics: (histograms: HistogramStatistic[]) => Action,
   domainEntityNames: string[],
   bins: number,
   geoFluidType: string,
@@ -34,6 +32,6 @@ export async function loadHistogramStatisticData(
   );
 
   if (statistics) {
-    dispatch(histogramDuck.actions.setStatistics(statistics));
+    setStatistics(statistics);
   }
 }

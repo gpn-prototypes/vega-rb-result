@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { EFluidType } from '@app/constants/Enums';
 import {
@@ -6,8 +6,8 @@ import {
   HistogramStatisticValues,
 } from '@app/generated/graphql';
 import { loadHistogramStatisticData } from '@app/services/histogramService';
+import histogramDuck from '@app/store/histogramDuck';
 import { RootState } from '@app/store/types';
-import { GridActiveRow } from '@app/types/typesTable';
 import { MathHelper } from '@app/utils/MathHelper';
 import { Loader } from '@consta/uikit/Loader';
 import { Text } from '@consta/uikit/Text';
@@ -25,11 +25,13 @@ export const HistogramStatisticsComponent: React.FC<Props> = ({
   bins,
 }) => {
   const dispatch = useDispatch();
+  const setStatistics = useCallback(
+    (statistics: HistogramStatistic[]) =>
+      dispatch(histogramDuck.actions.setStatistics(statistics)),
+    [dispatch],
+  );
   const statistics: HistogramStatistic[] = useSelector(
     ({ histograms }: RootState) => histograms.statistics,
-  );
-  const activeRow: GridActiveRow | undefined = useSelector(
-    ({ table }: RootState) => table.activeRow,
   );
   const fluidType: string = useSelector(
     ({ table }: RootState) => table.fluidType || EFluidType.ALL,
@@ -40,21 +42,15 @@ export const HistogramStatisticsComponent: React.FC<Props> = ({
     setIsLoading(true);
 
     loadHistogramStatisticData(
-      dispatch,
+      setStatistics,
       domainEntityNames,
       bins,
       fluidType,
     ).then(() => setIsLoading(false));
-  }, [domainEntityNames, bins, fluidType, dispatch, setIsLoading]);
+  }, [domainEntityNames, bins, fluidType, setStatistics, setIsLoading]);
 
   /** Обновляем данные при первой загрузке */
   useMount(() => loadData());
-
-  /** При каждом обновлении выбранной ячейки - обновляем данные */
-  useEffect(() => {
-    console.log(11, activeRow);
-    loadData();
-  }, [activeRow, loadData]);
 
   const getRows = (
     innerStatistic: HistogramStatistic,

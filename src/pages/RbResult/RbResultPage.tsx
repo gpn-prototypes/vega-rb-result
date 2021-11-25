@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { HistogramComponent } from '@app/components/Histograms/HistogramComponent';
 import NotifyComponent from '@app/components/Notify/Notify';
@@ -33,6 +33,7 @@ import { IconDownload } from '@consta/uikit/IconDownload';
 import { IconExpand } from '@consta/uikit/IconExpand';
 import { cnMixCard } from '@consta/uikit/MixCard';
 import { Sidebar } from '@consta/uikit/Sidebar';
+import { Item } from '@consta/uikit/SnackBar';
 import { Text } from '@consta/uikit/Text';
 import { SplitPanes, useInterval, useMount } from '@gpn-prototypes/vega-ui';
 
@@ -40,10 +41,40 @@ import './RbResultPage.scss';
 
 const RbResultPage: React.FC = () => {
   const dispatch = useDispatch();
+  const resetState = useCallback(() => {
+    dispatch(NotifyActions.resetState());
+    dispatch(TableActions.resetState());
+    dispatch(GeneralActions.resetState());
+    dispatch(SettingsActions.resetState());
+    dispatch(histogramDuck.actions.resetState());
+    dispatch(sensitiveAnalysisDuck.actions.resetState());
+    dispatch(treeDuck.actions.resetState());
+  }, [dispatch]);
+  const setFluidType = useCallback(
+    (type: EFluidType) => dispatch(TableActions.setFluidType(type)),
+    [dispatch],
+  );
+  const updateProjectName = useCallback(
+    (projectName: string) =>
+      dispatch(projectDuck.actions.updateProjectName(projectName)),
+    [dispatch],
+  );
+  const setRecentlyEdited = useCallback(
+    (recentlyEdited: boolean) =>
+      dispatch(competitiveAccessDuck.actions.setRecentlyEdited(recentlyEdited)),
+    [dispatch],
+  );
+  const appendItem = useCallback(
+    (item: Item) => dispatch(NotifyActions.appendItem(item)),
+    [dispatch],
+  );
+  const removeItem = useCallback(
+    (id: string) => dispatch(NotifyActions.removeItem(id)),
+    [dispatch],
+  );
   const treeEditorRef = useRef<HTMLDivElement>(null);
   const settingsRef = useRef<HTMLDivElement>(null);
   const [isShownTree, setIsShownTree] = useState(true);
-  const [fluidType, setFluidType] = useState<EFluidType>(EFluidType.ALL);
 
   const data: GridCollection = useSelector(({ table }: RootState) => table);
   const sidebarRow: GridActiveRow | undefined = useSelector(
@@ -62,6 +93,9 @@ const RbResultPage: React.FC = () => {
   const openSensitiveAnalysis = useSelector(
     ({ settings }: RootState) => settings.openSensitiveAnalysis,
   );
+  const fluidType = useSelector(
+    ({ table }: RootState) => table.fluidType || EFluidType.ALL,
+  );
 
   const handleResize = (): void => {
     if (treeEditorRef?.current?.clientWidth) {
@@ -70,30 +104,18 @@ const RbResultPage: React.FC = () => {
   };
 
   const handleChangeFluidType = (type: EFluidType) => {
-    dispatch(TableActions.setFluidType(type));
-
     setFluidType(type);
   };
 
   useMount(() => {
-    return () => {
-      dispatch(NotifyActions.resetState());
-      dispatch(TableActions.resetState());
-      dispatch(GeneralActions.resetState());
-      dispatch(SettingsActions.resetState());
-      dispatch(histogramDuck.actions.resetState());
-      dispatch(sensitiveAnalysisDuck.actions.resetState());
-      dispatch(treeDuck.actions.resetState());
-    };
+    return resetState;
   });
 
   useEffect(() => {
     projectService
       .getProjectName()
-      .then((projectName) =>
-        dispatch(projectDuck.actions.updateProjectName(projectName)),
-      );
-  }, [dispatch]);
+      .then((projectName) => updateProjectName(projectName));
+  }, [updateProjectName]);
 
   useInterval(IS_PROJECT_RECENTLY_EDITED_INTERVAL_IN_MS, () => {
     projectService
@@ -102,22 +124,18 @@ const RbResultPage: React.FC = () => {
         if (recentlyEdited === isRecentlyEdited) {
           return;
         }
-        dispatch(
-          competitiveAccessDuck.actions.setRecentlyEdited(recentlyEdited),
-        );
+        setRecentlyEdited(recentlyEdited);
       })
-      .catch(() => competitiveAccessDuck.actions.setRecentlyEdited(false));
+      .catch(() => setRecentlyEdited(false));
   });
 
   const downloadResult = async (): Promise<void> => {
     try {
-      dispatch(
-        NotifyActions.appendItem({
-          key: 'notify',
-          message: 'Идет генерация файла',
-          status: 'system',
-        }),
-      );
+      appendItem({
+        key: 'notify',
+        message: 'Идет генерация файла',
+        status: 'system',
+      });
 
       /** Таймаут добавлен для того, что бы визуально не мелькала нотификация */
       setTimeout(async () => {
@@ -125,7 +143,7 @@ const RbResultPage: React.FC = () => {
           LocalStorageHelper.get(LocalStorageKey.ResultId) || '',
         );
 
-        dispatch(NotifyActions.removeItem('notify'));
+        removeItem('notify');
       }, 1500);
     } catch (e) {
       console.warn(e);
