@@ -262,7 +262,7 @@ export namespace SensitiveAnalysisChart {
         .call(
           d3
             .axisTop(x1Scale)
-            .ticks(8)
+            .ticks(3)
             .tickFormat(formatValue())
             .tickSizeOuter(0),
         )

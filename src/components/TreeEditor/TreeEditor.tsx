@@ -15,7 +15,7 @@ import {
 import { getNodeListFromTableData, searchInTree } from './helpers';
 import { TargetData } from './types';
 
-import './TreeEditor.scss';
+import './TreeEditor.css';
 
 const icons = {
   'blue-line': <SvgResource color="#00eeaa" />,

@@ -1,4 +1,6 @@
 import React, { ErrorInfo, ReactNode } from 'react';
+import { cnMixCard } from '@consta/uikit/MixCard';
+import { Text } from '@consta/uikit/Text';
 
 interface ErrorBoundaryProps {
   hasError: boolean;
@@ -23,10 +25,17 @@ export class ErrorBoundary<T> extends React.Component<T, ErrorBoundaryProps> {
   render(): ReactNode {
     if (this.state.hasError) {
       return (
-        <h1>
+        <Text
+          view="alert"
+          className={cnMixCard({
+            verticalSpace: 'm',
+            horizontalSpace: 'm',
+            shadow: false,
+          })}
+        >
           Что-то пошло не так. Попробуйте перезагрузить страницу, приносим свои
           извинения.
-        </h1>
+        </Text>
       );
     }
 

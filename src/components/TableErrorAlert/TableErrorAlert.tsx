@@ -8,7 +8,7 @@ import { defaultTo, get } from 'lodash/fp';
 
 import { cnTableErrorAlert } from './cn-table-error-alert';
 
-import './TableErrorAlert.scss';
+import './TableErrorAlert.css';
 
 const errorMessages = {
   [RbErrorCodes.DuplicatingColumns]:

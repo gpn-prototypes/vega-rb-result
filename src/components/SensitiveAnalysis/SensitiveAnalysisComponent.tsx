@@ -23,7 +23,7 @@ import { VerticalMoreContextMenu } from '../Helpers/ContextMenuHelper';
 import { SensitiveAnalysisChartComponent } from './chart/Chart';
 import { SensitiveAnalysisStatisticComponent } from './statistic/SensitiveAnalysisStatisticComponent';
 
-import './SensitiveAnalysisComponent.scss';
+import './SensitiveAnalysisComponent.css';
 
 interface Props {
   sidebarRow: GridActiveRow;

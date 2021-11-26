@@ -163,10 +163,17 @@ export const GET_HISTOGRAM_RESULT_RB = gql`
               histograms {
                 title
                 subtitle
-                percentiles
+                percentiles {
+                  x
+                  y
+                  title
+                }
                 sample
                 numberOfIterationBin
-                cdf
+                cdf {
+                  x
+                  y
+                }
               }
             }
           }

@@ -4,6 +4,7 @@ export namespace DrawHelper {
   export interface Point {
     x: number;
     y: number;
+    title?: string;
   }
 
   export const xScalePosition = ({ left, right, width }) => [

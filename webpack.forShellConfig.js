@@ -40,8 +40,12 @@ module.exports = (webpackConfigEnv) => {
           ],
         },
         {
-          test: /\.s[ac]ss$/i,
-          use: ['style-loader', 'css-loader', 'sass-loader'],
+          test: /\.css$/,
+          use: [
+            {
+              loader: 'postcss-loader',
+            },
+          ],
         },
         {
           test: /\.svg$/,

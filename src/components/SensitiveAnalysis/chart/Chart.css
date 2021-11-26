@@ -1,18 +1,23 @@
 .chart {
   margin-bottom: var(--space-xs);
-
   color: var(--color-typo-secondary);
-
   border-radius: 4px;
 
-  &__projection-lines {
+  &__Percentiles {
+    &__Text {
+      font-size: var(--size-text-xs);
+      fill: var(--color-typo-primary);
+    }
+  }
+
+  &__ProjectionLines {
     opacity: 0.3;
     fill: none;
     stroke: var(--color-typo-warning);
     stroke-width: 1;
   }
 
-  &__grid {
+  &__Grid {
     line {
       stroke: var(--color-control-typo-primary);
       stroke-dasharray: 1, 3;
@@ -23,9 +28,7 @@
 
     text {
       font-size: var(--size-text-xs);
-
       color: rgba(246, 251, 253, 0.6);
-
       transform: translateY(10px);
     }
 
@@ -34,7 +37,7 @@
     }
   }
 
-  &__axis {
+  &__Axis {
     fill: none;
 
     .domain {
@@ -50,21 +53,28 @@
       line-height: var(--line-height-text-xs);
     }
 
-    &_bottom line {
+    &_position_bottom line {
       transform: translateY(1px);
     }
 
-    &_left text {
+    &_position_left text {
       color: var(--color-typo-warning);
+    }
+
+    &_position_right text {
+      color: var(--color-typo-normal);
+      transform: translateX(5px);
+    }
+
+    &_position_right path {
+      stroke-width: 0;
     }
   }
 
   &__description {
     margin-bottom: var(--space-m);
-
     font-size: 14px;
     line-height: 140%;
-
     color: var(--color-typo-secondary);
   }
 
@@ -74,18 +84,35 @@
 
   &__dot-text {
     fill: var(--color-typo-primary);
-
     font-size: 10px;
     line-height: 14px;
-    text-anchor: start;
   }
 
   &__text {
     font-size: 14px;
     line-height: 17px;
-
     fill: var(--color-typo-secondary);
-    text-anchor: start;
+    text-anchor: end;
+
+    &_white {
+      fill: var(--color-typo-primary);
+    }
+
+    &_middle {
+      text-anchor: middle;
+    }
+
+    &_start {
+      text-anchor: start;
+
+      text {
+        text-anchor: start;
+      }
+    }
+  }
+
+  &__main {
+    transform: translate(0, 15px);
   }
 }
 

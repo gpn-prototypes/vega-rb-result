@@ -5,18 +5,14 @@
 
   &__content {
     margin-top: var(--space-m);
-
     display: grid;
-
     min-height: 244px;
-
     grid-gap: var(--space-m) 120px;
     grid-template-columns: 545px 545px;
   }
 
   &__loader {
     margin-top: var(--space-m);
-
     min-height: 244px;
   }
 }

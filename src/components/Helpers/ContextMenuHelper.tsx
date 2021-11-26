@@ -7,7 +7,7 @@ import { Popover, Position } from '@consta/uikit/Popover';
 import { Switch } from '@consta/uikit/Switch';
 import { TextField } from '@consta/uikit/TextField';
 
-import './ContextMenuHelper.scss';
+import './ContextMenuHelper.css';
 
 interface ContextMenuBaseItemProps {
   menuItem: MenuContextItem;
@@ -117,7 +117,7 @@ export const ItemWithChoice: React.FC<{
             <TextField
               placeholder="Укажите количество"
               onChange={handleInputChange}
-              value={inputValue.toString()}
+              value={inputValue?.toString() || ''}
               size="s"
               view="default"
             />

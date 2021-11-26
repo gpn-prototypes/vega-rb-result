@@ -1,4 +1,4 @@
-declare module '*.scss' {
+declare module '*.css' {
   interface ClassNames {
     [className: string]: string;
   }

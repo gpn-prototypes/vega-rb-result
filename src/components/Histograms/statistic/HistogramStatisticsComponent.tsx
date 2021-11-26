@@ -13,7 +13,7 @@ import { Loader } from '@consta/uikit/Loader';
 import { Text } from '@consta/uikit/Text';
 import { useMount } from '@gpn-prototypes/vega-ui';
 
-import './HistogramStatisticsComponent.scss';
+import './HistogramStatisticsComponent.css';
 
 interface Props {
   domainEntityNames: string[];

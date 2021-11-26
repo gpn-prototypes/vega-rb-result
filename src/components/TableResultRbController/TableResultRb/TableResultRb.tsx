@@ -9,7 +9,11 @@ import {
   TableSetDecimalFixedActionPayload,
 } from '@app/store/table/tableActions';
 import { RootState, TreeFilter } from '@app/store/types';
-import { DecimalFixed, GridActiveRow } from '@app/types/typesTable';
+import {
+  DecimalFixed,
+  GridActiveRow,
+  HiddenColumns,
+} from '@app/types/typesTable';
 import { IconAdd } from '@consta/uikit/IconAdd';
 import { IconRemove } from '@consta/uikit/IconRemove';
 import { Position } from '@consta/uikit/Popover';
@@ -17,7 +21,7 @@ import { Table } from '@consta/uikit/Table';
 
 import { Column, RowEntity } from './types';
 
-import './TableResultRb.scss';
+import './TableResultRb.css';
 
 interface Props {
   rows: RowEntity[];
@@ -154,6 +158,9 @@ export const TableResultRb: React.FC<Props> = ({
   const showHistogram: boolean = useSelector(
     ({ settings }: RootState) => settings.showHistogram,
   );
+  const hiddenColumns: HiddenColumns | undefined = useSelector(
+    ({ table }: RootState) => table.hiddenColumns,
+  );
 
   /**
    * Сортировка данных по клику на элемент древа
@@ -247,8 +254,17 @@ export const TableResultRb: React.FC<Props> = ({
   }, [activeRow]);
 
   const onContextMenuClick = useCallback(
-    (event, element: Element, text: string) => {
+    (event, element: Element) => {
       event.preventDefault();
+
+      const rightSelector = element.querySelector(
+        '.TableCell-Wrapper_horizontalAlign_right',
+      );
+      const text = rightSelector?.textContent || '';
+
+      if (!text) {
+        return;
+      }
 
       const rect = element.getBoundingClientRect();
 
@@ -287,9 +303,9 @@ export const TableResultRb: React.FC<Props> = ({
         const htmlElement = element as HTMLElement;
 
         htmlElement.oncontextmenu = (event) =>
-          onContextMenuClick(event, element, text);
+          onContextMenuClick(event, element);
       });
-  }, [onContextMenuClick]);
+  }, [onContextMenuClick, hiddenColumns]);
 
   const handleClickRow = ({
     id,

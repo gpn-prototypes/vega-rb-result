@@ -6,7 +6,7 @@ import * as d3 from 'd3';
 import { cnChart } from './cn-chart';
 import { SensitiveAnalysisChart } from './drawUtils';
 
-import './Chart.scss';
+import './Chart.css';
 
 const PER_ELEMENT_HEIGHT = 66.6;
 

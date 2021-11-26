@@ -76,9 +76,12 @@ export const getDecimalRows = (
         return;
       }
 
+      const decimalFromStorage =
+        decimalFixed[rowKey] < 0 ? 0 : decimalFixed[rowKey];
+
       const decimal =
         decimalFixed[rowKey] || decimalFixed[rowKey] === 0
-          ? decimalFixed[rowKey]
+          ? decimalFromStorage
           : getDecimalByColumns(columns)[rowKey];
 
       // eslint-disable-next-line no-restricted-globals
