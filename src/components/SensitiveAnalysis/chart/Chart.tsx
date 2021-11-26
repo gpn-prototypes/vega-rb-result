@@ -54,7 +54,11 @@ export const SensitiveAnalysisChartComponent: React.FC<
 
     let cloneResultMinMax = [...resultMinMax];
 
-    cloneResultMinMax = resultMinMax
+    cloneResultMinMax = resultMinMax.filter((result: number[], index: number) =>
+      availableNames.includes(names[index]),
+    );
+
+    cloneResultMinMax
       .sort((a: number[], b: number[]) => {
         if (a[0] === b[0]) {
           return a[1] - b[1];
@@ -63,24 +67,30 @@ export const SensitiveAnalysisChartComponent: React.FC<
         return b[0] - a[0];
       })
       .reverse()
-      .filter((result: number[], index: number) =>
-        availableNames.includes(names[index]),
-      );
+      .forEach((result: number[]) => {
+        const getIndexByResult = (innerResult: number[]) => {
+          const equals = (a, b) =>
+            a.length === b.length && a.every((v, i) => v === b[i]);
 
-    cloneResultMinMax.forEach((result: number[], index: number) => {
-      result.forEach((currentResult: number, innerIndex: number) => {
-        data.push({
-          name: names[index],
-          value:
-            innerIndex === 0
-              ? zeroPoint - currentResult
-              : currentResult - zeroPoint,
-          category: innerIndex === 0 ? 0 : 1,
+          return resultMinMax.findIndex((res: number[]) =>
+            equals(res, innerResult),
+          );
+        };
+        result.forEach((currentResult: number, innerIndex: number) => {
+          data.push({
+            name: names[getIndexByResult(result)],
+            value:
+              innerIndex === 0
+                ? zeroPoint - currentResult
+                : currentResult - zeroPoint,
+            category: innerIndex === 0 ? 0 : 1,
+          });
         });
       });
-    });
 
     const { series, bias, options } = SensitiveAnalysisChart.getAxisData(data);
+
+    console.log(series, bias, options, cloneResultMinMax, data);
 
     const getColor = (key) => {
       return options.colors[key];

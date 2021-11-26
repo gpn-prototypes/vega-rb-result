@@ -186,17 +186,22 @@ export const TableResultRb: React.FC<Props> = ({
     /** Фильтрация колонок по типу флюида */
     filteredColumnsData = filteredColumnsData.map(
       (column: Column<RbDomainEntityInput>) => {
+        /** TODO: Refactor it, count to try refactor: 0 */
         if (
           fluidType === EFluidType.ALL ||
           fluidType === undefined ||
-          !column?.geoType
+          !column?.geoType ||
+          (column?.geoType === EFluidTypeCode[EFluidType.OIL_N_GAS] &&
+            column.accessor !== 'GAS_VOLUME_TO_ENTIRE_RESERVOIR') ||
+          (EFluidTypeCode[fluidType] === EFluidTypeCode[EFluidType.OIL_N_GAS] &&
+            column.accessor.indexOf('ngzngr_') > -1)
         ) {
           return column;
         }
 
         const cloneColumn = { ...column };
 
-        if (column?.geoType === EFluidTypeCode[fluidType]) {
+        if (EFluidTypeCode[fluidType] !== column?.geoType) {
           cloneColumn.hidden = true;
         }
 
@@ -230,7 +235,7 @@ export const TableResultRb: React.FC<Props> = ({
     setFilteredRows(filteredRowsData);
     setFilteredColumns(filteredColumnsData);
 
-    if (filteredColumnsData.length > 0) {
+    if (filteredColumnsData.length > 0 && filteredRowsData.length > 0) {
       const { accessor } = filteredColumnsData[0];
       const code = filteredRowsData[0][accessor].parentCodes || '';
       const title = filteredRowsData[0][accessor].parentNames || '';
