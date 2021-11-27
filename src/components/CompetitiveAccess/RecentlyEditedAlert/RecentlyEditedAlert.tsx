@@ -4,7 +4,7 @@ import { Item, SnackBar } from '@consta/uikit/SnackBar';
 
 import { cnAlert } from './cn-alert';
 
-import './RecentlyEditedAlert.scss';
+import './RecentlyEditedAlert.css';
 
 export const RecentlyEditedAlert: React.FC = () => {
   const items: Item[] = [

@@ -6,7 +6,7 @@ import * as d3 from 'd3';
 import { cnChart } from './cn-chart';
 import { SensitiveAnalysisChart } from './drawUtils';
 
-import './Chart.scss';
+import './Chart.css';
 
 const PER_ELEMENT_HEIGHT = 66.6;
 
@@ -52,7 +52,13 @@ export const SensitiveAnalysisChartComponent: React.FC<
 
     const data: SensitiveAnalysisChart.Payload[] = [];
 
-    resultMinMax
+    let cloneResultMinMax = [...resultMinMax];
+
+    cloneResultMinMax = resultMinMax.filter((result: number[], index: number) =>
+      availableNames.includes(names[index]),
+    );
+
+    cloneResultMinMax
       .sort((a: number[], b: number[]) => {
         if (a[0] === b[0]) {
           return a[1] - b[1];
@@ -61,14 +67,18 @@ export const SensitiveAnalysisChartComponent: React.FC<
         return b[0] - a[0];
       })
       .reverse()
-      .forEach((result: number[], index: number) => {
-        result.forEach((currentResult: number, innerIndex: number) => {
-          if (!availableNames.includes(names[index])) {
-            return;
-          }
+      .forEach((result: number[]) => {
+        const getIndexByResult = (innerResult: number[]) => {
+          const equals = (a, b) =>
+            a.length === b.length && a.every((v, i) => v === b[i]);
 
+          return resultMinMax.findIndex((res: number[]) =>
+            equals(res, innerResult),
+          );
+        };
+        result.forEach((currentResult: number, innerIndex: number) => {
           data.push({
-            name: names[index],
+            name: names[getIndexByResult(result)],
             value:
               innerIndex === 0
                 ? zeroPoint - currentResult
@@ -80,13 +90,15 @@ export const SensitiveAnalysisChartComponent: React.FC<
 
     const { series, bias, options } = SensitiveAnalysisChart.getAxisData(data);
 
+    console.log(series, bias, options, cloneResultMinMax, data);
+
     const getColor = (key) => {
       return options.colors[key];
     };
 
     const { xScale, x1Scale, yScale } = SensitiveAnalysisChart.getAxisScale({
       series,
-      resultMinMax,
+      resultMinMax: cloneResultMinMax,
       bias,
     });
 
@@ -95,7 +107,7 @@ export const SensitiveAnalysisChartComponent: React.FC<
       x1Scale,
       yScale,
       options,
-      resultMinMax,
+      resultMinMax: cloneResultMinMax,
       currentPercentiles,
       bias,
       series,

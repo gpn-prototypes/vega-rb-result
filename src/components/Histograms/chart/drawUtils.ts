@@ -16,7 +16,6 @@ export namespace Chart {
     probabilityDensityYScale: ScaleLinear<number, number, never>;
     cumulativeXScale: ScaleLinear<number, number, never>;
     cumulativeYScale: ScaleLinear<number, number, never>;
-    preparedPercentiles: DrawHelper.Point[];
   }
 
   export interface MainAxis {
@@ -33,7 +32,7 @@ export namespace Chart {
     bins: Bin<number, number>[];
     numberOfIterationBin: number[];
     cdf: DrawHelper.Point[];
-    percentiles: number[];
+    sample: number[];
   }
 
   export interface GetMainAxisArguments {
@@ -58,8 +57,8 @@ export namespace Chart {
   export interface DrawDotsArguments {
     svg: Selection<null, unknown, null, undefined>;
     percentiles: DrawHelper.Point[];
-    xScale: ScaleLinear<number, number>;
-    y1Scale: ScaleLinear<number, number>;
+    cumulativeXScale: ScaleLinear<number, number, never>;
+    cumulativeYScale: ScaleLinear<number, number, never>;
   }
 
   export interface DrawCdfLineWithGradientArguments {
@@ -108,7 +107,7 @@ export namespace Chart {
     bins,
     numberOfIterationBin,
     cdf,
-    percentiles,
+    sample,
   }: GetScaleArguments): Scale => {
     const xScale: ScaleLinear<number, number> = d3
       .scaleLinear()
@@ -165,6 +164,7 @@ export namespace Chart {
         width: Chart.Width,
       }),
     );
+
     const cumulativeYScale = DrawHelper.getScale(
       DrawHelper.getDomain(cdf, DrawHelper.getY),
       DrawHelper.yScalePosition({
@@ -172,21 +172,6 @@ export namespace Chart {
         bottom: Chart.Margin.bottom,
         height: Chart.Height,
       }),
-    );
-
-    const preparedPercentiles: DrawHelper.Point[] = percentiles.map(
-      (percentile: number, index: number) => {
-        const percentileMap = {
-          0: 0.1,
-          1: 0.5,
-          2: 0.9,
-        };
-
-        return {
-          x: percentile,
-          y: percentileMap[index],
-        };
-      },
     );
 
     return {
@@ -198,7 +183,6 @@ export namespace Chart {
       probabilityDensityYScale,
       cumulativeXScale,
       cumulativeYScale,
-      preparedPercentiles,
     };
   };
 
@@ -213,7 +197,9 @@ export namespace Chart {
         .call(
           d3
             .axisBottom(xScale)
-            .ticks(Width / 80)
+            .tickFormat((x) => `${Number(x).toFixed(0)}`)
+            .ticks(3)
+            .tickPadding(5)
             .tickSizeOuter(0),
         )
         .selectAll('.tick')
@@ -276,7 +262,8 @@ export namespace Chart {
           d3
             .axisRight(y2Scale)
             .ticks(DefaultY2TickCount)
-            .tickSize(-(Width - Margin.left - Margin.right)),
+            .tickSize(-(Width - Margin.left - Margin.right))
+            .tickFormat((x) => `${Number(x).toFixed(0)}`),
         )
         .call((innerG) => innerG.select('.domain').remove())
         .attr('class', 'chart__text chart__grid')
@@ -288,8 +275,7 @@ export namespace Chart {
             .attr('x', 50)
             .clone()
             .text(payload.y),
-        )
-        .call((nestedG) => nestedG.select('.tick:first-of-type line').remove());
+        );
 
     return { y1Axis, y2Axis };
   };
@@ -314,47 +300,23 @@ export namespace Chart {
 
   export const DrawDots = ({
     svg,
-    xScale,
-    y1Scale,
+    cumulativeXScale,
+    cumulativeYScale,
     percentiles,
   }: DrawDotsArguments): void => {
     /** Пока точки не отображаем */
-    // svg
-    //   .append('g')
-    //   .attr('stroke', 'var(--color-bg-warning)')
-    //   .attr('stroke-width', 1.5)
-    //   .attr('fill', 'var(--color-bg-warning)')
-    //   .attr('class', 'chart__dot')
-    //   .selectAll('circle')
-    //   .data(payload)
-    //   .join('circle')
-    //   .attr('cx', (d: any) => xScale(d.x))
-    //   .attr('cy', (d: any) => y1Scale(d.y))
-    //   .attr('r', 1.5);
-
     svg
       .append('g')
-      .attr('class', 'chart__dot-text')
-      .selectAll('text')
+      .attr('stroke', 'var(--color-bg-warning)')
+      .attr('stroke-width', 1.5)
+      .attr('fill', 'var(--color-bg-warning)')
+      .attr('class', 'chart__dot')
+      .selectAll('circle')
       .data(percentiles)
-      .join('text')
-      .attr('dy', '0.35em')
-      .attr('x', (d: any) => xScale(d.x))
-      .attr('y', (d: any) => y1Scale(d.y))
-      .text((d: any) => String(d.x).split('.')[0]);
-  };
-
-  export const getPayload = (
-    cdf: number[],
-    sample: number[],
-  ): DrawHelper.Point[] => {
-    const maxSample = d3.max(sample) || 0;
-    const stepPerSample = maxSample / cdf.length;
-
-    return cdf.map((currentCdf: number, index) => ({
-      x: index * stepPerSample,
-      y: currentCdf,
-    }));
+      .join('circle')
+      .attr('cx', (d: any) => cumulativeXScale(d.x))
+      .attr('cy', (d: any) => cumulativeYScale(d.y))
+      .attr('r', 1.5);
   };
 
   export const DrawCdfLineWithGradient = ({
@@ -418,7 +380,7 @@ export namespace Chart {
           .attr('stroke-opacity', 0.5)
           .attr('stroke-dasharray', '2,2'),
       )
-      .attr('stroke-width', 2)
+      .attr('stroke-width', 1)
       .attr(
         'd',
         d3
@@ -437,8 +399,7 @@ export namespace Chart {
           d3
             .axisBottom(scale)
             .ticks(Width / 80)
-            .tickSize(5)
-            .tickFormat(() => ''),
+            .tickSize(5),
         ),
     );
     svg.append('g').call((g) =>
@@ -485,7 +446,7 @@ export namespace Chart {
       svg
         .append('path')
         .datum([
-          { x: d3.min(sample), y: point.y },
+          { x: d3.min(cdf.map((x) => x.x)), y: point.y },
           point,
           { x: point.x, y: d3.min(data, DrawHelper.getY) },
         ])
@@ -494,12 +455,18 @@ export namespace Chart {
           'd',
           d3
             .line<any>()
-            .x((d) => xScale(DrawHelper.getX(d)) as number)
+            .x((d) => cumulativeXScale(DrawHelper.getX(d)) as number)
             .y((d) => cumulativeYScale(DrawHelper.getY(d)) as number),
         );
     };
 
     drawTicksY(svg, cumulativeYScale);
+
+    const getPercentileTitle = (point: DrawHelper.Point) => {
+      return point.title
+        ? Number(point.title).toFixed(0)
+        : DrawHelper.getX(point).toFixed(0);
+    };
 
     if (percentiles.length) {
       svg
@@ -507,11 +474,11 @@ export namespace Chart {
         .data(percentiles)
         .enter()
         .append('text')
-        .text((d) => DrawHelper.getX(d).toFixed(0))
+        .text(getPercentileTitle)
         .attr('class', 'chart__dot-text')
-        .attr('x', (d) => xScale(DrawHelper.getX(d)) as number)
+        .attr('x', (d) => cumulativeXScale(DrawHelper.getX(d)) as number)
         .attr('y', (d) => cumulativeYScale(DrawHelper.getY(d)) as number)
-        .attr('transform', `translate(5, 0)`);
+        .attr('transform', `translate(3, 0)`);
 
       percentiles.forEach((percentile) => {
         projectionLinesFromPoint(percentile, cdf);
@@ -526,7 +493,7 @@ export namespace Chart {
       .datum(cdf)
       .attr('fill', 'none')
       .attr('stroke', '#F38B00')
-      .attr('stroke-width', 2)
+      .attr('stroke-width', 1)
       .attr(
         'd',
         d3
@@ -534,5 +501,45 @@ export namespace Chart {
           .x((d) => cumulativeXScale(DrawHelper.getX(d)) as number)
           .y((d) => cumulativeYScale(DrawHelper.getY(d)) as number),
       );
+  };
+
+  /**
+   * Если указывать thresholds простым числом, то оп пытается вручную сагрегировать данные
+   * Тем самым, если значения у нас не сильно расходятся, то группировка будет плотнее/реже
+   *
+   * Данный метод генерирует thresholds в ручном режиме:
+   * Интернируем количество "бинов"(numberOfRows)
+   * Инициализируем первый шаг, а это минимальное значение данных
+   * Высчитываем шаг, который мы должны прибавить к первому(пред.) что бы получить релевантную картину
+   * И так n количество раз
+   * На выходе получаем массив, равный от количеству переданных "бинов"(numberOfRows) с верным интервалом по нашим данным
+   */
+  export const getThresholds = ({
+    sample,
+    numberOfRows,
+  }: {
+    sample: number[];
+    numberOfRows: number;
+  }) => {
+    const minSample = Number(d3.min(sample)) || 0;
+    const maxSample = Number(d3.max(sample)) || 0;
+    const diff = maxSample - minSample;
+    const stepPerThresholds = diff / numberOfRows;
+
+    let firstStep = minSample;
+
+    const thresholds = new Array(numberOfRows)
+      .fill(1)
+      .map((_, index: number) => {
+        if (index === 0) {
+          return firstStep;
+        }
+
+        firstStep += stepPerThresholds;
+
+        return firstStep;
+      });
+
+    return thresholds;
   };
 }

@@ -1,14 +1,9 @@
 .main {
   overflow-x: hidden;
-
-  // & > div {
-  //   display: block !important;
-  // }
 }
 
 .RbResultPage {
   position: relative;
-
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -16,7 +11,6 @@
 
 .Header {
   padding: var(--space-xs) var(--space-m);
-
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -36,9 +30,7 @@
 
 .RightPanel {
   padding: var(--space-s);
-
   overflow-y: auto;
-
   max-width: 400px;
   height: 100%;
   max-height: calc(100vh - 100px);
@@ -48,9 +40,7 @@
   &__graphs {
     padding-top: var(--space-l);
     padding-left: var(--size-text-m);
-
     display: flex;
-
     min-width: 1210px;
 
     &_hide {
@@ -69,38 +59,43 @@
   &__sidebar {
     margin-top: var(--space-3xl);
     padding: var(--space-l);
-
     min-width: 736px;
   }
 
   &__icons {
+    display: flex;
+    align-items: center;
     margin-left: var(--space-m);
   }
 
   &__icon {
     margin-left: var(--space-m);
-
     cursor: pointer;
   }
 
   &__top {
     margin: var(--space-s) var(--space-m);
-
     display: flex;
     justify-content: space-between;
     align-items: center;
   }
 
   &__table {
-    height: 430px;
+    height: 425px;
+    border-bottom: 1px solid var(--color-bg-border);
 
     &_full {
       height: calc(100vh - 100px);
+      box-shadow: inherit;
     }
   }
 }
 
-// TODO: Удалить, это дубли vega-ui, нужно убрать везде vega-ui тогда можно будет удалить
+/* TODO: Удалить, это дубли vega-ui, нужно убрать везде vega-ui тогда можно будет удалить */
 .ChoiceGroup-Label:first-child::after {
   width: inherit !important;
+}
+
+.Checkbox-Input::before {
+  z-index: 0 !important;
 }

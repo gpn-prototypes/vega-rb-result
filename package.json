@@ -30,8 +30,8 @@
     "lint-fix": "npm-run-all format lint-fix:*",
     "lint:ts": "eslint '{src,types}/**/*.ts{,x}'",
     "lint-fix:ts": "eslint '{src,types}/**/*.ts{,x}' --fix",
-    "lint:css": "stylelint 'src/**/*.scss'",
-    "lint-fix:css": "stylelint 'src/**/*.scss' --fix"
+    "lint:css": "stylelint 'src/**/*.css'",
+    "lint-fix:css": "stylelint 'src/**/*.css' --fix"
   },
   "dependencies": {
     "@apollo/client": "^3.3.11",
@@ -59,10 +59,7 @@
     "redux-observable": "^1.2.0",
     "redux-persist": "^6.0.0",
     "redux-thunk": "^2.3.0",
-    "eslint-plugin-lodash-fp": "^2.2.0-a1",
     "single-spa-react": "^3.1.0",
-    "sass": "1.43.2",
-    "sass-loader": "10.1.1",
     "style-loader": "2.0.0",
     "ts-config-single-spa": "^1.7.0",
     "typescript-fsa": "^3.0.0",
@@ -106,7 +103,6 @@
     "prettier": "^2.1.1",
     "redux-logger": "^3.0.6",
     "stylelint": "^13.7.0",
-    "stylelint-scss": "3.21.0",
     "stylelint-order": "^4.1.0",
     "stylelint-prettier": "^1.1.2",
     "systemjs-webpack-interop": "^2.1.2",

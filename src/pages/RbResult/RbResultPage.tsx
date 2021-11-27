@@ -1,6 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { CustomContextMenu } from '@app/components/Helpers/ContextMenuHelper';
 import { HistogramComponent } from '@app/components/Histograms/HistogramComponent';
 import NotifyComponent from '@app/components/Notify/Notify';
 import { SensitiveAnalysisComponent } from '@app/components/SensitiveAnalysis/SensitiveAnalysisComponent';
@@ -13,51 +12,76 @@ import {
   IS_PROJECT_RECENTLY_EDITED_INTERVAL_IN_MS,
 } from '@app/constants/GeneralConstants';
 import { LocalStorageKey } from '@app/constants/LocalStorageKeyConstants';
-import { MenuContextItem } from '@app/interfaces/ContextMenuInterface';
 import projectService from '@app/services/ProjectService';
 import { loadArchive } from '@app/services/utilsService';
 import competitiveAccessDuck from '@app/store/competitiveAccessDuck';
+import { GeneralActions } from '@app/store/general/generalActions';
+import histogramDuck from '@app/store/histogramDuck';
 import { NotifyActions } from '@app/store/notify/notifyActions';
 import projectDuck from '@app/store/projectDuck';
+import sensitiveAnalysisDuck from '@app/store/sensitiveAnalysisDuck';
 import { SettingsActions } from '@app/store/settings/settingsActions';
-import { openSensitiveAnalysisFromLocalStorage } from '@app/store/settings/settingsReducers';
 import { TableActions } from '@app/store/table/tableActions';
+import treeDuck from '@app/store/treeDuck';
 import { RootState } from '@app/store/types';
 import { GridActiveRow, GridCollection } from '@app/types/typesTable';
 import { LocalStorageHelper } from '@app/utils/LocalStorageHelper';
+import { Checkbox } from '@consta/uikit/Checkbox';
 import { ChoiceGroup } from '@consta/uikit/ChoiceGroup';
 import { IconCollapse } from '@consta/uikit/IconCollapse';
 import { IconDownload } from '@consta/uikit/IconDownload';
 import { IconExpand } from '@consta/uikit/IconExpand';
-import { IconSettings } from '@consta/uikit/IconSettings';
-import { Position } from '@consta/uikit/Popover';
+import { cnMixCard } from '@consta/uikit/MixCard';
 import { Sidebar } from '@consta/uikit/Sidebar';
+import { Item } from '@consta/uikit/SnackBar';
 import { Text } from '@consta/uikit/Text';
-import { SplitPanes, useInterval } from '@gpn-prototypes/vega-ui';
+import { SplitPanes, useInterval, useMount } from '@gpn-prototypes/vega-ui';
 
-import './RbResultPage.scss';
-
-const payloadMenuItems: MenuContextItem[] = [
-  {
-    name: 'Открывать анализ чувствительности',
-    code: 'analysis',
-    switch: (() => openSensitiveAnalysisFromLocalStorage)(),
-  },
-];
+import './RbResultPage.css';
 
 const RbResultPage: React.FC = () => {
   const dispatch = useDispatch();
+  const resetState = useCallback(() => {
+    dispatch(NotifyActions.resetState());
+    dispatch(TableActions.resetState());
+    dispatch(GeneralActions.resetState());
+    dispatch(SettingsActions.resetState());
+    dispatch(histogramDuck.actions.resetState());
+    dispatch(sensitiveAnalysisDuck.actions.resetState());
+    dispatch(treeDuck.actions.resetState());
+  }, [dispatch]);
+  const setFluidType = useCallback(
+    (type: EFluidType) => dispatch(TableActions.setFluidType(type)),
+    [dispatch],
+  );
+  const updateProjectName = useCallback(
+    (projectName: string) =>
+      dispatch(projectDuck.actions.updateProjectName(projectName)),
+    [dispatch],
+  );
+  const setRecentlyEdited = useCallback(
+    (recentlyEdited: boolean) =>
+      dispatch(competitiveAccessDuck.actions.setRecentlyEdited(recentlyEdited)),
+    [dispatch],
+  );
+  const appendItem = useCallback(
+    (item: Item) => dispatch(NotifyActions.appendItem(item)),
+    [dispatch],
+  );
+  const removeItem = useCallback(
+    (id: string) => dispatch(NotifyActions.removeItem(id)),
+    [dispatch],
+  );
   const treeEditorRef = useRef<HTMLDivElement>(null);
   const settingsRef = useRef<HTMLDivElement>(null);
   const [isShownTree, setIsShownTree] = useState(true);
-  const [isShownSettings, setIsShownSettings] = useState(false);
-  const [fluidType, setFluidType] = useState<EFluidType>(EFluidType.ALL);
-  const [menuItems, setMenuItems] =
-    useState<MenuContextItem[]>(payloadMenuItems);
 
   const data: GridCollection = useSelector(({ table }: RootState) => table);
   const sidebarRow: GridActiveRow | undefined = useSelector(
     ({ table }: RootState) => table.sidebarRow,
+  );
+  const isNotFound: boolean = useSelector(
+    ({ general }: RootState) => general.notFound,
   );
 
   const isRecentlyEdited = useSelector(
@@ -69,6 +93,9 @@ const RbResultPage: React.FC = () => {
   const openSensitiveAnalysis = useSelector(
     ({ settings }: RootState) => settings.openSensitiveAnalysis,
   );
+  const fluidType = useSelector(
+    ({ table }: RootState) => table.fluidType || EFluidType.ALL,
+  );
 
   const handleResize = (): void => {
     if (treeEditorRef?.current?.clientWidth) {
@@ -77,18 +104,18 @@ const RbResultPage: React.FC = () => {
   };
 
   const handleChangeFluidType = (type: EFluidType) => {
-    dispatch(TableActions.setFluidType(type));
-
     setFluidType(type);
   };
+
+  useMount(() => {
+    return resetState;
+  });
 
   useEffect(() => {
     projectService
       .getProjectName()
-      .then((projectName) =>
-        dispatch(projectDuck.actions.updateProjectName(projectName)),
-      );
-  }, [dispatch]);
+      .then((projectName) => updateProjectName(projectName));
+  }, [updateProjectName]);
 
   useInterval(IS_PROJECT_RECENTLY_EDITED_INTERVAL_IN_MS, () => {
     projectService
@@ -97,61 +124,18 @@ const RbResultPage: React.FC = () => {
         if (recentlyEdited === isRecentlyEdited) {
           return;
         }
-        dispatch(
-          competitiveAccessDuck.actions.setRecentlyEdited(recentlyEdited),
-        );
+        setRecentlyEdited(recentlyEdited);
       })
-      .catch(() => competitiveAccessDuck.actions.setRecentlyEdited(false));
+      .catch(() => setRecentlyEdited(false));
   });
-
-  const onChange = (item: MenuContextItem) => {
-    const updatedMenuItems: MenuContextItem[] = menuItems.map(
-      (menuItem: MenuContextItem) => {
-        const newItem = { ...menuItem };
-
-        if (menuItem.switch !== undefined && menuItem.code === item.code) {
-          newItem.switch = !item.switch;
-        }
-
-        return newItem;
-      },
-    );
-
-    setMenuItems(updatedMenuItems);
-
-    const currentItem = updatedMenuItems.find((cur) => cur.code === item.code);
-
-    switch (currentItem?.code) {
-      case 'analysis': {
-        dispatch(
-          SettingsActions.setOpenSensitiveAnalysis(Boolean(currentItem.switch)),
-        );
-
-        break;
-      }
-
-      default:
-        break;
-    }
-  };
-
-  /** Установка позиции Popover */
-  const getPosition = (): Position => {
-    const rect: DOMRect | undefined =
-      settingsRef.current?.getBoundingClientRect();
-
-    return rect ? { x: rect.left, y: rect.bottom } : { x: 0, y: 0 };
-  };
 
   const downloadResult = async (): Promise<void> => {
     try {
-      dispatch(
-        NotifyActions.appendItem({
-          key: 'notify',
-          message: 'Идет генерация файла',
-          status: 'system',
-        }),
-      );
+      appendItem({
+        key: 'notify',
+        message: 'Идет генерация файла',
+        status: 'system',
+      });
 
       /** Таймаут добавлен для того, что бы визуально не мелькала нотификация */
       setTimeout(async () => {
@@ -159,12 +143,28 @@ const RbResultPage: React.FC = () => {
           LocalStorageHelper.get(LocalStorageKey.ResultId) || '',
         );
 
-        dispatch(NotifyActions.removeItem('notify'));
+        removeItem('notify');
       }, 1500);
     } catch (e) {
       console.warn(e);
     }
   };
+
+  if (isNotFound) {
+    return (
+      <Text
+        className={cnMixCard({
+          verticalSpace: 'm',
+          horizontalSpace: 'm',
+          form: 'square',
+          shadow: false,
+        })}
+        view="alert"
+      >
+        Были обновлены входные данные. Сделайте повторный расчет.
+      </Text>
+    );
+  }
 
   return (
     <div>
@@ -207,6 +207,21 @@ const RbResultPage: React.FC = () => {
                       />
 
                       <div className="result__icons">
+                        <span className="result__icon">
+                          <Checkbox
+                            view="primary"
+                            checked={openSensitiveAnalysis}
+                            onChange={({ checked }) =>
+                              dispatch(
+                                SettingsActions.setOpenSensitiveAnalysis(
+                                  checked,
+                                ),
+                              )
+                            }
+                            label="Открывать анализ чувствительности"
+                          />
+                        </span>
+
                         <span ref={settingsRef} className="result__icon">
                           <IconDownload
                             onClick={() => downloadResult()}
@@ -231,24 +246,7 @@ const RbResultPage: React.FC = () => {
                             />
                           )}
                         </span>
-
-                        <span ref={settingsRef} className="result__icon">
-                          <IconSettings
-                            onClick={() => setIsShownSettings(true)}
-                            size="m"
-                          />
-                        </span>
                       </div>
-
-                      {isShownSettings && (
-                        <CustomContextMenu
-                          ref={settingsRef}
-                          menuItems={() => (() => menuItems)()}
-                          onChange={onChange}
-                          position={getPosition()}
-                          setIsOpenContextMenu={setIsShownSettings}
-                        />
-                      )}
                     </div>
                     <div
                       className={`result__table ${

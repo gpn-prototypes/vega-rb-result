@@ -2,6 +2,7 @@ import {
   SensitiveAnalysis,
   SensitiveAnalysisStatistic,
 } from '@app/interfaces/SensitiveAnalysisInterface';
+import { DrawHelper } from '@app/utils/DrawHelper';
 
 export type Maybe<T> = T | null;
 export type Exact<T extends { [key: string]: unknown }> = {
@@ -3004,9 +3005,9 @@ export type ResultProjectStructure = {
 };
 
 export type Histogram = {
-  percentiles: number[];
+  percentiles: DrawHelper.Point[];
   sample: number[];
-  cdf: number[];
+  cdf: DrawHelper.Point[];
   numberOfIterationBin: number[];
   subtitle: string;
   title: string;

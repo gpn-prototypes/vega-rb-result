@@ -110,6 +110,7 @@ export interface GridCollection {
   fluidType?: EFluidType;
   decimalFixed?: DecimalFixed;
   hiddenColumns?: HiddenColumns;
+  entitiesCount?: number;
 }
 
 export interface FilteredGridDataKeys {

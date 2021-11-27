@@ -2,12 +2,18 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { CustomContextMenu } from '@app/components/Helpers/ContextMenuHelper';
 import { EFluidType, EFluidTypeCode } from '@app/constants/Enums';
-import { DomainEntityCode } from '@app/constants/GeneralConstants';
 import { RbDomainEntityInput } from '@app/generated/graphql';
 import { MenuContextItem } from '@app/interfaces/ContextMenuInterface';
-import { TableActions } from '@app/store/table/tableActions';
+import {
+  TableActions,
+  TableSetDecimalFixedActionPayload,
+} from '@app/store/table/tableActions';
 import { RootState, TreeFilter } from '@app/store/types';
-import { DecimalFixed, GridActiveRow } from '@app/types/typesTable';
+import {
+  DecimalFixed,
+  GridActiveRow,
+  HiddenColumns,
+} from '@app/types/typesTable';
 import { IconAdd } from '@consta/uikit/IconAdd';
 import { IconRemove } from '@consta/uikit/IconRemove';
 import { Position } from '@consta/uikit/Popover';
@@ -15,7 +21,7 @@ import { Table } from '@consta/uikit/Table';
 
 import { Column, RowEntity } from './types';
 
-import './TableResultRb.scss';
+import './TableResultRb.css';
 
 interface Props {
   rows: RowEntity[];
@@ -105,6 +111,27 @@ export const TableResultRb: React.FC<Props> = ({
   filter,
 }) => {
   const dispatch = useDispatch();
+  const setActiveRow = useCallback(
+    ({ code, title }: GridActiveRow) =>
+      dispatch(TableActions.setActiveRow({ code, title })),
+    [dispatch],
+  );
+  const setSidebarRow = useCallback(
+    ({ code, title }: GridActiveRow) =>
+      dispatch(TableActions.setSidebarRow({ code, title: title || '' })),
+    [dispatch],
+  );
+  const setDecimalFixed = useCallback(
+    ({ type, columnCode }: TableSetDecimalFixedActionPayload) =>
+      dispatch(
+        TableActions.setDecimalFixed({
+          type,
+          columnCode,
+        }),
+      ),
+    [dispatch],
+  );
+
   const rowRef = useRef(null);
   const [filteredRows, setFilteredRows] = useState<RowEntity[]>(rows);
   const [filteredColumns, setFilteredColumns] =
@@ -115,6 +142,9 @@ export const TableResultRb: React.FC<Props> = ({
 
   const activeRow: GridActiveRow | undefined = useSelector(
     ({ table }: RootState) => table.activeRow,
+  );
+  const entitiesCount: number = useSelector(
+    ({ table }: RootState) => table.entitiesCount || 0,
   );
   const fluidType: EFluidType | undefined = useSelector(
     ({ table }: RootState) => table.fluidType,
@@ -127,6 +157,9 @@ export const TableResultRb: React.FC<Props> = ({
   );
   const showHistogram: boolean = useSelector(
     ({ settings }: RootState) => settings.showHistogram,
+  );
+  const hiddenColumns: HiddenColumns | undefined = useSelector(
+    ({ table }: RootState) => table.hiddenColumns,
   );
 
   /**
@@ -151,17 +184,28 @@ export const TableResultRb: React.FC<Props> = ({
     }
 
     /** Фильтрация колонок по типу флюида */
-    filteredColumnsData = filteredColumnsData.filter(
+    filteredColumnsData = filteredColumnsData.map(
       (column: Column<RbDomainEntityInput>) => {
+        /** TODO: Refactor it, count to try refactor: 0 */
         if (
           fluidType === EFluidType.ALL ||
           fluidType === undefined ||
-          !column?.geoType
+          !column?.geoType ||
+          (column?.geoType === EFluidTypeCode[EFluidType.OIL_N_GAS] &&
+            column.accessor !== 'GAS_VOLUME_TO_ENTIRE_RESERVOIR') ||
+          (EFluidTypeCode[fluidType] === EFluidTypeCode[EFluidType.OIL_N_GAS] &&
+            column.accessor.indexOf('ngzngr_') > -1)
         ) {
-          return true;
+          return column;
         }
 
-        return column?.geoType === EFluidTypeCode[fluidType];
+        const cloneColumn = { ...column };
+
+        if (EFluidTypeCode[fluidType] !== column?.geoType) {
+          cloneColumn.hidden = true;
+        }
+
+        return cloneColumn;
       },
     );
 
@@ -191,24 +235,12 @@ export const TableResultRb: React.FC<Props> = ({
     setFilteredRows(filteredRowsData);
     setFilteredColumns(filteredColumnsData);
 
-    if (filteredColumnsData.length > 0) {
-      const code = filteredColumnsData[0].accessor;
-      const title =
-        filteredRowsData.length > 0 ? filteredRowsData[0][code].value : '';
+    if (filteredColumnsData.length > 0 && filteredRowsData.length > 0) {
+      const { accessor } = filteredColumnsData[0];
+      const code = filteredRowsData[0][accessor].parentCodes || '';
+      const title = filteredRowsData[0][accessor].parentNames || '';
 
-      /** Нам необходимо дождаться рендера новых колонок, что бы потом найти самую первую колонку и найти у него необходимы нам данные */
-      setTimeout(() => {
-        const element: HTMLElement | null = document.querySelector(
-          `[data-name*="${title}"]`,
-        );
-
-        const dataCode = element?.dataset?.code || '';
-        const dataTitle = element?.dataset?.name || '';
-
-        dispatch(
-          TableActions.setActiveRow({ code: dataCode, title: dataTitle }),
-        );
-      });
+      setActiveRow({ code, title });
     }
   }, [
     filter,
@@ -216,7 +248,7 @@ export const TableResultRb: React.FC<Props> = ({
     columns,
     actualColumns,
     fluidType,
-    dispatch,
+    setActiveRow,
     setFilteredRows,
     setFilteredColumns,
   ]);
@@ -227,8 +259,17 @@ export const TableResultRb: React.FC<Props> = ({
   }, [activeRow]);
 
   const onContextMenuClick = useCallback(
-    (event, element: Element, text: string) => {
+    (event, element: Element) => {
       event.preventDefault();
+
+      const rightSelector = element.querySelector(
+        '.TableCell-Wrapper_horizontalAlign_right',
+      );
+      const text = rightSelector?.textContent || '';
+
+      if (!text) {
+        return;
+      }
 
       const rect = element.getBoundingClientRect();
 
@@ -267,9 +308,9 @@ export const TableResultRb: React.FC<Props> = ({
         const htmlElement = element as HTMLElement;
 
         htmlElement.oncontextmenu = (event) =>
-          onContextMenuClick(event, element, text);
+          onContextMenuClick(event, element);
       });
-  }, [onContextMenuClick]);
+  }, [onContextMenuClick, hiddenColumns]);
 
   const handleClickRow = ({
     id,
@@ -291,26 +332,24 @@ export const TableResultRb: React.FC<Props> = ({
     /** Отправляем активную строку в стору, это нужно для обновления данных в графиках */
     if (code && title) {
       if (showHistogram) {
-        dispatch(TableActions.setActiveRow({ code, title: title || '' }));
+        setActiveRow({ code, title: title || '' });
       }
 
       if (
-        code.indexOf(DomainEntityCode.Mine) > -1 &&
+        code.split(',').length === entitiesCount &&
         (title || '').indexOf('Всего') === -1 &&
         openSensitiveAnalysis
       ) {
-        dispatch(TableActions.setSidebarRow({ code, title: title || '' }));
+        setSidebarRow({ code, title: title || '' });
       }
     }
   };
 
   const handleContextMenuClick = (item: MenuContextItem): void => {
-    dispatch(
-      TableActions.setDecimalFixed({
-        type: item.code === 'add' ? 'plus' : 'minus',
-        columnCode: currentColumnCode || '',
-      }),
-    );
+    setDecimalFixed({
+      type: item.code === 'add' ? 'plus' : 'minus',
+      columnCode: currentColumnCode || '',
+    });
   };
 
   const isContextMenuDisabled = (item: MenuContextItem) => {
@@ -341,7 +380,6 @@ export const TableResultRb: React.FC<Props> = ({
         borderBetweenColumns
         borderBetweenRows
         stickyHeader
-        stickyColumns={1}
         isResizable
       />
 

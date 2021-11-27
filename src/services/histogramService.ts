@@ -1,32 +1,37 @@
-import { Dispatch } from 'react';
+import { Histogram, HistogramStatistic } from '@app/generated/graphql';
 import projectService from '@app/services/ProjectService';
-import histogramDuck from '@app/store/histogramDuck';
+import { Action } from 'redux';
 
 export async function loadHistogramData(
-  dispatch: Dispatch<unknown>,
+  setHistograms: (histograms: Histogram[]) => Action,
   domainEntityNames: string[],
   bins: number,
+  geoFluidType: string,
 ): Promise<void> {
-  const data = await projectService.getHistogramData(domainEntityNames, bins);
+  const data = await projectService.getHistogramData(
+    domainEntityNames,
+    bins,
+    geoFluidType,
+  );
 
   if (data) {
-    dispatch(
-      histogramDuck.actions.setHistograms(data.getHistograms.histograms),
-    );
+    setHistograms(data.getHistograms.histograms);
   }
 }
 
 export async function loadHistogramStatisticData(
-  dispatch: Dispatch<unknown>,
+  setStatistics: (histograms: HistogramStatistic[]) => Action,
   domainEntityNames: string[],
   bins: number,
+  geoFluidType: string,
 ): Promise<void> {
   const statistics = await projectService.getHistogramStatisticsData(
     domainEntityNames,
     bins,
+    geoFluidType,
   );
 
   if (statistics) {
-    dispatch(histogramDuck.actions.setStatistics(statistics));
+    setStatistics(statistics);
   }
 }

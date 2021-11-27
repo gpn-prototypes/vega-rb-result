@@ -1,15 +1,32 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useHistory } from 'react-router-dom';
 import { TableResultRb } from '@app/components/TableResultRbController/TableResultRb/TableResultRb';
 import { loadTableData } from '@app/services/loadTableData';
+import { GeneralActions } from '@app/store/general/generalActions';
 import { TableActions } from '@app/store/table/tableActions';
 import { RootState } from '@app/store/types';
+import { GridCollection } from '@app/types/typesTable';
 import { Loader, useMount } from '@gpn-prototypes/vega-ui';
 
 export const Table: React.FC = () => {
   const dispatch = useDispatch();
-  const history = useHistory();
+  const setNotFound = useCallback(
+    (isNotFound: boolean) => dispatch(GeneralActions.setNotFound(isNotFound)),
+    [dispatch],
+  );
+  const resetState = useCallback(
+    () => dispatch(TableActions.resetState()),
+    [dispatch],
+  );
+  const setEntitiesCount = useCallback(
+    (count: number) => dispatch(TableActions.setEntitiesCount(count)),
+    [dispatch],
+  );
+  const setTable = useCallback(
+    (table: GridCollection) => dispatch(TableActions.initState(table)),
+    [dispatch],
+  );
+
   const reduxTableData = useSelector(({ table }: RootState) => table);
   const filterData = useSelector(({ tree }: RootState) => tree.filter);
 
@@ -18,20 +35,22 @@ export const Table: React.FC = () => {
   useMount(() => {
     setIsLoading(true);
 
-    loadTableData(dispatch)
-      .catch((e) => {
-        console.error('Error when load table data', e);
-        /** Придумать механизм редиректа между проектами */
-        history.push(window.location.pathname.replace('/rb-result', '/rb'));
-      })
-      .then(() => setIsLoading(false));
+    const load = async () => {
+      try {
+        await loadTableData(setTable, setEntitiesCount);
 
-    return () => {
-      dispatch(TableActions.resetState());
+        setIsLoading(false);
+      } catch (e) {
+        setNotFound(true);
+      }
     };
+
+    load();
+
+    return resetState;
   });
 
-  return isLoading || !reduxTableData.actualColumns ? (
+  return isLoading || !reduxTableData || !reduxTableData.actualColumns ? (
     <Loader />
   ) : (
     <TableResultRb

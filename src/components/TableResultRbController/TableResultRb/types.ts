@@ -11,6 +11,8 @@ export type Row = {
   code: string;
   value: string;
   formattedValue: string;
+  parentNames?: string;
+  parentCodes?: string;
   visible?: { calc: boolean; tree: boolean; table: boolean };
   icon?: RbDomainEntityIcons;
   id?: string;

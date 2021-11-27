@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { VerticalMoreContextMenu } from '@app/components/Helpers/ContextMenuHelper';
+import { EFluidType } from '@app/constants/Enums';
 import { Histogram } from '@app/generated/graphql';
 import { MenuContextItem } from '@app/interfaces/ContextMenuInterface';
 import { loadHistogramData } from '@app/services/histogramService';
@@ -13,7 +14,7 @@ import { Loader, useMount } from '@gpn-prototypes/vega-ui';
 import ChartComponent from './chart/Chart';
 import { HistogramStatisticsComponent } from './statistic/HistogramStatisticsComponent';
 
-import './HistogramComponent.scss';
+import './HistogramComponent.css';
 
 interface Props {
   grid: GridCollection;
@@ -49,12 +50,24 @@ const getDomainEntityNames = (
 
 export const HistogramComponent: React.FC<Props> = ({ grid }) => {
   const dispatch = useDispatch();
+  const resetHistogramState = useCallback(
+    () => dispatch(histogramDuck.actions.resetState()),
+    [dispatch],
+  );
+  const setHistograms = useCallback(
+    (histograms: Histogram[]) =>
+      dispatch(histogramDuck.actions.setHistograms(histograms)),
+    [dispatch],
+  );
 
   const histogramsPayload: Histogram[] = useSelector(
     ({ histograms }: RootState) => histograms.payload,
   );
   const activeRow: GridActiveRow | undefined = useSelector(
     ({ table }: RootState) => table.activeRow,
+  );
+  const fluidType: string = useSelector(
+    ({ table }: RootState) => table.fluidType || EFluidType.ALL,
   );
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -74,14 +87,13 @@ export const HistogramComponent: React.FC<Props> = ({ grid }) => {
   /** Запрашиваем данные в самом начале, берем самый первый элемент */
   useMount(() => {
     loadHistogramData(
-      dispatch,
+      setHistograms,
       getDomainEntityNames(undefined, grid),
       numberOfRows,
-    ).then(() => setIsLoading(false));
+      fluidType,
+    ).finally(() => setIsLoading(false));
 
-    return () => {
-      dispatch(histogramDuck.actions.resetState());
-    };
+    return resetHistogramState;
   });
 
   const loadData = useCallback(
@@ -96,10 +108,11 @@ export const HistogramComponent: React.FC<Props> = ({ grid }) => {
       setIsLoading(true);
 
       loadHistogramData(
-        dispatch,
+        setHistograms,
         getDomainEntityNames(innerActiveRow, grid),
         numberOfRows,
-      ).then(() => {
+        fluidType,
+      ).finally(() => {
         setIsLoading(false);
 
         setPreviousActiveRow(innerActiveRow);
@@ -111,7 +124,8 @@ export const HistogramComponent: React.FC<Props> = ({ grid }) => {
       previousNumberOfRows,
       previousActiveRow,
       grid,
-      dispatch,
+      fluidType,
+      setHistograms,
       setIsLoading,
       setPreviousNumberOfRows,
       setPreviousActiveRow,
@@ -148,7 +162,7 @@ export const HistogramComponent: React.FC<Props> = ({ grid }) => {
   };
 
   const handleClick = (item: MenuContextItem) => {
-    console.log('handle click', item);
+    console.info('DEV: handle click', item);
   };
 
   const histograms = (

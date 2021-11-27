@@ -1,10 +1,10 @@
-import React, { PropsWithChildren, useMemo } from 'react';
+import React, { PropsWithChildren, useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import SvgResource from '@app/assets/icons/components/Resource';
 import { cnTreeEditor } from '@app/components/TreeEditor/cn-tree-editor';
 import { RbDomainEntityInput } from '@app/generated/graphql';
 import treeFilterDuck from '@app/store/treeDuck';
-import { RootState } from '@app/store/types';
+import { RootState, TreeFilter } from '@app/store/types';
 import { Text, Tree, useMount } from '@gpn-prototypes/vega-ui';
 
 import {
@@ -15,7 +15,7 @@ import {
 import { getNodeListFromTableData, searchInTree } from './helpers';
 import { TargetData } from './types';
 
-import './TreeEditor.scss';
+import './TreeEditor.css';
 
 const icons = {
   'blue-line': <SvgResource color="#00eeaa" />,
@@ -35,11 +35,23 @@ export default React.forwardRef<HTMLDivElement, StructureTreeEditorProps>(
     ref,
   ): React.ReactElement {
     const dispatch = useDispatch();
+    const resetState = useCallback(
+      () => dispatch(treeFilterDuck.actions.resetState()),
+      [dispatch],
+    );
+    const setFilter = useCallback(
+      ({ columnKeys, rowsIdx }: TreeFilter) =>
+        dispatch(
+          treeFilterDuck.actions.setFilter({
+            columnKeys,
+            rowsIdx,
+          }),
+        ),
+      [dispatch],
+    );
 
     useMount(() => {
-      return () => {
-        dispatch(treeFilterDuck.actions.resetState());
-      };
+      return resetState;
     });
 
     const projectName = useSelector(({ project }: RootState) => project.name);
@@ -55,22 +67,20 @@ export default React.forwardRef<HTMLDivElement, StructureTreeEditorProps>(
         if (node && node.data) {
           const { columnIdx } = node.data.position[0];
           const rowsIds = node.data.position.map(({ rowIdx }) => rowIdx);
-          dispatch(
-            treeFilterDuck.actions.setFilter({
-              columnKeys:
-                columns
-                  .filter(
-                    (_, idx) => columnIdx >= idx && idx !== columns.length - 1,
-                  )
-                  .map(({ accessor }) => accessor || '') || '',
-              rowsIdx: rowsIds,
-            }),
-          );
+          setFilter({
+            columnKeys:
+              columns
+                .filter(
+                  (_, idx) => columnIdx >= idx && idx !== columns.length - 1,
+                )
+                .map(({ accessor }) => accessor || '') || '',
+            rowsIdx: rowsIds,
+          });
         } else {
-          dispatch(treeFilterDuck.actions.resetState());
+          resetState();
         }
       } else {
-        dispatch(treeFilterDuck.actions.resetState());
+        resetState();
       }
     };
 

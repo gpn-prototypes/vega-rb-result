@@ -6,7 +6,7 @@ import { Bin } from 'd3-array';
 import { cnChart } from './cn-chart';
 import { Chart } from './drawUtils';
 
-import './Chart.scss';
+import './Chart.css';
 
 const ChartComponent: React.FC<
   Histogram & { numberOfRows: number; id: string }
@@ -32,12 +32,9 @@ const ChartComponent: React.FC<
     const payload: Chart.Payload = Object.assign(sample, { x: '', y: '' });
 
     /** Создание бинов, это "бары", которые будут отображаться на графике */
-    const bins: Bin<number, number>[] = d3.bin().thresholds(numberOfRows)(
-      payload,
-    );
-
-    /** Получение данных для линии выживаемости */
-    const preparedCdf = Chart.getPayload(cdf, sample);
+    const bins: Bin<number, number>[] = d3
+      .bin()
+      .thresholds(Chart.getThresholds({ sample, numberOfRows }))(payload);
 
     /** Получаем основные данные и их распределение на гистограмме */
     const {
@@ -47,14 +44,12 @@ const ChartComponent: React.FC<
       y2Scale,
       cumulativeXScale,
       cumulativeYScale,
-      preparedPercentiles,
       probabilityDensityXScale,
-      // probabilityDensityYScale,
     } = Chart.getScales({
       bins,
       numberOfIterationBin,
-      cdf: preparedCdf,
-      percentiles,
+      cdf,
+      sample,
     });
 
     /** Получаем основные оси, на основе них будет сопастовление с данными выше */
@@ -71,16 +66,14 @@ const ChartComponent: React.FC<
     Chart.DrawHistogram({ bins, svg, xScale, yScale });
 
     /** Рисуем точки на основе данных */
-    // Chart.DrawDots({ svg, xScale, y1Scale, percentiles: preparedPercentiles });
+    Chart.DrawDots({
+      svg,
+      cumulativeXScale,
+      cumulativeYScale,
+      percentiles,
+    });
 
     /** Рисуем линию выживаемости */
-    // Chart.DrawCdfLineWithGradient({
-    //   probabilityDensityXScale,
-    //   probabilityDensityYScale,
-    //   svg,
-    //   pdf,
-    //   id,
-    // });
     Chart.DrawCdfLineWithGrid({
       cumulativeXScale,
       cumulativeYScale,
@@ -88,9 +81,9 @@ const ChartComponent: React.FC<
       probabilityDensityXScale,
       sample,
       svg,
-      cdf: preparedCdf,
+      cdf,
       id,
-      percentiles: preparedPercentiles,
+      percentiles,
     });
 
     /** Добавляем все оси на гистограмму */
@@ -99,13 +92,11 @@ const ChartComponent: React.FC<
     /** Рисуем основную ось Y, не видимая */
     svg.append('g').call(yAxis);
 
-    /** Рисуем фиктивную ось Y, слева */
-    // svg.append('g').call(y1Axis);
-
     /** Рисуем фиктивную ось Y, справа */
     svg.append('g').call(y2Axis);
   }, [sample, percentiles, numberOfIterationBin, numberOfRows, cdf, id]);
 
+  /** Рисуем графики. Смотрим на обновление самплов */
   useEffect(() => {
     if (d3Container.current) {
       draw();

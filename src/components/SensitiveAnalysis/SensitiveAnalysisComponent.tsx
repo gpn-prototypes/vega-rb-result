@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { MenuContextItem } from '@app/interfaces/ContextMenuInterface';
 import {
@@ -23,7 +23,7 @@ import { VerticalMoreContextMenu } from '../Helpers/ContextMenuHelper';
 import { SensitiveAnalysisChartComponent } from './chart/Chart';
 import { SensitiveAnalysisStatisticComponent } from './statistic/SensitiveAnalysisStatisticComponent';
 
-import './SensitiveAnalysisComponent.scss';
+import './SensitiveAnalysisComponent.css';
 
 interface Props {
   sidebarRow: GridActiveRow;
@@ -38,6 +38,15 @@ const payloadMenuItem: MenuContextItem = {
 
 export const SensitiveAnalysisComponent: React.FC<Props> = ({ sidebarRow }) => {
   const dispatch = useDispatch();
+  const resetState = useCallback(() => {
+    dispatch(sensitiveAnalysisDuck.actions.resetState());
+    dispatch(TableActions.resetSidebarRow());
+  }, [dispatch]);
+  const resetSidebarRow = useCallback(
+    () => dispatch(TableActions.resetSidebarRow()),
+    [dispatch],
+  );
+
   const [menuItems, setMenuItems] = useState<MenuContextItem[]>([]);
   const sensitiveAnalysisData: SensitiveAnalysis | undefined = useSelector(
     ({ sensitiveAnalysis }: RootState) => sensitiveAnalysis.payload,
@@ -65,10 +74,7 @@ export const SensitiveAnalysisComponent: React.FC<Props> = ({ sidebarRow }) => {
       () => setIsLoadingStatistic(false),
     );
 
-    return () => {
-      dispatch(sensitiveAnalysisDuck.actions.resetState());
-      dispatch(TableActions.resetSidebarRow());
-    };
+    return resetState;
   });
 
   useEffect(() => {
@@ -110,11 +116,7 @@ export const SensitiveAnalysisComponent: React.FC<Props> = ({ sidebarRow }) => {
   };
 
   const handleClick = (item: MenuContextItem) => {
-    console.log('handle click', item);
-  };
-
-  const handleClose = () => {
-    dispatch(TableActions.resetSidebarRow());
+    console.info('DEV: handle click', item);
   };
 
   const getAvailableNames = (): string[] => {
@@ -184,7 +186,7 @@ export const SensitiveAnalysisComponent: React.FC<Props> = ({ sidebarRow }) => {
       </Sidebar.Content>
 
       <Sidebar.Actions className="sensitive-analysis__actions">
-        <Button onClick={handleClose} label="Закрыть" size="m" />
+        <Button onClick={resetSidebarRow} label="Закрыть" size="m" />
       </Sidebar.Actions>
     </div>
   );

@@ -38,6 +38,10 @@ export interface NormalizedState<T> {
 
 export type ErrorsState = NormalizedState<any>;
 
+export type GeneralStore = {
+  notFound: boolean;
+};
+
 export interface RootState {
   alert: AlertState;
   project: ProjectState;
@@ -49,6 +53,7 @@ export interface RootState {
   sensitiveAnalysis: SensitiveAnalysisStore;
   settings: SettingStore;
   notify: NotifyStore;
+  general: GeneralStore;
 }
 
 export type TypedColumnsList = {

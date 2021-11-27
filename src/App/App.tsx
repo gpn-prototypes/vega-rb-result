@@ -8,7 +8,7 @@ import { CurrentProject, Identity, ShellToolkit } from '@app/types';
 import { presetGpnDark, Theme } from '@consta/uikit/Theme';
 import { useMount } from '@gpn-prototypes/vega-ui';
 
-import './App.scss';
+import './App.css';
 
 const getInitProps = async ({
   currentProject,

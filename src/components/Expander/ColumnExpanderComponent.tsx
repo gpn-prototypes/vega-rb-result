@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RbDomainEntityInput } from '@app/generated/graphql';
 import { TableActions } from '@app/store/table/tableActions';
@@ -16,6 +16,11 @@ interface Props {
 
 export const ColumnExpanderComponent: React.FC<Props> = ({ column }) => {
   const dispatch = useDispatch();
+  const setHiddenColumns = useCallback(
+    (hidden: HiddenColumns) => dispatch(TableActions.setHiddenColumns(hidden)),
+    [dispatch],
+  );
+
   const hiddenColumns: HiddenColumns | undefined = useSelector(
     ({ table }: RootState) => table.hiddenColumns,
   );
@@ -36,7 +41,7 @@ export const ColumnExpanderComponent: React.FC<Props> = ({ column }) => {
 
     hidden[column.accessor] = !hidden[column.accessor];
 
-    dispatch(TableActions.setHiddenColumns(hidden));
+    setHiddenColumns(hidden);
   };
 
   return (

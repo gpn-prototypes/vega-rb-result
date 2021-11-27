@@ -1,6 +1,5 @@
 .histogram-statistics {
   padding-bottom: var(--space-3xl);
-
   display: grid;
   grid-template-columns: 167px 109px;
   grid-gap: 22px;
@@ -12,49 +11,38 @@
 
   &__row {
     padding: 4px 8px;
-
     display: flex;
     justify-content: flex-end;
     align-items: center;
-
     height: 100%;
-
     font-size: 14px;
     line-height: 120%;
     text-align: right;
-
     color: var(--color-typo-primary);
-
     border-bottom: 1px solid var(--color-bg-border);
 
     &_last {
       justify-content: flex-start;
-
       text-align: left;
-
       border-left: 1px solid var(--color-bg-border);
     }
   }
 
   &__loader {
     margin-top: var(--space-m);
-
     min-height: 244px;
   }
 
   &__wrapper {
     padding-bottom: var(--space-2xl);
-
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-gap: 89px;
   }
 
   &__statistic {
-    margin-top: var(--space-xl);
-
+    margin-top: var(--space-m);
     display: grid;
-
     grid-gap: var(--space-m);
     grid-template-columns: 1fr 1fr;
   }
