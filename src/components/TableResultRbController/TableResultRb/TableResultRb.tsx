@@ -88,7 +88,9 @@ const isHasAnyValuesInFilteredRows = (
     columns
       .filter(
         (column: Column<RbDomainEntityInput>) =>
-          column.geoType !== '' && column.geoType !== undefined,
+          !column.hidden &&
+          column.geoType !== '' &&
+          column.geoType !== undefined,
       )
       .find((column: Column<RbDomainEntityInput>) => {
         let isHasAnyValue = false;
@@ -186,15 +188,13 @@ export const TableResultRb: React.FC<Props> = ({
     /** Фильтрация колонок по типу флюида */
     filteredColumnsData = filteredColumnsData.map(
       (column: Column<RbDomainEntityInput>) => {
-        /** TODO: Refactor it, count to try refactor: 0 */
         if (
           fluidType === EFluidType.ALL ||
+          fluidType === EFluidType.OIL_N_GAS ||
           fluidType === undefined ||
           !column?.geoType ||
           (column?.geoType === EFluidTypeCode[EFluidType.OIL_N_GAS] &&
-            column.accessor !== 'GAS_VOLUME_TO_ENTIRE_RESERVOIR') ||
-          (EFluidTypeCode[fluidType] === EFluidTypeCode[EFluidType.OIL_N_GAS] &&
-            column.accessor.indexOf('ngzngr_') > -1)
+            column.accessor !== 'GAS_VOLUME_TO_ENTIRE_RESERVOIR')
         ) {
           return column;
         }
@@ -235,10 +235,14 @@ export const TableResultRb: React.FC<Props> = ({
     setFilteredRows(filteredRowsData);
     setFilteredColumns(filteredColumnsData);
 
-    if (filteredColumnsData.length > 0 && filteredRowsData.length > 0) {
-      const { accessor } = filteredColumnsData[0];
-      const code = filteredRowsData[0][accessor].parentCodes || '';
-      const title = filteredRowsData[0][accessor].parentNames || '';
+    const { accessor } = filteredColumnsData[0];
+    if (
+      filteredColumnsData.length > 0 &&
+      filteredRowsData.length > 0 &&
+      filteredRowsData[0][accessor]
+    ) {
+      const code = filteredRowsData[0][accessor]?.parentCodes || '';
+      const title = filteredRowsData[0][accessor]?.parentNames || '';
 
       setActiveRow({ code, title });
     }
@@ -291,25 +295,34 @@ export const TableResultRb: React.FC<Props> = ({
 
   /** Добавляем обработчик клика по шапке таблицы */
   useEffect(() => {
-    document
-      .querySelectorAll('.TableCell_isHeader')
-      .forEach((element: Element) => {
-        const rightSelector = element.querySelector(
-          '.TableCell-Wrapper_horizontalAlign_right',
-        );
-        const text = rightSelector?.textContent || '';
-        const blackListNames = ['Категория', 'Флюид'];
+    /**
+     * Хак, в виду того, что в консте еще нет обработчика по кликам
+     * TODO: https://github.com/gazprom-neft/consta-uikit/issues/1806
+     *
+     * Данный timeout нужен потому что при сокрытии колонок может не успеть обновиться DOM дерево
+     * Поэтому нужен timeout
+     */
+    setTimeout(() => {
+      document
+        .querySelectorAll('.TableCell_isHeader')
+        .forEach((element: Element) => {
+          const rightSelector = element.querySelector(
+            '.TableCell-Wrapper_horizontalAlign_right',
+          );
+          const text = rightSelector?.textContent || '';
+          const blackListNames = ['Категория', 'Флюид'];
 
-        /** Показываем контекстное меню, в случае когда это числа, а числа у нас по правому краю */
-        if (rightSelector === null || blackListNames.includes(text)) {
-          return;
-        }
+          /** Показываем контекстное меню, в случае когда это числа, а числа у нас по правому краю */
+          if (rightSelector === null || blackListNames.includes(text)) {
+            return;
+          }
 
-        const htmlElement = element as HTMLElement;
+          const htmlElement = element as HTMLElement;
 
-        htmlElement.oncontextmenu = (event) =>
-          onContextMenuClick(event, element);
-      });
+          htmlElement.oncontextmenu = (event) =>
+            onContextMenuClick(event, element);
+        });
+    });
   }, [onContextMenuClick, hiddenColumns]);
 
   const handleClickRow = ({

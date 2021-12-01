@@ -10,6 +10,11 @@ import './Chart.css';
 
 const PER_ELEMENT_HEIGHT = 66.6;
 
+type Sorted = {
+  range: number;
+  index: number;
+};
+
 export const SensitiveAnalysisChartComponent: React.FC<
   SensitiveAnalysis & { availableNames: string[] }
 > = ({ names, percentiles, resultMinMax, zeroPoint, availableNames }) => {
@@ -25,9 +30,34 @@ export const SensitiveAnalysisChartComponent: React.FC<
   );
 
   useEffect(() => {
-    const result = percentiles.filter((percent: number[], index: number) => {
-      return availableNames.includes(names[index]);
-    });
+    /**
+     * Пока что нет сортировки на backend, приходится вручную сортировать все
+     * Сортируем путям вычитания максимального значения из минимального
+     * И полученный результат сортируем с сохранением индекса у изначальных данных
+     */
+    const resultSorted: Sorted[] = resultMinMax
+      .map((result: number[], index: number) => ({
+        range: result[1] - result[0],
+        index,
+      }))
+      .sort((a: Sorted, b: Sorted) => {
+        if (a.range < b.range) {
+          return -1;
+        }
+
+        if (a.range > b.range) {
+          return 1;
+        }
+
+        return 0;
+      })
+      .reverse();
+
+    const result = resultSorted
+      .map(({ index }) => percentiles[index])
+      .filter((percent: number[], index: number) => {
+        return availableNames.includes(names[index]);
+      });
 
     setCurrentPercentiles(result);
 
@@ -39,6 +69,7 @@ export const SensitiveAnalysisChartComponent: React.FC<
   }, [
     availableNames,
     percentiles,
+    resultMinMax,
     setCurrentPercentiles,
     setCurrentHeight,
     names,
@@ -89,8 +120,6 @@ export const SensitiveAnalysisChartComponent: React.FC<
       });
 
     const { series, bias, options } = SensitiveAnalysisChart.getAxisData(data);
-
-    console.log(series, bias, options, cloneResultMinMax, data);
 
     const getColor = (key) => {
       return options.colors[key];

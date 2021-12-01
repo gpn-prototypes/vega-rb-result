@@ -20,7 +20,7 @@ const getMappedColumn = (
   header: SensitiveAnalysisStatisticHeaders,
   isLeft = true,
 ): Column<any> => {
-  return {
+  const column: Column<any> = {
     title: header.name,
     accessor: header.code,
     align: isLeft ? 'left' : 'right',
@@ -39,6 +39,8 @@ const getMappedColumn = (
       return row[header.code];
     },
   };
+
+  return column;
 };
 
 const getMappedRow = (

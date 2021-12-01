@@ -1,4 +1,5 @@
 import { RbDomainEntityIcons, Visible } from '@app/generated/graphql';
+import { OrderType } from '@consta/uikit/__internal__/src/components/Table/helpers';
 import { TableControl } from '@consta/uikit/Table';
 
 export type RowEntity = Record<string, Row> & {
@@ -33,6 +34,7 @@ export interface Column<T = any> {
   decimal?: number;
   width?: number;
   hidden?: boolean;
+  order?: OrderType;
   getComparisonValue?: (row: Row) => string;
   control?: ({ column }: TableControl<any>) => React.ReactNode;
   columnAccessorGroup?: string[];

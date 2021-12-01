@@ -140,7 +140,7 @@ const RbResultPage: React.FC = () => {
       /** Таймаут добавлен для того, что бы визуально не мелькала нотификация */
       setTimeout(async () => {
         await loadArchive(
-          LocalStorageHelper.get(LocalStorageKey.ResultId) || '',
+          LocalStorageHelper.get(LocalStorageKey.RecordId) || '',
         );
 
         removeItem('notify');
