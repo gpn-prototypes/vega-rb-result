@@ -3,7 +3,7 @@ import { OrderType } from '@consta/uikit/__internal__/src/components/Table/helpe
 import { TableControl } from '@consta/uikit/Table';
 
 export type RowEntity = Record<string, Row> & {
-  geoFluidType?: string;
+  geoFluidTypes?: string[];
   isAll?: boolean;
   id?: string;
 };

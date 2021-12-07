@@ -6,13 +6,8 @@ export async function loadHistogramData(
   setHistograms: (histograms: Histogram[]) => Action,
   domainEntityNames: string[],
   bins: number,
-  geoFluidType: string,
 ): Promise<void> {
-  const data = await projectService.getHistogramData(
-    domainEntityNames,
-    bins,
-    geoFluidType,
-  );
+  const data = await projectService.getHistogramData(domainEntityNames, bins);
 
   if (data) {
     setHistograms(data.getHistograms.histograms);
@@ -23,12 +18,10 @@ export async function loadHistogramStatisticData(
   setStatistics: (histograms: HistogramStatistic[]) => Action,
   domainEntityNames: string[],
   bins: number,
-  geoFluidType: string,
 ): Promise<void> {
   const statistics = await projectService.getHistogramStatisticsData(
     domainEntityNames,
     bins,
-    geoFluidType,
   );
 
   if (statistics) {

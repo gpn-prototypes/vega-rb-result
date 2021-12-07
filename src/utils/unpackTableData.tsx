@@ -292,7 +292,7 @@ export const prepareRows = ({
           };
 
           /** Установка типа флюида в общий флоу */
-          row[percIndex].geoFluidType = String(domainObject.geoFluidType);
+          row[percIndex].geoFluidTypes = domainObject.geoFluidTypes;
 
           /** Устанавливаем кастомные флаги, для того чтобы менять отображение таблицы */
           if (isHasParentAll(domainObject.parents)) {

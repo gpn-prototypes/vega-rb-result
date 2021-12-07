@@ -2993,7 +2993,7 @@ export type ResultDomainObject = {
   __typename?: 'ResultDomainObject';
   parents: Array<Parent>;
   geoCategory: GeoCategory;
-  geoFluidType: GeoType;
+  geoFluidTypes: string[];
   attributeValues: Array<ResultAttributeValue>;
 };
 

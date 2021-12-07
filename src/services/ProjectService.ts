@@ -203,7 +203,6 @@ class ProjectService implements IProjectService {
   async getHistogramData(
     domainEntityNames: string[],
     bins: number,
-    geoFluidType: string,
   ): Promise<ResultHistogramsStructure> {
     const { data: responseData } = await this.client
       .watchQuery<Query>({
@@ -214,7 +213,6 @@ class ProjectService implements IProjectService {
         variables: {
           domainEntityNames,
           bins,
-          // geoFluidType,
         },
         fetchPolicy: 'no-cache',
       })
@@ -232,7 +230,6 @@ class ProjectService implements IProjectService {
   async getHistogramStatisticsData(
     domainEntityNames: string[],
     bins: number,
-    geoFluidType: string,
   ): Promise<HistogramStatistic[]> {
     const { data: responseData } = await this.client
       .watchQuery<Query>({
@@ -243,7 +240,6 @@ class ProjectService implements IProjectService {
         variables: {
           domainEntityNames,
           bins,
-          // geoFluidType,
         },
         fetchPolicy: 'no-cache',
       })

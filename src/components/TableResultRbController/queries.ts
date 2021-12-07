@@ -297,7 +297,7 @@ export const GET_TABLE_RESULT_RB = gql`
                 viewType
               }
               domainObjects {
-                geoFluidType
+                geoFluidTypes
                 parents {
                   code
                   name
