@@ -1,6 +1,5 @@
 import React, { useCallback, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { EFluidType } from '@app/constants/Enums';
 import {
   HistogramStatistic,
   HistogramStatisticValues,
@@ -33,21 +32,15 @@ export const HistogramStatisticsComponent: React.FC<Props> = ({
   const statistics: HistogramStatistic[] = useSelector(
     ({ histograms }: RootState) => histograms.statistics,
   );
-  const fluidType: string = useSelector(
-    ({ table }: RootState) => table.fluidType || EFluidType.ALL,
-  );
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const loadData = useCallback(() => {
     setIsLoading(true);
 
-    loadHistogramStatisticData(
-      setStatistics,
-      domainEntityNames,
-      bins,
-      fluidType,
-    ).then(() => setIsLoading(false));
-  }, [domainEntityNames, bins, fluidType, setStatistics, setIsLoading]);
+    loadHistogramStatisticData(setStatistics, domainEntityNames, bins).then(
+      () => setIsLoading(false),
+    );
+  }, [domainEntityNames, bins, setStatistics, setIsLoading]);
 
   /** Обновляем данные при первой загрузке */
   useMount(() => loadData());

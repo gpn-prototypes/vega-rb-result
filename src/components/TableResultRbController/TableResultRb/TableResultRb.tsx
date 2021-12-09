@@ -214,12 +214,13 @@ export const TableResultRb: React.FC<Props> = ({
       if (
         fluidType === EFluidType.ALL ||
         fluidType === undefined ||
-        !row?.geoFluidType
+        !row?.geoFluidTypes ||
+        row.geoFluidTypes.length === 0
       ) {
         return true;
       }
 
-      return row?.geoFluidType === EFluidTypeCode[fluidType];
+      return row?.geoFluidTypes.includes(EFluidTypeCode[fluidType]);
     });
 
     if (
