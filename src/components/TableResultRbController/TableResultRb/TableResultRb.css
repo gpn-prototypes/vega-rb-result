@@ -20,7 +20,7 @@
     color: var(--color-typo-primary);
   }
 
-  .TableCell_oddBackground {
+  .TableCell_lightBackground {
     background-color: rgb(60, 64, 67);
   }
 

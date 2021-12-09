@@ -395,7 +395,11 @@ export const TableResultRb: React.FC<Props> = ({
         stickyHeader
         isResizable
         getAdditionalClassName={({ column, row, isActive }) => {
-          return row.GEO_CATEGORY?.value === 'Ресурсы' && !column.mergeCells && !isActive ? 'TableCell_oddBackground' : '';
+          return row.GEO_CATEGORY?.value === 'Ресурсы' &&
+            !column.mergeCells &&
+            !isActive
+            ? 'TableCell_lightBackground'
+            : '';
         }}
       />
 
