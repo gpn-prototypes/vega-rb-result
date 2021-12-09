@@ -35,7 +35,7 @@
   },
   "dependencies": {
     "@apollo/client": "^3.3.11",
-    "@consta/uikit": "3.9.3",
+    "@consta/uikit": "3.11.0",
     "@gpn-prototypes/vega-ui": "3.3.1",
     "@graphql-codegen/cli": "2.2.0",
     "@graphql-codegen/introspection": "2.1.0",

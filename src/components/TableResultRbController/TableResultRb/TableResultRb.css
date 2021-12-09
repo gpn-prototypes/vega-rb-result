@@ -20,6 +20,10 @@
     color: var(--color-typo-primary);
   }
 
+  .TableCell_oddBackground {
+    background-color: rgb(60, 64, 67);
+  }
+
   ._all {
     font-weight: 600;
   }
