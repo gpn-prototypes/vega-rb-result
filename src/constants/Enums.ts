@@ -11,3 +11,8 @@ export const EFluidTypeCode = {
   [EFluidType.OIL_N_GAS]: 'MIXTURE',
   [EFluidType.ALL]: '',
 };
+
+export enum EGeoCategory {
+  RESOURCES = 'Ресурсы',
+  RESERVES = 'Запасы',
+}

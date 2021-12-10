@@ -20,15 +20,15 @@
     color: var(--color-typo-primary);
   }
 
-  .TableCell_lightBackground {
-    background-color: rgb(60, 64, 67);
-  }
-
   ._all {
     font-weight: 600;
   }
 
   ._no-right-border {
     border-left: 0 !important;
+  }
+
+  ._lightBackground {
+    background-color: var(--color-bg-stripe);
   }
 }
