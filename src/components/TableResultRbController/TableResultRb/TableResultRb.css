@@ -28,7 +28,7 @@
     border-left: 0 !important;
   }
 
-  ._lightBackground {
+  ._light-background {
     background-color: var(--color-bg-stripe);
   }
 }

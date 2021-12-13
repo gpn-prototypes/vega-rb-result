@@ -384,7 +384,7 @@ export const TableResultRb: React.FC<Props> = ({
 
   const getAdditionalClassName = ({ column, row, isActive }): string => {
     return cn('TableCell', {
-      _lightBackground:
+      '_light-background':
         row.GEO_CATEGORY?.value === EGeoCategory.RESOURCES &&
         !column.mergeCells &&
         !isActive,
