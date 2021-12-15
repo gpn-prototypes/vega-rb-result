@@ -4,7 +4,7 @@ export const getBaseApiUrl = (): string | undefined => {
   if (process.env.BASE_API_URL === undefined) {
     return undefined;
   }
-  const baseApiUrl =
+  let baseApiUrl =
     process.env.BASE_API_URL.indexOf('://') > -1
       ? process.env.BASE_API_URL
       : window.location.origin + process.env.BASE_API_URL;
