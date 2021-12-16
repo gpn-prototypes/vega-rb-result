@@ -1,11 +1,7 @@
 import { ConceptionInput, RbProjectInput } from '@app/generated/graphql';
 
 export const getBaseApiUrl = (): string => {
-  if (
-    process.env.BASE_API_URL === undefined ||
-    process.env.BASE_API_URL === '/' ||
-    process.env.BASE_API_URL === ''
-  ) {
+  if (!process.env.BASE_API_URL || process.env.BASE_API_URL === '/') {
     return window.location.origin;
   }
 
