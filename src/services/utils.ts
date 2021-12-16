@@ -14,7 +14,6 @@ export const getBaseApiUrl = (): string => {
     : window.location.origin + process.env.BASE_API_URL;
 };
 
-
 export const getGraphqlUri = (projectId: string): string =>
   `${getBaseApiUrl()}/graphql/${projectId}`;
 
