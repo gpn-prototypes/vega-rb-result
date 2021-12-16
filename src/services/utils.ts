@@ -1,19 +1,19 @@
 import { ConceptionInput, RbProjectInput } from '@app/generated/graphql';
 
-export const getBaseApiUrl = (): string | undefined => {
-  if (process.env.BASE_API_URL === undefined) {
-    return undefined;
+export const getBaseApiUrl = (): string => {
+  if (
+    process.env.BASE_API_URL === undefined ||
+    process.env.BASE_API_URL === '/' ||
+    process.env.BASE_API_URL === ''
+  ) {
+    return window.location.origin;
   }
-  let baseApiUrl =
-    process.env.BASE_API_URL.indexOf('://') > -1
-      ? process.env.BASE_API_URL
-      : window.location.origin + process.env.BASE_API_URL;
-
-  if (baseApiUrl.slice(-1) === '/') {
-    baseApiUrl = baseApiUrl.slice(0, -1);
-  }
-  return baseApiUrl;
+  
+  return process.env.BASE_API_URL.indexOf('://') > -1
+    ? process.env.BASE_API_URL
+    : window.location.origin + process.env.BASE_API_URL;
 };
+
 
 export const getGraphqlUri = (projectId: string): string =>
   `${getBaseApiUrl()}/graphql/${projectId}`;
