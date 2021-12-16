@@ -73,7 +73,17 @@ module.exports = (webpackConfigEnv) => {
           return undefined;
         },
       }),
-      new webpack.DefinePlugin(envKeys),
+      new webpack.DefinePlugin({
+        'process.env.NODE_ENV': JSON.stringify(NODE_ENV),
+        'process.env.YC_DEPLOYMENT': JSON.stringify(YC_DEPLOYMENT),
+        'process.env.AVAILABLE_RB_RESULT': JSON.stringify(AVAILABLE_RB_RESULT),
+        'process.env.AVAILABLE_LC': JSON.stringify(AVAILABLE_LC),
+        'process.env.AVAILABLE_FEM': JSON.stringify(AVAILABLE_FEM),
+        'process.env.BASE_API_URL': JSON.stringify(process.env.BASE_API_URL),
+        'process.env.BASE_URL': JSON.stringify(BASE_URL),
+        'process.env.VEGA_ENV': JSON.stringify(VEGA_ENV),
+        ...envKeys,
+      }),
     ],
   });
 };
