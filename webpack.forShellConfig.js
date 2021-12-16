@@ -73,7 +73,10 @@ module.exports = (webpackConfigEnv) => {
           return undefined;
         },
       }),
-      new webpack.DefinePlugin(envKeys),
+      new webpack.DefinePlugin({
+        'process.env.BASE_API_URL': JSON.stringify(process.env.BASE_API_URL),
+        ...envKeys,
+      }),
     ],
   });
 };
