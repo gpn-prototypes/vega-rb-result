@@ -27,4 +27,8 @@
   ._no-right-border {
     border-left: 0 !important;
   }
+
+  ._light-background {
+    background-color: var(--color-bg-stripe);
+  }
 }

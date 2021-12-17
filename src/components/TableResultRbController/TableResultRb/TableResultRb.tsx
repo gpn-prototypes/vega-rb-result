@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { CustomContextMenu } from '@app/components/Helpers/ContextMenuHelper';
-import { EFluidType, EFluidTypeCode } from '@app/constants/Enums';
+import { EFluidType, EFluidTypeCode, EGeoCategory } from '@app/constants/Enums';
 import { RbDomainEntityInput } from '@app/generated/graphql';
 import { MenuContextItem } from '@app/interfaces/ContextMenuInterface';
 import {
@@ -18,6 +18,7 @@ import { IconAdd } from '@consta/uikit/IconAdd';
 import { IconRemove } from '@consta/uikit/IconRemove';
 import { Position } from '@consta/uikit/Popover';
 import { Table } from '@consta/uikit/Table';
+import cn from 'classnames';
 
 import { Column, RowEntity } from './types';
 
@@ -382,6 +383,15 @@ export const TableResultRb: React.FC<Props> = ({
     return false;
   };
 
+  const getAdditionalClassName = ({ column, row, isActive }): string => {
+    return cn('TableCell', {
+      '_light-background':
+        row.GEO_CATEGORY?.value === EGeoCategory.RESOURCES &&
+        !column.mergeCells &&
+        !isActive,
+    });
+  };
+
   return (
     <div className="table">
       <Table
@@ -395,6 +405,7 @@ export const TableResultRb: React.FC<Props> = ({
         borderBetweenRows
         stickyHeader
         isResizable
+        getAdditionalClassName={getAdditionalClassName}
       />
 
       {visible && (
