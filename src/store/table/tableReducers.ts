@@ -28,6 +28,15 @@ const hiddenColumnsFromLocalStorage: HiddenColumns | null =
 
 export const DEFAULT_DECIMAL_FIXED = 3;
 
+export const getHiddenColumns = (): HiddenColumns => {
+  return Object.keys(hiddenColumnsFromLocalStorage).length !== 0
+    ? hiddenColumnsFromLocalStorage
+    : {
+        PERCENTILE: true,
+        GCOS: true,
+      };
+};
+
 export const tableInitialState: GridCollection = {
   columns: [],
   actualColumns: [],
@@ -37,8 +46,7 @@ export const tableInitialState: GridCollection = {
   sidebarRow: undefined,
   fluidType: EFluidType.ALL,
   decimalFixed: decimalFromLocalStorage !== null ? decimalFromLocalStorage : {},
-  hiddenColumns:
-    hiddenColumnsFromLocalStorage !== null ? hiddenColumnsFromLocalStorage : {},
+  hiddenColumns: getHiddenColumns(),
   entitiesCount: 0,
 };
 
@@ -138,11 +146,13 @@ export const TableReducers = reducerWithInitialState<GridCollection>(
   .case(
     TableActions.initState,
     (state: GridCollection, payload: GridCollection) => {
+      const initialHidenColumns = getHiddenColumns();
+
       return {
         ...state,
         rows: payload.rows,
         columns: payload.columns,
-        actualColumns: getActualColumns(payload),
+        actualColumns: getActualColumns(payload, initialHidenColumns),
         version: payload.version,
       };
     },
