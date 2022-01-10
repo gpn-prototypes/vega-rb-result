@@ -1,5 +1,3 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { HistogramComponent } from '@app/components/Histograms/HistogramComponent';
 import NotifyComponent from '@app/components/Notify/Notify';
 import { SensitiveAnalysisComponent } from '@app/components/SensitiveAnalysis/SensitiveAnalysisComponent';
@@ -9,9 +7,8 @@ import TreeEditor from '@app/components/TreeEditor';
 import { EFluidType } from '@app/constants/Enums';
 import {
   FLUID_TYPES,
-  IS_PROJECT_RECENTLY_EDITED_INTERVAL_IN_MS,
+  IS_PROJECT_RECENTLY_EDITED_INTERVAL_IN_MS
 } from '@app/constants/GeneralConstants';
-import { LocalStorageKey } from '@app/constants/LocalStorageKeyConstants';
 import projectService from '@app/services/ProjectService';
 import { loadArchive } from '@app/services/utilsService';
 import competitiveAccessDuck from '@app/store/competitiveAccessDuck';
@@ -25,7 +22,6 @@ import { TableActions } from '@app/store/table/tableActions';
 import treeDuck from '@app/store/treeDuck';
 import { RootState } from '@app/store/types';
 import { GridActiveRow, GridCollection } from '@app/types/typesTable';
-import { LocalStorageHelper } from '@app/utils/LocalStorageHelper';
 import { Checkbox } from '@consta/uikit/Checkbox';
 import { ChoiceGroup } from '@consta/uikit/ChoiceGroup';
 import { IconCollapse } from '@consta/uikit/IconCollapse';
@@ -36,8 +32,10 @@ import { Sidebar } from '@consta/uikit/Sidebar';
 import { Item } from '@consta/uikit/SnackBar';
 import { Text } from '@consta/uikit/Text';
 import { SplitPanes, useInterval, useMount } from '@gpn-prototypes/vega-ui';
-
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import './RbResultPage.css';
+
 
 const RbResultPage: React.FC = () => {
   const dispatch = useDispatch();
@@ -139,9 +137,7 @@ const RbResultPage: React.FC = () => {
 
       /** Таймаут добавлен для того, что бы визуально не мелькала нотификация */
       setTimeout(async () => {
-        await loadArchive(
-          LocalStorageHelper.get(LocalStorageKey.RecordId) || '',
-        );
+        await loadArchive();
 
         removeItem('notify');
       }, 1500);
