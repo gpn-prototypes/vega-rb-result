@@ -154,10 +154,6 @@ export const HistogramComponent: React.FC<Props> = ({ grid }) => {
     }
   };
 
-  const handleClick = (item: MenuContextItem) => {
-    console.info('DEV: handle click', item);
-  };
-
   const histograms = (
     <div className="histogram__content">
       {histogramsPayload?.map((histogram: Histogram, index: number) => {
@@ -185,7 +181,6 @@ export const HistogramComponent: React.FC<Props> = ({ grid }) => {
             menuItems={() => (() => menuItems)()}
             title="Гистограмма запасов"
             onChange={handleChange}
-            onClick={handleClick}
           />
         </div>
         {histograms}

@@ -100,7 +100,6 @@ export const SensitiveAnalysisComponent: React.FC<Props> = ({ sidebarRow }) => {
   const handleChange = (item: MenuContextItem) => {
     const updatedMenuItems = menuItems.map((menuItem: MenuContextItem) => {
       const cloneItem = { ...menuItem };
-
       if (cloneItem.code === item.code) {
         cloneItem.switch = !menuItem.switch;
 
@@ -167,7 +166,6 @@ export const SensitiveAnalysisComponent: React.FC<Props> = ({ sidebarRow }) => {
             menuItems={() => (() => menuItems)()}
             title="Анализ чувствительности"
             onChange={handleChange}
-            onClick={handleClick}
           />
         </div>
 
@@ -179,7 +177,7 @@ export const SensitiveAnalysisComponent: React.FC<Props> = ({ sidebarRow }) => {
               chart
             )}
           </div>
-
+          {/*test commit*/}
           {/* Статистика */}
           {isShowStatistic ? statistic : null}
         </div>

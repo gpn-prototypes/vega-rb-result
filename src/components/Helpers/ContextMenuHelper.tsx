@@ -220,7 +220,7 @@ interface Props {
   title: string;
   menuItems: () => MenuContextItem[];
   onChange: (item: MenuContextItem) => void;
-  onClick: (item: MenuContextItem) => void;
+  onClick?: (item: MenuContextItem) => void;
 }
 
 export const VerticalMoreContextMenu: React.FC<Props> = ({
