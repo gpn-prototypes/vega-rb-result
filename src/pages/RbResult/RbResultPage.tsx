@@ -1,3 +1,5 @@
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { HistogramComponent } from '@app/components/Histograms/HistogramComponent';
 import NotifyComponent from '@app/components/Notify/Notify';
 import { SensitiveAnalysisComponent } from '@app/components/SensitiveAnalysis/SensitiveAnalysisComponent';
@@ -7,7 +9,7 @@ import TreeEditor from '@app/components/TreeEditor';
 import { EFluidType } from '@app/constants/Enums';
 import {
   FLUID_TYPES,
-  IS_PROJECT_RECENTLY_EDITED_INTERVAL_IN_MS
+  IS_PROJECT_RECENTLY_EDITED_INTERVAL_IN_MS,
 } from '@app/constants/GeneralConstants';
 import projectService from '@app/services/ProjectService';
 import { loadArchive } from '@app/services/utilsService';
@@ -32,10 +34,8 @@ import { Sidebar } from '@consta/uikit/Sidebar';
 import { Item } from '@consta/uikit/SnackBar';
 import { Text } from '@consta/uikit/Text';
 import { SplitPanes, useInterval, useMount } from '@gpn-prototypes/vega-ui';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import './RbResultPage.css';
 
+import './RbResultPage.css';
 
 const RbResultPage: React.FC = () => {
   const dispatch = useDispatch();

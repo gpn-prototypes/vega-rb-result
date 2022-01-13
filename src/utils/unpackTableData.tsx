@@ -34,7 +34,7 @@ const isHasParentAll = (parents: Parent[]): boolean => {
 
 export type ViewType = 'attribute' | 'risk';
 
-const getNameWithParents = (
+export const getNameWithParents = (
   index: number,
   row: RowEntity,
   domainEntity: ResultDomainEntity,
@@ -49,11 +49,11 @@ const getNameWithParents = (
 };
 
 /** Подготовка колонок */
-export const prepareColumns = (
-  data: ResultProjectStructure,
-): Column<RbDomainEntityInput>[] => {
-  const { domainEntities, attributes } = data;
-
+/** TODO: Вынести методы в хелперы и тестить их отдельно */
+export const prepareColumns = ({
+  domainEntities,
+  attributes,
+}: ResultProjectStructure): Column<RbDomainEntityInput>[] => {
   const getClass = (
     row: RowEntity,
     domainEntity: ResultDomainEntity | ResultAttribute,

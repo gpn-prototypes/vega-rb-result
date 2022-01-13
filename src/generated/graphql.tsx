@@ -2979,7 +2979,7 @@ export type ResultAttributeValue = {
   __typename?: 'ResultAttributeValue';
   code: Scalars['String'];
   percentiles: Array<Scalars['Int']>;
-  values: Array<Scalars['Float']>;
+  values: Array<Scalars['Float' | 'String']>;
 };
 
 export type ResultDomainEntity = {
@@ -2992,7 +2992,6 @@ export type ResultDomainEntity = {
 export type ResultDomainObject = {
   __typename?: 'ResultDomainObject';
   parents: Array<Parent>;
-  geoCategory: GeoCategory;
   geoFluidTypes: string[];
   attributeValues: Array<ResultAttributeValue>;
 };

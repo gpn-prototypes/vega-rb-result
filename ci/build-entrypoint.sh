@@ -35,13 +35,14 @@ yarn install --frozen-lockfile
 if [ $WITH_TEST == true ]
 then
   echo "*** run tests ***"
-  yarn test
+  yarn coverage
 fi
 
 if [ $WITH_LINT == true ]
 then
   echo "*** run lint ***"
-  #yarn lint
+  yarn lint
 fi
 
-yarn build
+# yarn build
+yarn coverage
