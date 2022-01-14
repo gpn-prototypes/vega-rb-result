@@ -115,10 +115,11 @@ describe('UnpackTableData', () => {
         domainObjects: DomainObjectsMock,
       },
       1,
-      () => null,
+      jest.fn(),
     );
 
     expect(isCorrectCompileColumns(columns)).toEqual(true);
+    expect(version).toEqual(1);
     expect(isCorrectCompileRows(rows)).toEqual(true);
   });
 });

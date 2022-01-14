@@ -280,7 +280,7 @@ export const prepareRows = ({
           const value = attributeValue.values[percIndex];
           const formattedValue =
             // eslint-disable-next-line no-restricted-globals
-            isNaN(value) || value === undefined
+            isNaN(value as number) || value === undefined
               ? value
               : getNumberWithSpaces(value.toString());
 
