@@ -44,5 +44,4 @@ then
   yarn lint
 fi
 
-# yarn build
-yarn coverage
+yarn build
