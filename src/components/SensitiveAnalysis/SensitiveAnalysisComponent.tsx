@@ -29,26 +29,30 @@ interface Props {
   sidebarRow: GridActiveRow;
 }
 
-const payloadMenuItem: MenuContextItem = {
-  name: 'Показывать статистику',
-  code: 'stat',
-  switch: true,
-  border: true,
-};
+// const payloadMenuItem: MenuContextItem = {
+//   name: 'Показывать статистику',
+//   code: 'stat',
+//   switch: true,
+//   border: true,
+// };
 
 export const SensitiveAnalysisComponent: React.FC<Props> = ({ sidebarRow }) => {
   const dispatch = useDispatch();
-  const resetState = useCallback(() => {
-    dispatch(sensitiveAnalysisDuck.actions.resetState());
-    dispatch(TableActions.resetSidebarRow());
-  }, [dispatch]);
-  const resetSidebarRow = useCallback(
-    () => dispatch(TableActions.resetSidebarRow()),
-    [dispatch],
-  );
 
+  // при клике вне окна
+  const resetState = useCallback(() => {
+    dispatch(sensitiveAnalysisDuck.actions.resetState(undefined, undefined));
+    dispatch(TableActions.resetSidebarRow(undefined, undefined));
+  }, [dispatch]);
+
+  // при клике вне окна и кнопке закрыть
+  const resetSidebarRow = useCallback(() => {
+      dispatch(TableActions.resetSidebarRow(undefined, undefined))
+  }, [dispatch]);
+
+  // свичи из выпадающего окна
   const [menuItems, setMenuItems] = useState<MenuContextItem[]>([]);
-  const sensitiveAnalysisData: SensitiveAnalysis | undefined = useSelector(
+  const sensitiveAnalysisData: SensitiveAnalysis[] | undefined = useSelector(
     ({ sensitiveAnalysis }: RootState) => sensitiveAnalysis.payload,
   );
   const sensitiveAnalysisStatisticData: SensitiveAnalysisStatistic | undefined =
@@ -64,39 +68,80 @@ export const SensitiveAnalysisComponent: React.FC<Props> = ({ sidebarRow }) => {
     setIsLoading(true);
     setIsLoadingStatistic(true);
 
-    loadSensitiveAnalysisData(dispatch, sidebarRow.title.split(',')).then(
-      () => {
-        setIsLoading(false);
-      },
-    );
+    // загрузка диаграммы, без setIsLoading(false) не отобразится даже при успехе
+    loadSensitiveAnalysisData(dispatch, sidebarRow.title.split(','))
+      .then(() => setIsLoading(false));
 
-    loadSensitiveAnalysisStatistic(dispatch, sidebarRow.title.split(',')).then(
-      () => setIsLoadingStatistic(false),
-    );
+    loadSensitiveAnalysisStatistic(dispatch, sidebarRow.title.split(','))
+      .then(() => setIsLoadingStatistic(false));
 
     return resetState;
   });
 
   useEffect(() => {
-    /** Заполняем пункты меню, данными из бекенда */
+    /** Заполняем пункты меню данными из бека */
     if (!sensitiveAnalysisData) {
       return;
     }
 
-    const items: MenuContextItem[] =
-      sensitiveAnalysisData.names.map((name: string) => {
+    // console.log(sensitiveAnalysisData.length, 'ggd')
+
+    // const items: MenuContextItem[] = sensitiveAnalysisData
+
+    // const items2 = sensitiveAnalysisData.map(i => {
+    //     return {
+    //   i.names.map((name: string) => {
+    //         name,
+    //         code: name,
+    //         switch: true,
+    //       }
+    //     }
+    // })
+
+let items2: any = []  // тип!!
+
+    for(let i = 0; i < sensitiveAnalysisData.length; i++) {
+
+const l = {
+  title: sensitiveAnalysisData[i].title,
+}
+
+      const items = sensitiveAnalysisData[i].names.map((name: string) => {
         return {
           name,
           code: name,
           switch: true,
         };
-      }) || [];
+      }) || []
 
-    items.push(payloadMenuItem);
+      items2.push({...l, ...items})
+    }
 
-    setMenuItems(items);
+console.log(items2, 'items2')
+
+//[
+// {title: 'oil', {name: 'F, тыс. м²', code: 'F, тыс. м²', switch: true}, {name: 'F, тыс. м²', code: 'F, тыс. м²', switch: true}},
+// {title: 'gas', {name: 'F, тыс. м²', code: 'F, тыс. м²', switch: true}}
+// ]
+
+
+    // const items: MenuContextItem[] =
+    //   sensitiveAnalysisData[0].names.map((name: string) => {
+    //     return {
+    //       name,
+    //       code: name,
+    //       switch: true,
+    //     };
+    //   }) || [];
+
+
+    // items.push(payloadMenuItem);
+
+
+    setMenuItems(items2);
   }, [sensitiveAnalysisData]);
 
+  // вызывается на изменение свичей
   const handleChange = (item: MenuContextItem) => {
     const updatedMenuItems = menuItems.map((menuItem: MenuContextItem) => {
       const cloneItem = { ...menuItem };
@@ -114,10 +159,6 @@ export const SensitiveAnalysisComponent: React.FC<Props> = ({ sidebarRow }) => {
     setMenuItems(updatedMenuItems);
   };
 
-  const handleClick = (item: MenuContextItem) => {
-    console.info('DEV: handle click', item);
-  };
-
   const getAvailableNames = (): string[] => {
     const result: string[] = [];
 
@@ -133,10 +174,10 @@ export const SensitiveAnalysisComponent: React.FC<Props> = ({ sidebarRow }) => {
 
   const chart = sensitiveAnalysisData && (
     <SensitiveAnalysisChartComponent
-      percentiles={sensitiveAnalysisData.percentiles}
-      resultMinMax={sensitiveAnalysisData.resultMinMax}
-      names={sensitiveAnalysisData.names}
-      zeroPoint={sensitiveAnalysisData.zeroPoint}
+      percentiles={sensitiveAnalysisData[0].percentiles}
+      resultMinMax={sensitiveAnalysisData[0].resultMinMax}
+      names={sensitiveAnalysisData[0].names}
+      zeroPoint={sensitiveAnalysisData[0].zeroPoint}
       availableNames={getAvailableNames()}
     />
   );
@@ -177,7 +218,6 @@ export const SensitiveAnalysisComponent: React.FC<Props> = ({ sidebarRow }) => {
               chart
             )}
           </div>
-          {/*test commit*/}
           {/* Статистика */}
           {isShowStatistic ? statistic : null}
         </div>

@@ -204,7 +204,9 @@ export const CustomContextMenu: React.FC<ContextMenuProps> = ({
   });
 
   return (
-    <Popover
+    <>
+  {console.log(menuItems, 'menuItemsLOL')}
+  <Popover
       anchorRef={ref}
       onClickOutside={() => setIsOpenContextMenu(false)}
       direction="downStartLeft"
@@ -213,6 +215,7 @@ export const CustomContextMenu: React.FC<ContextMenuProps> = ({
     >
       {items}
     </Popover>
+    </>
   );
 };
 
@@ -254,14 +257,17 @@ export const VerticalMoreContextMenu: React.FC<Props> = ({
       </div>
 
       {isOpenContextMenu && (
-        <CustomContextMenu
-          ref={ref}
-          menuItems={() => menuItems()}
-          onClick={onClick}
-          onChange={onChange}
-          position={getPosition()}
-          setIsOpenContextMenu={setIsOpenContextMenu}
-        />
+        <>
+          <div>ok</div>
+          <CustomContextMenu
+            ref={ref}
+            menuItems={() => menuItems()}
+            onClick={onClick} // оставить
+            onChange={onChange}
+            position={getPosition()}
+            setIsOpenContextMenu={setIsOpenContextMenu}
+          />
+        </>
       )}
     </div>
   );

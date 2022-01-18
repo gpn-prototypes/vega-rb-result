@@ -3,6 +3,7 @@ export interface SensitiveAnalysis {
   percentiles: number[][];
   resultMinMax: number[][];
   zeroPoint: number;
+  title?: string;
 }
 
 export interface SensitiveAnalysisStatisticHeaders {

@@ -10,4 +10,5 @@ export interface MenuContextItem {
   border?: boolean;
   choice?: MenuContextItemChoice;
   icon?: () => React.ReactNode;
+  title?: string;
 }
