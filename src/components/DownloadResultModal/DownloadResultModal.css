@@ -1,0 +1,8 @@
+.DownloadResultModal {
+  &__Content {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: var(--space-2xs) var(--space-m) var(--space-xl);
+  }
+}
