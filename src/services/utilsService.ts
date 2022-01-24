@@ -1,7 +1,7 @@
 import projectService from './ProjectService';
 
-export const loadArchive = async (fileId: string): Promise<void> => {
-  const { filename, data } = await projectService.getCalculationArchive(fileId);
+export const loadArchive = async (): Promise<void> => {
+  const { filename, data } = await projectService.getCalculationArchive();
 
   const url = window.URL.createObjectURL(data);
   const link = Object.assign(document.createElement('a'), {

@@ -1,5 +1,4 @@
 import { RbDomainEntityInput } from '@app/generated/graphql';
-import { getRowId } from '@app/utils/getRowId';
 import { TreeItem } from '@gpn-prototypes/vega-ui';
 import arrayToTree from 'array-to-tree';
 import { get, groupBy, mergeWith } from 'lodash/fp';
@@ -8,11 +7,10 @@ import { v4 as uuid } from 'uuid';
 import {
   Column,
   RowEntity,
-} from '../TableResultRbController/TableResultRb/types';
+} from '../components/TableResultRbController/TableResultRb/types';
+import { CellPosition, TreeItemData } from '../components/TreeEditor/types';
 
-import { CellPosition, TreeItemData } from './types';
-
-const getTreeNodeItem = (
+export const getTreeNodeItem = (
   row: RowEntity,
   rowIdx: number,
   columnIdx: number,
@@ -59,7 +57,7 @@ const getTreeNodeItem = (
   };
 };
 
-const mergeCustomizer = (
+export const mergeCustomizer = (
   objValue: string | number | Array<string | number>,
   srcValue: string | number | Array<string | number>,
   k: string,
@@ -75,12 +73,17 @@ const mergeCustomizer = (
   return undefined;
 };
 
+export const getRowId = (row: RowEntity): number =>
+  ((row?.id || 0) as number) - 1;
+
+/** Возвращает ноду по ключу и значению */
 export function searchInTree<T>(
   tree: TreeItem<T>[],
   value: string | number,
   key: keyof TreeItem = 'id',
   reverse = false,
 ): TreeItem<T> | null {
+  /** TODO: Переделать, сейчас ищет только в одном элементе, зачем? */
   const stack = [tree[0]];
 
   while (stack.length) {
@@ -115,6 +118,7 @@ export function mergeObjectsInUnique<T>(array: T[], properties: string[]): T[] {
   return Array.from(newArray.values());
 }
 
+/** TODO: Рафактор, что то тут с типами намудрено */
 export function getNodeListFromTableData<T>(
   data: {
     columns: Column<RbDomainEntityInput>[];

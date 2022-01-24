@@ -8,11 +8,14 @@ import { RootState, TreeFilter } from '@app/store/types';
 import { Text, Tree, useMount } from '@gpn-prototypes/vega-ui';
 
 import {
+  getNodeListFromTableData,
+  searchInTree,
+} from '../../utils/TableHelpers';
+import {
   Column,
   RowEntity,
 } from '../TableResultRbController/TableResultRb/types';
 
-import { getNodeListFromTableData, searchInTree } from './helpers';
 import { TargetData } from './types';
 
 import './TreeEditor.css';

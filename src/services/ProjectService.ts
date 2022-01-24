@@ -347,11 +347,11 @@ class ProjectService implements IProjectService {
     }
   }
 
-  async getCalculationArchive(fileId: string): Promise<CalculationResponse> {
+  async getCalculationArchive(): Promise<CalculationResponse> {
     const DEFAULT_FILENAME = 'result.zip';
 
     const token = await this.identity.getToken();
-    const serverResponse = await fetch(getDownloadResultUri(fileId), {
+    const serverResponse = await fetch(getDownloadResultUri(this.projectId), {
       headers: {
         Authorization: `Bearer ${token}`,
       },

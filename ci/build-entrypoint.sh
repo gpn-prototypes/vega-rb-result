@@ -31,4 +31,17 @@ sed -e "s/\$NPM_URI/$NPM_URI/" \
     -e "s/\$NPM_AUTH_TOKEN/$NPM_AUTH_TOKEN/" ./ci/npmrc-template > .npmrc
 
 yarn install --frozen-lockfile
+
+if [ $WITH_TEST == true ]
+then
+  echo "*** run tests ***"
+  yarn coverage
+fi
+
+if [ $WITH_LINT == true ]
+then
+  echo "*** run lint ***"
+  yarn lint
+fi
+
 yarn build

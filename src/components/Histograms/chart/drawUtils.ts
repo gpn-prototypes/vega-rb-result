@@ -420,10 +420,7 @@ export namespace Chart {
             .axisLeft(scale)
             .ticks(Width / 80)
             .tickSize(5)
-            .tickFormat(
-              (domainValue) => domainValue.toString(),
-              // (domainValue) => `${roundTo(3, domainValue as number)}`,
-            ),
+            .tickFormat((domainValue) => domainValue.toString()),
         ),
     );
   };

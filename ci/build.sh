@@ -42,6 +42,8 @@ docker run \
   --env NPM_AUTH_TOKEN=$NPM_AUTH_TOKEN \
   --env BASE_URL=$BASE_URL \
   --env BASE_API_URL=$BASE_API_URL \
+  --env WITH_TEST=false \
+  --env WITH_LINT=false \
   -v $CACHE_PATH:/usr/local/share/.cache/ \
   $TAG \
   /app/ci/build-entrypoint.sh
