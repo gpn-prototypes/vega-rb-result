@@ -11,9 +11,9 @@ import './ContextMenuHelper.css';
 
 interface ContextMenuBaseItemProps {
   menuItem: any;
-  handleContextClick?: (menuItem: MenuContextItem) => void;
+  handleContextClick?: (menuItem: any) => void;
   column?: boolean;
-  getDisabled?: (item: MenuContextItem) => boolean;
+  getDisabled?: (item: any) => boolean;
 }
 
 export const ContextMenuBaseItem: React.FC<ContextMenuBaseItemProps> = ({
@@ -38,12 +38,12 @@ export const ContextMenuBaseItem: React.FC<ContextMenuBaseItemProps> = ({
       tabIndex={0}
     >
       <div className="menu__left">
-        {menuItem.icon && <div className="menu__icon">{menuItem.icon()}</div>}
+        {menuItem.icon && <div className="menu__icon">{menuItem.icon()}icon</div>}
 
-        <div>{menuItem.name}</div>
+        <div>{menuItem.name}name</div>
       </div>
 
-      <div>{children}</div>
+      <div>{children}children</div>
     </div>
   );
 };
@@ -184,24 +184,29 @@ export const CustomContextMenu: React.FC<ContextMenuProps> = ({
     />
   );
 
-  const items = menuItems().map((menuItem: any) => {
-    // if (menuItem.switch !== undefined) {
-    //   return itemWithSwitch(menuItem);
-    // }
+  const items2 = menuItems().map(menuItem => {
+    // return menuItem.title
+      return simpleItem(menuItem);
+  })
 
-    // if (menuItem.choice !== undefined) {
-    //   return (
-    //     <ItemWithChoice
-    //       menuItem={menuItem}
-    //       onChange={onChange}
-    //       getDisabled={getDisabled}
-    //       setIsOpenContextMenu={setIsOpenContextMenu}
-    //     />
-    //   );
-    // }
-
-    return simpleItem(menuItem);
-  });
+  // const items = menuItems().map((menuItem: any) => {
+  //   // if (menuItem.switch !== undefined) {
+  //   //   return itemWithSwitch(menuItem);
+  //   // }
+  //
+  //   // if (menuItem.choice !== undefined) {
+  //   //   return (
+  //   //     <ItemWithChoice
+  //   //       menuItem={menuItem}
+  //   //       onChange={onChange}
+  //   //       getDisabled={getDisabled}
+  //   //       setIsOpenContextMenu={setIsOpenContextMenu}
+  //   //     />
+  //   //   );
+  //   // }
+  //
+  //   return simpleItem(menuItem);
+  // });
 
   return (
     <>
@@ -213,7 +218,8 @@ export const CustomContextMenu: React.FC<ContextMenuProps> = ({
         className="menu"
         position={position}
       >
-        {items[0]}
+        {/*{items}*/}
+      {items2}
       fdfg
       </Popover>
       </>
