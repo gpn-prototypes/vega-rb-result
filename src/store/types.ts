@@ -2,6 +2,7 @@ import { Param } from '@app/model/Param';
 import { IProjectService } from '@app/services/types';
 import { GridCollection } from '@app/types/typesTable';
 
+import { LoaderStore } from './loader/loaderActions';
 import { NotifyStore } from './notify/notifyActions';
 import { SettingStore } from './settings/settingsActions';
 import { HistogramStore } from './histogramDuck';
@@ -54,6 +55,8 @@ export interface RootState {
   settings: SettingStore;
   notify: NotifyStore;
   general: GeneralStore;
+  loader: LoaderStore;
+  file: any; // TODO ?
 }
 
 export type TypedColumnsList = {

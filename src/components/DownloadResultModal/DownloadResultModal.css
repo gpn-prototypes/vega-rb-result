@@ -6,3 +6,8 @@
     padding: var(--space-2xs) var(--space-m) var(--space-xl);
   }
 }
+
+.Modal-Window {
+  width: 520px;
+  min-height: 100px;
+}

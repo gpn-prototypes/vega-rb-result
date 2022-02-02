@@ -347,15 +347,21 @@ class ProjectService implements IProjectService {
     }
   }
 
-  async getCalculationArchive(): Promise<CalculationResponse> {
+  async getCalculationArchive(
+    statistics: boolean,
+    samples: boolean,
+  ): Promise<CalculationResponse> {
     const DEFAULT_FILENAME = 'result.zip';
 
     const token = await this.identity.getToken();
-    const serverResponse = await fetch(getDownloadResultUri(this.projectId), {
-      headers: {
-        Authorization: `Bearer ${token}`,
+    const serverResponse = await fetch(
+      getDownloadResultUri(this.projectId, statistics, samples),
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       },
-    });
+    );
     const filename = serverResponse.headers
       .get('Content-Disposition')
       ?.match('filename="(?<filename>.*)"')?.groups?.filename;

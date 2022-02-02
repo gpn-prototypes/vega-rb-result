@@ -4,21 +4,18 @@ import { Loader } from '@consta/uikit/Loader';
 import { Text } from '@consta/uikit/Text';
 import { block } from 'bem-cn';
 
+import { ModalContentProps } from '../types';
+
 import './LoadingModeContent.css';
 
 export const cn = block('LoadingModeContent');
 
-interface Props {
-  handleCloseContent: () => void;
-  setModalContent: (contentType: string) => void;
-}
-
-export const LoadingModeContent: React.FC<Props> = ({
+export const LoadingModeContent: React.FC<ModalContentProps> = ({
   handleCloseContent,
   setModalContent,
+  isFileWithImg,
+  setFileWithImg,
 }) => {
-  console.log(handleCloseContent); // TODO ? сделать handleCloseContent ?
-
   return (
     <>
       <div className={cn('Header')}>
@@ -36,9 +33,11 @@ export const LoadingModeContent: React.FC<Props> = ({
 
         <Loader />
 
-        <Text view="alert" size="xs">
-          Генерация файла займёт больше времени из-за большого объема данных
-        </Text>
+        {isFileWithImg && (
+          <Text view="alert" size="xs">
+            Генерация файла займёт больше времени из-за большого объема данных
+          </Text>
+        )}
       </div>
       <div className={cn('Footer')}>
         <Button
@@ -46,7 +45,9 @@ export const LoadingModeContent: React.FC<Props> = ({
           view="ghost"
           label="Отменить"
           width="default"
-          onClick={() => setModalContent('cancel')}
+          onClick={() => {
+            setModalContent('cancel');
+          }}
         />
       </div>
     </>

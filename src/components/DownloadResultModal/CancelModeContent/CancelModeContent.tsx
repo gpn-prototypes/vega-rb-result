@@ -1,22 +1,38 @@
-import React from 'react';
+import React, { useCallback } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { FileAction } from '@app/store/file/fileActions';
+import { RootState } from '@app/store/types';
 import { Button } from '@consta/uikit/Button';
 import { IconClose } from '@consta/uikit/IconClose';
 import { Text } from '@consta/uikit/Text';
 import { block } from 'bem-cn';
 
+import { ModalContentProps } from '../types';
+
 import './CancelModeContent.css';
 
 export const cn = block('CancelModeContent');
 
-interface Props {
-  handleCloseContent: () => void;
-  setModalContent: (contentType: string) => void;
-}
-
-export const CancelModeContent: React.FC<Props> = ({
+export const CancelModeContent: React.FC<ModalContentProps> = ({
   handleCloseContent,
   setModalContent,
+  isFileWithImg,
+  setFileWithImg,
 }) => {
+  /** Store */
+  const dispatch = useDispatch();
+
+  const isLoading: boolean = useSelector(
+    ({ loader }: RootState): boolean => loader.loading.file || false,
+  );
+
+  /** Callbacks */
+  const cancelFetch = useCallback(() => {
+    if (isLoading) {
+      dispatch(FileAction.stopFetchingFile());
+    }
+  }, [dispatch, isLoading]);
+
   return (
     <>
       <div className={cn('Header')}>
@@ -36,14 +52,20 @@ export const CancelModeContent: React.FC<Props> = ({
           view="ghost"
           label="Продолжить"
           width="default"
-          onClick={() => setModalContent('loading')}
+          onClick={() => {
+            setFileWithImg(isFileWithImg);
+            setModalContent('loading');
+          }}
         />
         <Button
           size="m"
           view="primary"
           label="Прекратить"
           width="default"
-          onClick={() => handleCloseContent()}
+          onClick={() => {
+            cancelFetch();
+            handleCloseContent();
+          }}
         />
       </div>
     </>

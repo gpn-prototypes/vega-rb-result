@@ -10,7 +10,14 @@ import { RootState } from './types';
 
 const configureStore = (): Store<CombinedState<RootState>, AnyAction> => {
   const epicMiddleware = createEpicMiddleware<AnyAction, AnyAction, RootState>({
-    dependencies: { projectService },
+    dependencies: {
+      projectService,
+
+      get dispatch() {
+        // eslint-disable-next-line @typescript-eslint/no-use-before-define
+        return store.dispatch;
+      },
+    },
   });
 
   const middleware =

@@ -1,24 +1,17 @@
-import React, { useCallback, useState } from 'react';
+import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { LocalStorageKey } from '@app/constants/LocalStorageKeyConstants';
-import { loadArchive } from '@app/services/utilsService';
-import { NotifyActions } from '@app/store/notify/notifyActions';
-import { LocalStorageHelper } from '@app/utils/LocalStorageHelper';
+import { FileAction } from '@app/store/file/fileActions';
 import { Button } from '@consta/uikit/Button';
 import { Checkbox } from '@consta/uikit/Checkbox';
 import { IconClose } from '@consta/uikit/IconClose';
-import { Item } from '@consta/uikit/SnackBar';
 import { Text } from '@consta/uikit/Text';
 import { block } from 'bem-cn';
+
+import { ModalContentProps } from '../types';
 
 import './InitialModeContent.css';
 
 export const cn = block('InitialModeContent');
-
-interface Props {
-  handleCloseContent: () => void;
-  setModalContent: (contentType: string) => void;
-}
 
 type DownloadData = {
   name: string;
@@ -26,17 +19,14 @@ type DownloadData = {
   disabled?: boolean;
 };
 
-export const InitialModeContent: React.FC<Props> = ({
+export const InitialModeContent: React.FC<ModalContentProps> = ({
   handleCloseContent,
   setModalContent,
+  isFileWithImg,
+  setFileWithImg,
 }) => {
+  /* Store */
   const dispatch = useDispatch();
-
-  const downloadDataTypes: DownloadData[] = [
-    { name: 'Статистика', size: 'Небольшой', disabled: true },
-    { name: 'Сэмплы', size: 'Средний', disabled: true },
-    { name: 'Изображения', size: 'Большой' },
-  ];
 
   /** State */
   const [checkedState, setCheckedState] = useState<boolean[]>([
@@ -45,15 +35,13 @@ export const InitialModeContent: React.FC<Props> = ({
     false,
   ]);
 
-  const appendItem = useCallback(
-    (item: Item) => dispatch(NotifyActions.appendItem(item)),
-    [dispatch],
-  );
-  const removeItem = useCallback(
-    (id: string) => dispatch(NotifyActions.removeItem(id)),
-    [dispatch],
-  );
+  const downloadDataTypes: DownloadData[] = [
+    { name: 'Статистика', size: 'Небольшой', disabled: true },
+    { name: 'Сэмплы', size: 'Средний', disabled: true },
+    { name: 'Изображения', size: 'Большой' },
+  ];
 
+  /** Handlers */
   const handleOnChange = (position: number): void => {
     const updatedCheckedState = checkedState.map(
       (item: boolean, index: number) => {
@@ -66,20 +54,12 @@ export const InitialModeContent: React.FC<Props> = ({
 
   const downloadResult = async (): Promise<void> => {
     try {
-      appendItem({
-        key: 'notify',
-        message: 'Идет генерация файла',
-        status: 'system',
-      });
-
-      /** Таймаут добавлен для того, что бы визуально не мелькала нотификация */
-      setTimeout(async () => {
-        await loadArchive(
-          LocalStorageHelper.get(LocalStorageKey.RecordId) || '',
-        );
-
-        removeItem('notify');
-      }, 1500);
+      dispatch(
+        FileAction.fetchResultFile({
+          statistics: checkedState[0],
+          samples: checkedState[1],
+        }),
+      );
     } catch (e) {
       console.warn(e);
     }
@@ -155,7 +135,9 @@ export const InitialModeContent: React.FC<Props> = ({
           width="default"
           disabled={!checkedState.includes(true)}
           onClick={() => {
+            const withImages: boolean = checkedState[2];
             downloadResult();
+            setFileWithImg(withImages);
             setModalContent('loading');
           }}
         />
