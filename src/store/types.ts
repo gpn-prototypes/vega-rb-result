@@ -1,7 +1,10 @@
+import { Dispatch } from 'react';
 import { Param } from '@app/model/Param';
 import { IProjectService } from '@app/services/types';
 import { GridCollection } from '@app/types/typesTable';
+import { AnyAction } from 'redux';
 
+import { FileStore } from './file/fileActions';
 import { LoaderStore } from './loader/loaderActions';
 import { NotifyStore } from './notify/notifyActions';
 import { SettingStore } from './settings/settingsActions';
@@ -56,7 +59,7 @@ export interface RootState {
   notify: NotifyStore;
   general: GeneralStore;
   loader: LoaderStore;
-  file: any; // TODO ?
+  file: FileStore;
 }
 
 export type TypedColumnsList = {
@@ -76,4 +79,5 @@ export type RemovableError = {
 
 export type EpicDependencies = {
   projectService: IProjectService;
+  dispatch: Dispatch<AnyAction>;
 };

@@ -352,6 +352,9 @@ class ProjectService implements IProjectService {
     samples: boolean,
   ): Promise<CalculationResponse> {
     const DEFAULT_FILENAME = 'result.zip';
+    // TODO: придумать общее решение для отмены запроса
+    this.abortControllerMod = new AbortController();
+    const { signal } = this.abortControllerMod;
 
     const token = await this.identity.getToken();
     const serverResponse = await fetch(
@@ -360,6 +363,7 @@ class ProjectService implements IProjectService {
         headers: {
           Authorization: `Bearer ${token}`,
         },
+        signal,
       },
     );
     const filename = serverResponse.headers

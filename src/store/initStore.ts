@@ -6,10 +6,15 @@ import { AnyAction } from 'typescript-fsa';
 
 import rootReducer from './reducers';
 import rootEpic from './rootEpic';
-import { RootState } from './types';
+import { EpicDependencies, RootState } from './types';
 
 const configureStore = (): Store<CombinedState<RootState>, AnyAction> => {
-  const epicMiddleware = createEpicMiddleware<AnyAction, AnyAction, RootState>({
+  const epicMiddleware = createEpicMiddleware<
+    AnyAction,
+    AnyAction,
+    RootState,
+    EpicDependencies
+  >({
     dependencies: {
       projectService,
 

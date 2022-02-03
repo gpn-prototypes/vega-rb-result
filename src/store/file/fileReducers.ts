@@ -1,27 +1,22 @@
 import { reducerWithInitialState } from 'typescript-fsa-reducers';
 
-import { FileAction } from './fileActions';
+import { FileAction, FileStore, fileStoreInitialState } from './fileActions';
 
-export const FileReducers = reducerWithInitialState<any>( // TODO ? <LoaderStore>
-  // loaderStoreInitialState,
-  {},
+export const FileReducers = reducerWithInitialState<FileStore>(
+  fileStoreInitialState,
 )
-  .case(FileAction.fetchResultFile, (state: any) => {
-    // TODO ? any
+  .case(FileAction.fetchResultFile, (state: FileStore) => {
     return {
       ...state,
     };
   })
-  .case(FileAction.fetchResultFileFulfilled, (state: any) => {
-    // TODO ? any
+  .case(FileAction.fetchResultFileFulfilled, (state: FileStore) => {
     return {
       ...state,
     };
   })
-  .case(FileAction.stopFetchingFile, (state: any) => {
-    // TODO ? any
+  .case(FileAction.stopFetchingFile, (state: FileStore) => {
     return {
       ...state,
-      file: undefined,
     };
   });

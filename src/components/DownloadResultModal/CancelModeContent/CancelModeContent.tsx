@@ -39,7 +39,14 @@ export const CancelModeContent: React.FC<ModalContentProps> = ({
         <Text as="p" size="xs" align="center">
           Отмена генерации файла
         </Text>
-        <IconClose size="s" view="ghost" onClick={() => handleCloseContent()} />
+        <IconClose
+          size="s"
+          view="ghost"
+          onClick={() => {
+            cancelFetch();
+            handleCloseContent();
+          }}
+        />
       </div>
       <div className={cn('Body')}>
         <Text size="s" view="secondary">
