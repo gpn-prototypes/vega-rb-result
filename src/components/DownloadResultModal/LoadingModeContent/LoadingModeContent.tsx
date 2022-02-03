@@ -4,7 +4,7 @@ import { Loader } from '@consta/uikit/Loader';
 import { Text } from '@consta/uikit/Text';
 import { block } from 'bem-cn';
 
-import { ModalContentProps } from '../types';
+import { ModalContentProps, ModalMode } from '../ModalContentType';
 
 import './LoadingModeContent.css';
 
@@ -16,6 +16,11 @@ export const LoadingModeContent: React.FC<ModalContentProps> = ({
   isFileWithImg,
   setFileWithImg,
 }) => {
+  /** Handlers */
+  const handleClose = (): void => {
+    setModalContent(ModalMode.cancel);
+  };
+
   return (
     <>
       <div className={cn('Header')}>
@@ -45,9 +50,7 @@ export const LoadingModeContent: React.FC<ModalContentProps> = ({
           view="ghost"
           label="Отменить"
           width="default"
-          onClick={() => {
-            setModalContent('cancel');
-          }}
+          onClick={handleClose}
         />
       </div>
     </>

@@ -6,7 +6,6 @@ import { TableReducers } from '@app/store/table/tableReducers';
 import treeDuck from '@app/store/treeDuck';
 import { combineReducers } from 'redux';
 
-import { FileReducers } from './file/fileReducers';
 import { GeneralReducers } from './general/generalReducers';
 import { LoaderReducers } from './loader/loaderReducers';
 import { NotifyReducers } from './notify/notifyReducers';
@@ -28,5 +27,4 @@ export default combineReducers<RootState>({
   notify: NotifyReducers,
   general: GeneralReducers,
   loader: LoaderReducers,
-  file: FileReducers,
 });

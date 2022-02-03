@@ -7,7 +7,7 @@ import { IconClose } from '@consta/uikit/IconClose';
 import { Text } from '@consta/uikit/Text';
 import { block } from 'bem-cn';
 
-import { ModalContentProps } from '../types';
+import { ModalContentProps, ModalMode } from '../ModalContentType';
 
 import './CancelModeContent.css';
 
@@ -33,20 +33,24 @@ export const CancelModeContent: React.FC<ModalContentProps> = ({
     }
   }, [dispatch, isLoading]);
 
+  /** Handlers */
+  const handleDownloadCancel = (): void => {
+    cancelFetch();
+    handleCloseContent();
+  };
+
+  const handleDownloadResume = (): void => {
+    setFileWithImg(isFileWithImg);
+    setModalContent(ModalMode.loading);
+  };
+
   return (
     <>
       <div className={cn('Header')}>
         <Text as="p" size="xs" align="center">
           Отмена генерации файла
         </Text>
-        <IconClose
-          size="s"
-          view="ghost"
-          onClick={() => {
-            cancelFetch();
-            handleCloseContent();
-          }}
-        />
+        <IconClose size="s" view="ghost" onClick={handleDownloadCancel} />
       </div>
       <div className={cn('Body')}>
         <Text size="s" view="secondary">
@@ -59,20 +63,14 @@ export const CancelModeContent: React.FC<ModalContentProps> = ({
           view="ghost"
           label="Продолжить"
           width="default"
-          onClick={() => {
-            setFileWithImg(isFileWithImg);
-            setModalContent('loading');
-          }}
+          onClick={handleDownloadResume}
         />
         <Button
           size="m"
           view="primary"
           label="Прекратить"
           width="default"
-          onClick={() => {
-            cancelFetch();
-            handleCloseContent();
-          }}
+          onClick={handleDownloadCancel}
         />
       </div>
     </>

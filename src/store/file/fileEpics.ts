@@ -2,7 +2,14 @@ import { ofAction } from '@app/operators/ofAction';
 import { loadArchive } from '@app/services/utilsService';
 import { AnyAction } from 'redux';
 import { Epic } from 'redux-observable';
-import { ignoreElements, switchMap, takeUntil, tap } from 'rxjs/operators';
+import { of } from 'rxjs';
+import {
+  catchError,
+  ignoreElements,
+  switchMap,
+  takeUntil,
+  tap,
+} from 'rxjs/operators';
 
 import { LoaderAction } from '../loader/loaderActions';
 import { EpicDependencies, RootState } from '../types';
@@ -25,6 +32,10 @@ const fetchResultFileEpic: Epic<
           action$.ofType(FileAction.stopFetchingFile).pipe(
             tap(() => {
               projectService.abortController.abort();
+            }),
+            catchError((e) => {
+              console.error('Error occured while cancelling request. ', e);
+              return of(LoaderAction.setLoaded('file'));
             }),
           ),
         ),

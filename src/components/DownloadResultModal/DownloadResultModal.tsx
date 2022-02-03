@@ -10,7 +10,7 @@ import { block } from 'bem-cn';
 import { CancelModeContent } from './CancelModeContent/CancelModeContent';
 import { InitialModeContent } from './InitialModeContent/InitialModeContent';
 import { LoadingModeContent } from './LoadingModeContent/LoadingModeContent';
-import { ModalContentProps } from './types';
+import { ModalContentProps, ModalMode } from './ModalContentType';
 
 import './DownloadResultModal.css';
 
@@ -41,15 +41,15 @@ export const DownloadResultModal: React.FC<Props> = ({ handleClose }) => {
   );
 
   /** State */
-  const [mode, setMode] = React.useState<string>('initial');
+  const [mode, setMode] = React.useState<ModalMode>(ModalMode.initial);
   const [isFileLarge, setIsFileLarge] = React.useState<boolean>(false);
 
   /** Callbacks */
-  const appendItem = useCallback(
+  const showNotification = useCallback(
     (item: Item) => dispatch(NotifyActions.appendItem(item)),
     [dispatch],
   );
-  const removeItem = useCallback(
+  const hideNotification = useCallback(
     (id: string) => dispatch(NotifyActions.removeItem(id)),
     [dispatch],
   );
@@ -61,41 +61,36 @@ export const DownloadResultModal: React.FC<Props> = ({ handleClose }) => {
     };
   }, [dispatch]);
 
+  /**
+   * Подписываемся на состояние загрузки:
+   * когда файл загружен,
+   * закрываем модалку и показываем нотификацию
+   * */
   useEffect(() => {
     if (isLoaded) {
       handleClose();
 
-      appendItem({
+      showNotification({
         key: 'success',
         message: 'Файл расчёта сохранён на компьютер',
         status: 'success',
+        onClose: () => hideNotification('success'),
+        autoClose: 5,
       });
-
-      /** Таймаут добавлен для того, что бы визуально не мелькала нотификация */
-      setTimeout(async () => {
-        removeItem('success');
-      }, 1500);
     }
-  }, [isLoaded, handleClose, appendItem, removeItem]);
+  }, [isLoaded, handleClose, showNotification, hideNotification]);
 
   const ContentComponent = modalConfig[mode];
 
   return (
-    <Modal
-      isOpen
-      hasOverlay
-      onClickOutside={() => handleClose()}
-      onEsc={() => handleClose()}
-    >
+    <Modal isOpen hasOverlay onClickOutside={handleClose} onEsc={handleClose}>
       <div className={cn('Content')}>
         <ContentComponent
           handleCloseContent={handleClose}
           setModalContent={(contentMode) => {
-            setMode(contentMode);
+            setMode(ModalMode[contentMode]);
           }}
-          setFileWithImg={(value) => {
-            setIsFileLarge(value);
-          }}
+          setFileWithImg={setIsFileLarge}
           isFileWithImg={isFileLarge}
         />
       </div>

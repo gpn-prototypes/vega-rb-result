@@ -7,14 +7,6 @@ export type FetchFilePayload = {
   samples: boolean;
 };
 
-export interface FileStore {
-  payload: FetchFilePayload;
-}
-
-export const fileStoreInitialState: FileStore = {
-  payload: {} as FetchFilePayload,
-};
-
 export const FileAction = {
   fetchResultFile: factory<FetchFilePayload>('FETCH_RESULT_FILE'),
   stopFetchingFile: factory('STOP_FETCHING_FILE'),

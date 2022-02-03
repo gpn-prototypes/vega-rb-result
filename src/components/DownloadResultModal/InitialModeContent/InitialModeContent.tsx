@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { FileAction } from '@app/store/file/fileActions';
 import { Button } from '@consta/uikit/Button';
@@ -7,14 +7,27 @@ import { IconClose } from '@consta/uikit/IconClose';
 import { Text } from '@consta/uikit/Text';
 import { block } from 'bem-cn';
 
-import { ModalContentProps } from '../types';
+import { ModalContentProps, ModalMode } from '../ModalContentType';
 
 import './InitialModeContent.css';
 
 export const cn = block('InitialModeContent');
 
+enum DownloadTypeEnum {
+  statistics = 'statistics',
+  samples = 'samples',
+  plots = 'plots',
+}
+
+enum DownloadNameEnum {
+  statistics = 'Статистика',
+  samples = 'Сэмплы',
+  plots = 'Изображения',
+}
+
 type DownloadData = {
-  name: string;
+  name: DownloadNameEnum;
+  type: DownloadTypeEnum;
   size: string;
   disabled?: boolean;
 };
@@ -29,40 +42,59 @@ export const InitialModeContent: React.FC<ModalContentProps> = ({
   const dispatch = useDispatch();
 
   /** State */
-  const [checkedState, setCheckedState] = useState<boolean[]>([
-    true,
-    true,
-    false,
-  ]);
+  const [checkedState, setCheckedState] = useState<
+    Record<DownloadTypeEnum, boolean>
+  >({
+    statistics: true,
+    samples: true,
+    plots: false,
+  });
 
   const downloadDataTypes: DownloadData[] = [
-    { name: 'Статистика', size: 'Небольшой', disabled: true },
-    { name: 'Сэмплы', size: 'Средний', disabled: true },
-    { name: 'Изображения', size: 'Большой' },
+    {
+      name: DownloadNameEnum.statistics,
+      type: DownloadTypeEnum.statistics,
+      size: 'Небольшой',
+    },
+    {
+      name: DownloadNameEnum.samples,
+      type: DownloadTypeEnum.samples,
+      size: 'Средний',
+    },
+    {
+      name: DownloadNameEnum.plots,
+      type: DownloadTypeEnum.plots,
+      size: 'Большой',
+    },
   ];
 
+  /** Callbacks */
+  const handleOnChange = useCallback(
+    (type: DownloadTypeEnum): void => {
+      setCheckedState({ ...checkedState, [type]: !checkedState[type] });
+    },
+    [checkedState],
+  );
+
   /** Handlers */
-  const handleOnChange = (position: number): void => {
-    const updatedCheckedState = checkedState.map(
-      (item: boolean, index: number) => {
-        return position === index ? !item : item;
-      },
-    );
-
-    setCheckedState(updatedCheckedState);
-  };
-
-  const downloadResult = async (): Promise<void> => {
+  const downloadResult = (): void => {
     try {
       dispatch(
         FileAction.fetchResultFile({
-          statistics: checkedState[0],
-          samples: checkedState[1],
+          statistics: checkedState[DownloadTypeEnum.statistics],
+          samples: checkedState[DownloadTypeEnum.samples],
         }),
       );
-    } catch (e) {
-      console.warn(e);
+    } catch (error) {
+      console.error('Cannot fetch result file. ', error);
     }
+  };
+
+  const handleStartDownload = (): void => {
+    const withImages: boolean = checkedState[DownloadTypeEnum.plots];
+    downloadResult();
+    setFileWithImg(withImages);
+    setModalContent(ModalMode.loading);
   };
 
   return (
@@ -71,7 +103,7 @@ export const InitialModeContent: React.FC<ModalContentProps> = ({
         <Text as="p" size="xs" align="center">
           Экспорт результата расчёта
         </Text>
-        <IconClose size="s" view="ghost" onClick={() => handleCloseContent()} />
+        <IconClose size="s" view="ghost" onClick={handleCloseContent} />
       </div>
       <div className={cn('Body')}>
         <div className={cn('Checkbox-group-label')}>
@@ -100,21 +132,21 @@ export const InitialModeContent: React.FC<ModalContentProps> = ({
           </Text>
         </div>
         <div className={cn('Checkbox-group')}>
-          {downloadDataTypes.map((item, index) => (
-            <div className={cn('Checkbox-group-item')}>
+          {downloadDataTypes.map((dataType) => (
+            <div key={dataType.type} className={cn('Checkbox-group-item')}>
               <Checkbox
-                label={item.name}
-                checked={checkedState[index]}
-                disabled={item?.disabled}
-                onChange={() => handleOnChange(index)}
+                label={dataType.name}
+                checked={checkedState[dataType.type]}
+                disabled={dataType?.disabled}
+                onChange={() => handleOnChange(dataType.type)}
               />
               <Text as="p" size="s">
-                {item.size}
+                {dataType.size}
               </Text>
             </div>
           ))}
         </div>
-        {checkedState[2] && (
+        {checkedState[DownloadTypeEnum.plots] && (
           <Text view="alert" size="xs">
             Генерация файла займёт больше времени
           </Text>
@@ -126,20 +158,15 @@ export const InitialModeContent: React.FC<ModalContentProps> = ({
           view="ghost"
           label="Закрыть"
           width="default"
-          onClick={() => handleCloseContent()}
+          onClick={handleCloseContent}
         />
         <Button
           size="m"
           view="primary"
           label="Сохранить"
           width="default"
-          disabled={!checkedState.includes(true)}
-          onClick={() => {
-            const withImages: boolean = checkedState[2];
-            downloadResult();
-            setFileWithImg(withImages);
-            setModalContent('loading');
-          }}
+          disabled={!Object.values(checkedState).includes(true)}
+          onClick={handleStartDownload}
         />
       </div>
     </>
