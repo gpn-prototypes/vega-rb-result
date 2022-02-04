@@ -139,6 +139,7 @@ export const InitialModeContent: React.FC<ModalContentProps> = ({
                 checked={checkedState[dataType.type]}
                 disabled={dataType?.disabled}
                 onChange={() => handleOnChange(dataType.type)}
+                data-testid="export-data-type-checkbox"
               />
               <Text as="p" size="s">
                 {dataType.size}
@@ -147,8 +148,13 @@ export const InitialModeContent: React.FC<ModalContentProps> = ({
           ))}
         </div>
         {checkedState[DownloadTypeEnum.plots] && (
-          <Text view="alert" size="xs">
+          <Text view="alert" size="xs" data-testid="long-time-export-warning">
             Генерация файла займёт больше времени
+          </Text>
+        )}
+        {!Object.values(checkedState).includes(true) && (
+          <Text view="alert" size="xs" data-testid="no-data-type-warning">
+            Выберите, какие данные вы хотите сохранить
           </Text>
         )}
       </div>
@@ -159,6 +165,7 @@ export const InitialModeContent: React.FC<ModalContentProps> = ({
           label="Закрыть"
           width="default"
           onClick={handleCloseContent}
+          data-testid="close-export-button"
         />
         <Button
           size="m"
