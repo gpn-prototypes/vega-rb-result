@@ -83,7 +83,13 @@ export const DownloadResultModal: React.FC<Props> = ({ handleClose }) => {
   const ContentComponent = modalConfig[mode];
 
   return (
-    <Modal isOpen hasOverlay onClickOutside={handleClose} onEsc={handleClose}>
+    <Modal
+      isOpen
+      hasOverlay
+      onClickOutside={handleClose}
+      onEsc={handleClose}
+      data-testid="export-file-modal"
+    >
       <div className={cn('Content')}>
         <ContentComponent
           handleCloseContent={handleClose}

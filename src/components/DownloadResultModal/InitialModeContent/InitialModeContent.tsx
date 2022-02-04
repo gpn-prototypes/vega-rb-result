@@ -167,6 +167,7 @@ export const InitialModeContent: React.FC<ModalContentProps> = ({
           width="default"
           disabled={!Object.values(checkedState).includes(true)}
           onClick={handleStartDownload}
+          data-testid="save-result-button"
         />
       </div>
     </>

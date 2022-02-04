@@ -23,7 +23,7 @@ export const LoadingModeContent: React.FC<ModalContentProps> = ({
 
   return (
     <>
-      <div className={cn('Header')}>
+      <div className={cn('Header')} data-testid="export-file-loading-modal">
         <Text as="p" size="xs" align="center">
           Экспорт результата расчёта
         </Text>
@@ -51,6 +51,7 @@ export const LoadingModeContent: React.FC<ModalContentProps> = ({
           label="Отменить"
           width="default"
           onClick={handleClose}
+          data-testid="cancel-file-export"
         />
       </div>
     </>

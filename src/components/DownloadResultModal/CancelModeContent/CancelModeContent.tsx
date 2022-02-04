@@ -71,6 +71,7 @@ export const CancelModeContent: React.FC<ModalContentProps> = ({
           label="Прекратить"
           width="default"
           onClick={handleDownloadCancel}
+          data-testid="confirm-cancel-export"
         />
       </div>
     </>
