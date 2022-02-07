@@ -157,11 +157,9 @@ export namespace SensitiveAnalysisChart {
     x1Scale,
     yScale,
     options,
-    resultMinMax,
     currentPercentiles,
     bias,
     series,
-    zeroPoint,
     data,
   }: {
     xScale: d3.ScaleLinear<number, number, never>;
@@ -182,6 +180,7 @@ export namespace SensitiveAnalysisChart {
   } {
     const formatValue = () => {
       const format = d3.format(options.format || '');
+
       return (innerX) => format(Math.abs(innerX));
     };
 
@@ -356,7 +355,7 @@ export namespace SensitiveAnalysisChart {
             .attr('class', 'chart__text chart__text_start')
             .attr(
               'transform',
-              ([name, min]) =>
+              ([name]) =>
                 `translate(0, ${(yScale(name) || 0) + yScale.bandwidth() / 2})`,
             ),
         )

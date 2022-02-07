@@ -24,6 +24,7 @@ import { TableActions } from '@app/store/table/tableActions';
 import treeDuck from '@app/store/treeDuck';
 import { RootState } from '@app/store/types';
 import { GridActiveRow, GridCollection } from '@app/types/typesTable';
+import { Item } from '@consta/uikit/__internal__/src/components/SnackBar/helper';
 import { Checkbox } from '@consta/uikit/Checkbox';
 import { ChoiceGroup } from '@consta/uikit/ChoiceGroup';
 import { IconCollapse } from '@consta/uikit/IconCollapse';
@@ -31,7 +32,6 @@ import { IconDownload } from '@consta/uikit/IconDownload';
 import { IconExpand } from '@consta/uikit/IconExpand';
 import { cnMixCard } from '@consta/uikit/MixCard';
 import { Sidebar } from '@consta/uikit/Sidebar';
-import { Item } from '@consta/uikit/SnackBar';
 import { Text } from '@consta/uikit/Text';
 import { SplitPanes, useInterval, useMount } from '@gpn-prototypes/vega-ui';
 

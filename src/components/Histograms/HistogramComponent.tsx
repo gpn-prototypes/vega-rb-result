@@ -7,8 +7,9 @@ import { loadHistogramData } from '@app/services/histogramService';
 import histogramDuck from '@app/store/histogramDuck';
 import { RootState } from '@app/store/types';
 import { GridActiveRow, GridCollection } from '@app/types/typesTable';
+import { Loader } from '@consta/uikit/Loader';
 import { Text } from '@consta/uikit/Text';
-import { Loader, useMount } from '@gpn-prototypes/vega-ui';
+import { useMount } from '@gpn-prototypes/vega-ui';
 
 import ChartComponent from './chart/Chart';
 import { HistogramStatisticsComponent } from './statistic/HistogramStatisticsComponent';

@@ -9,30 +9,29 @@ import {
   DistributionParameterTypes,
   DistributionTypes,
   GeoObjectCategories,
-  RbDomainEntityInput,
   TableError,
 } from '@app/generated/graphql';
 import { TableEntities, VisibleKeys } from '@app/types/enumsTable';
 
 export class OptionEntity implements DropDownOption {
-  private readonly _id: GeoObjectCategories;
+  private readonly innerId: GeoObjectCategories;
 
-  private readonly _value: GeoObjectCategories;
+  private readonly innerValue: GeoObjectCategories;
 
   text: string;
 
   constructor(id: GeoObjectCategories, text: string) {
-    this._id = id;
-    this._value = id;
+    this.innerId = id;
+    this.innerValue = id;
     this.text = text;
   }
 
   get id(): GeoObjectCategories {
-    return this._id;
+    return this.innerId;
   }
 
   get value(): GeoObjectCategories {
-    return this._value;
+    return this.innerValue;
   }
 
   toString(): string {
@@ -49,10 +48,10 @@ export type ErrorWrapper = { [index: string]: TableError };
 
 export type ColumnErrors = { [index: string]: ErrorWrapper };
 
-export type SelectedCell<T = any> = {
+export type SelectedCell = {
   rowIdx: number;
   row: GridRow;
-  column: Column<T>;
+  column: Column;
 };
 
 export type VisibilityProperties = {
@@ -101,8 +100,8 @@ export type DecimalFixed = Record<string, number>;
 export type HiddenColumns = Record<string, boolean>;
 
 export interface GridCollection {
-  columns: Column<RbDomainEntityInput>[];
-  actualColumns?: Column<RbDomainEntityInput>[];
+  columns: Column[];
+  actualColumns?: Column[];
   rows: RowEntity[];
   version: number;
   activeRow?: GridActiveRow | undefined;
@@ -142,16 +141,16 @@ export interface DropdownOption {
   text: string;
 }
 
-export interface OnRowClickArgs<T = any> {
+export interface OnRowClickArgs {
   rowIdx: number;
   row: GridRow;
-  column: Column<T>;
+  column: Column;
 }
 
 export type OnRowClick = (args: OnRowClickArgs) => void;
 
-export interface RowsToUpdate<T = any> {
-  column?: Column<T>;
+export interface RowsToUpdate {
+  column?: Column;
   rowsKeys?: string[];
 }
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { CurrentProject, Identity, Project } from '@app/types';
 
 interface IProps {
@@ -23,13 +23,15 @@ const ProjectProvider: React.FC<IProps> = ({
   identity,
   children,
 }) => {
+  const providerValue = useMemo(() => {
+    return {
+      project: currentProject.get(),
+      identity,
+    };
+  }, [currentProject, identity]);
+
   return (
-    <ProjectContext.Provider
-      value={{
-        project: currentProject.get(),
-        identity,
-      }}
-    >
+    <ProjectContext.Provider value={providerValue}>
       {children}
     </ProjectContext.Provider>
   );

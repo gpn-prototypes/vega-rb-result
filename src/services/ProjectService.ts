@@ -330,6 +330,7 @@ class ProjectService implements IProjectService {
         data.project.rbResult?.result?.resultTable?.template,
       );
       // TODO - refactor after work with data
+
       this.projectMod = isTemplateProject
         ? ({
             ...data.project,
