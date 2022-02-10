@@ -37,7 +37,7 @@
     "@apollo/client": "^3.3.11",
     "@consta/uikit": "^3.14.0",
     "@gpn-prototypes/frontend-configs": "^1.4.6",
-    "@gpn-prototypes/vega-ui": "^4.0.2",
+    "@gpn-prototypes/vega-ui": "^4.0.3",
     "@graphql-codegen/cli": "2.2.0",
     "@graphql-codegen/introspection": "2.1.0",
     "@graphql-codegen/typescript": "2.2.2",
