@@ -250,9 +250,7 @@ export const VerticalMoreContextMenu: React.FC<Props> = ({
         aria-hidden="true"
       >
         <div>{title}</div>
-        <span className="vertical__more">
           <SvgMoreVertical />
-        </span>
       </div>
 
       {isOpenContextMenu && (
