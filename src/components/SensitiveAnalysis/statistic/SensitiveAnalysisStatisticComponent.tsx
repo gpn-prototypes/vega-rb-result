@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 import {
   Column,
   RowEntity,
@@ -12,7 +12,7 @@ import {
 import { MathHelper } from '@app/utils/MathHelper';
 import { Table } from '@consta/uikit/Table';
 
-interface Props {
+interface P {
   statistic: SensitiveAnalysisStatistic;
 }
 
@@ -55,10 +55,8 @@ const getMappedRow = (
   return row;
 };
 
-export const SensitiveAnalysisStatisticComponent: React.FC<Props> = ({
-  statistic,
-}) => {
-  const columns: any[] = statistic.headers.map(
+export const SensitiveAnalysisStatisticComponent: FC<P> = ({ statistic }) => {
+  const columns: any[] = statistic.headers?.map(
     (header: SensitiveAnalysisStatisticHeaders) => {
       if (header?.children && header?.children?.length > 0) {
         return {
@@ -74,7 +72,7 @@ export const SensitiveAnalysisStatisticComponent: React.FC<Props> = ({
     },
   );
 
-  const rows: Record<string, string>[] = statistic.rows.map(
+  const rows: Record<string, string>[] = statistic.rows?.map(
     (row: SensitiveAnalysisStatisticRows) => getMappedRow(row.cells),
   );
 

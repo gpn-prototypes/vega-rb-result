@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { FC, useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { MenuContextItem } from '@app/interfaces/ContextMenuInterface';
 import {
@@ -25,7 +25,7 @@ import { SensitiveAnalysisStatisticComponent } from './statistic/SensitiveAnalys
 
 import './SensitiveAnalysisComponent.css';
 
-interface Props {
+interface P {
   sidebarRow: GridActiveRow;
 }
 
@@ -36,18 +36,18 @@ interface Props {
 //   border: true,
 // };
 
-export const SensitiveAnalysisComponent: React.FC<Props> = ({ sidebarRow }) => {
+export const SensitiveAnalysisComponent: FC<P> = ({ sidebarRow }) => {
   const dispatch = useDispatch();
 
   // при клике вне окна
   const resetState = useCallback(() => {
-    dispatch(sensitiveAnalysisDuck.actions.resetState(undefined, undefined));
-    dispatch(TableActions.resetSidebarRow(undefined, undefined));
+    dispatch(sensitiveAnalysisDuck.actions.resetState());
+    dispatch(TableActions.resetSidebarRow());
   }, [dispatch]);
 
   // при клике вне окна и кнопке закрыть
   const resetSidebarRow = useCallback(() => {
-      dispatch(TableActions.resetSidebarRow(undefined, undefined))
+    dispatch(TableActions.resetSidebarRow());
   }, [dispatch]);
 
   // свичи из выпадающего окна
@@ -69,11 +69,13 @@ export const SensitiveAnalysisComponent: React.FC<Props> = ({ sidebarRow }) => {
     setIsLoadingStatistic(true);
 
     // загрузка диаграммы, без setIsLoading(false) не отобразится даже при успехе
-    loadSensitiveAnalysisData(dispatch, sidebarRow.title.split(','))
-      .then(() => setIsLoading(false));
+    loadSensitiveAnalysisData(dispatch, sidebarRow.title.split(',')).then(() =>
+      setIsLoading(false),
+    );
 
-    loadSensitiveAnalysisStatistic(dispatch, sidebarRow.title.split(','))
-      .then(() => setIsLoadingStatistic(false));
+    loadSensitiveAnalysisStatistic(dispatch, sidebarRow.title.split(',')).then(
+      () => setIsLoadingStatistic(false),
+    );
 
     return resetState;
   });
@@ -98,32 +100,31 @@ export const SensitiveAnalysisComponent: React.FC<Props> = ({ sidebarRow }) => {
     //     }
     // })
 
-let items2: any = []  // тип!!
+    let items2: any = []; // тип!!
 
-    for(let i = 0; i < sensitiveAnalysisData.length; i++) {
+    for (let i = 0; i < sensitiveAnalysisData.length; i++) {
+      const l = {
+        title: sensitiveAnalysisData[i].title,
+      };
 
-const l = {
-  title: sensitiveAnalysisData[i].title,
-}
+      const items =
+        sensitiveAnalysisData[i].names.map((name: string) => {
+          return {
+            name,
+            code: name,
+            switch: true,
+          };
+        }) || [];
 
-      const items = sensitiveAnalysisData[i].names.map((name: string) => {
-        return {
-          name,
-          code: name,
-          switch: true,
-        };
-      }) || []
-
-      items2.push({...l, ...items})
+      items2.push({ ...l, ...items });
     }
 
-console.log(items2, 'items2')
+    console.log(items2, 'items2');
 
-//[
-// {title: 'oil', {name: 'F, тыс. м²', code: 'F, тыс. м²', switch: true}, {name: 'F, тыс. м²', code: 'F, тыс. м²', switch: true}},
-// {title: 'gas', {name: 'F, тыс. м²', code: 'F, тыс. м²', switch: true}}
-// ]
-
+    //[
+    // {title: 'oil', {name: 'F, тыс. м²', code: 'F, тыс. м²', switch: true}, {name: 'F, тыс. м²', code: 'F, тыс. м²', switch: true}},
+    // {title: 'gas', {name: 'F, тыс. м²', code: 'F, тыс. м²', switch: true}}
+    // ]
 
     // const items: MenuContextItem[] =
     //   sensitiveAnalysisData[0].names.map((name: string) => {
@@ -134,9 +135,7 @@ console.log(items2, 'items2')
     //     };
     //   }) || [];
 
-
     // items.push(payloadMenuItem);
-
 
     setMenuItems(items2);
   }, [sensitiveAnalysisData]);
