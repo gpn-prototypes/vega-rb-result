@@ -179,7 +179,7 @@ export const HistogramComponent: React.FC<Props> = ({ grid }) => {
   );
 
   const topContent =
-    histogramsPayload?.length > 0 ? (
+    histogramsPayload?.length ? (
       <div>
         <div>
           <VerticalMoreContextMenu
