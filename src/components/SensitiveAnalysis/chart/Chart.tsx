@@ -1,5 +1,5 @@
 /* eslint-disable no-param-reassign */
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { SensitiveAnalysis } from '@app/interfaces/SensitiveAnalysisInterface';
 import * as d3 from 'd3';
 
@@ -15,13 +15,13 @@ type Sorted = {
   index: number;
 };
 
-export const SensitiveAnalysisChartComponent: React.FC<
+export const SensitiveAnalysisChartComponent: FC<
   SensitiveAnalysis & { availableNames: string[] }
 > = ({ names, percentiles, resultMinMax, zeroPoint, availableNames }) => {
   const d3Container = useRef(null);
 
   /**
-   * Необходимо собрать объект, собираем все значения из percentales и мапим их по названию
+   * Необходимо собрать объект, собираем все значения из percentiles и мапим их по названию
    */
   const [currentPercentiles, setCurrentPercentiles] =
     useState<number[][]>(percentiles);

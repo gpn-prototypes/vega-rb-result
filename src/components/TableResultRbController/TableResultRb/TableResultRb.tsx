@@ -62,7 +62,7 @@ const setActiveClass = (title: string) => {
     });
 };
 
-const menuItems = (): MenuContextItem[] => [
+const menuItems: MenuContextItem[] = [
   {
     code: 'remove',
     name: 'Уменьшить разрядность',
@@ -410,7 +410,7 @@ export const TableResultRb: React.FC<Props> = ({
 
       {visible && (
         <CustomContextMenu
-          menuItems={() => menuItems()}
+          menuItems={menuItems}
           ref={rowRef}
           onClick={handleContextMenuClick}
           setIsOpenContextMenu={(isVisible) => setContextMenu(isVisible)}

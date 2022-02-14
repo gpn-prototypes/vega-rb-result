@@ -20,7 +20,7 @@ const getMappedColumn = (
   header: SensitiveAnalysisStatisticHeaders,
   isLeft = true,
 ): Column<any> => {
-  const column: Column<any> = {
+  return {
     title: header.name,
     accessor: header.code,
     align: isLeft ? 'left' : 'right',
@@ -39,8 +39,6 @@ const getMappedColumn = (
       return row[header.code];
     },
   };
-
-  return column;
 };
 
 const getMappedRow = (
@@ -56,7 +54,7 @@ const getMappedRow = (
 };
 
 export const SensitiveAnalysisStatisticComponent: FC<P> = ({ statistic }) => {
-  const columns: any[] = statistic.headers?.map(
+  const columns: any[] = statistic.headers.map(
     (header: SensitiveAnalysisStatisticHeaders) => {
       if (header?.children && header?.children?.length > 0) {
         return {
@@ -72,7 +70,7 @@ export const SensitiveAnalysisStatisticComponent: FC<P> = ({ statistic }) => {
     },
   );
 
-  const rows: Record<string, string>[] = statistic.rows?.map(
+  const rows: Record<string, string>[] = statistic.rows.map(
     (row: SensitiveAnalysisStatisticRows) => getMappedRow(row.cells),
   );
 

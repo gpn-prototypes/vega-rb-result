@@ -17,6 +17,9 @@
     display: grid;
     grid-template-rows: 1fr 1fr;
     min-height: 246px;
+    .tabsWrapper {
+      width: 224px;
+    }
   }
 
   &__loader {
