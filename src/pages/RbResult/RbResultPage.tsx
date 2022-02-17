@@ -1,7 +1,14 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { HistogramComponent } from '@app/components/Histograms/HistogramComponent';
 import NotifyComponent from '@app/components/Notify/Notify';
+import { ProjectContext } from '@app/components/Providers';
 import { SensitiveAnalysisComponent } from '@app/components/SensitiveAnalysis/SensitiveAnalysisComponent';
 import { TableErrorAlert } from '@app/components/TableErrorAlert';
 import Table from '@app/components/TableResultRbController';
@@ -12,7 +19,6 @@ import {
   IS_PROJECT_RECENTLY_EDITED_INTERVAL_IN_MS,
 } from '@app/constants/GeneralConstants';
 import projectService from '@app/services/ProjectService';
-import { loadArchive } from '@app/services/utilsService';
 import competitiveAccessDuck from '@app/store/competitiveAccessDuck';
 import { GeneralActions } from '@app/store/general/generalActions';
 import histogramDuck from '@app/store/histogramDuck';
@@ -24,6 +30,7 @@ import { TableActions } from '@app/store/table/tableActions';
 import treeDuck from '@app/store/treeDuck';
 import { RootState } from '@app/store/types';
 import { GridActiveRow, GridCollection } from '@app/types/typesTable';
+import { createWebsocket } from '@app/utils/websocketHelper';
 import { Checkbox } from '@consta/uikit/Checkbox';
 import { ChoiceGroup } from '@consta/uikit/ChoiceGroup';
 import { IconCollapse } from '@consta/uikit/IconCollapse';
@@ -31,7 +38,6 @@ import { IconDownload } from '@consta/uikit/IconDownload';
 import { IconExpand } from '@consta/uikit/IconExpand';
 import { cnMixCard } from '@consta/uikit/MixCard';
 import { Sidebar } from '@consta/uikit/Sidebar';
-import { Item } from '@consta/uikit/SnackBar';
 import { Text } from '@consta/uikit/Text';
 import { SplitPanes, useInterval, useMount } from '@gpn-prototypes/vega-ui';
 
@@ -48,6 +54,9 @@ const RbResultPage: React.FC = () => {
     dispatch(sensitiveAnalysisDuck.actions.resetState());
     dispatch(treeDuck.actions.resetState());
   }, [dispatch]);
+
+  const { vid: projectId } = useContext(ProjectContext).project;
+
   const setFluidType = useCallback(
     (type: EFluidType) => dispatch(TableActions.setFluidType(type)),
     [dispatch],
@@ -60,14 +69,6 @@ const RbResultPage: React.FC = () => {
   const setRecentlyEdited = useCallback(
     (recentlyEdited: boolean) =>
       dispatch(competitiveAccessDuck.actions.setRecentlyEdited(recentlyEdited)),
-    [dispatch],
-  );
-  const appendItem = useCallback(
-    (item: Item) => dispatch(NotifyActions.appendItem(item)),
-    [dispatch],
-  );
-  const removeItem = useCallback(
-    (id: string) => dispatch(NotifyActions.removeItem(id)),
     [dispatch],
   );
   const treeEditorRef = useRef<HTMLDivElement>(null);
@@ -129,18 +130,14 @@ const RbResultPage: React.FC = () => {
 
   const downloadResult = async (): Promise<void> => {
     try {
-      appendItem({
-        key: 'notify',
-        message: 'Идет генерация файла',
-        status: 'system',
+      const id =
+        await projectService.generateCalculationResultArchiveProcessId();
+
+      createWebsocket({
+        id,
+        projectId,
+        dispatch,
       });
-
-      /** Таймаут добавлен для того, что бы визуально не мелькала нотификация */
-      setTimeout(async () => {
-        await loadArchive();
-
-        removeItem('notify');
-      }, 1500);
     } catch (e) {
       console.warn(e);
     }

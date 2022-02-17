@@ -24,13 +24,13 @@ import {
   SensitivityAnalysisStatisticStructure,
   SensitivityAnalysisStructure,
 } from '@app/generated/graphql';
+import { GENERATE_CALCULATION_RESULT_ARCHIVE } from '@app/pages/RbResult/mutations';
 import {
   CalculationResponse,
   IProjectService,
   ProjectServiceProps,
 } from '@app/services/types';
 import {
-  getDownloadResultUri,
   getGraphqlUri,
   // wrapConception,
 } from '@app/services/utils';
@@ -347,11 +347,37 @@ class ProjectService implements IProjectService {
     }
   }
 
-  async getCalculationArchive(): Promise<CalculationResponse> {
+  async generateCalculationResultArchiveProcessId(): Promise<string> {
+    const { data: responseData } = await this.client
+      .watchQuery<Query>({
+        query: GENERATE_CALCULATION_RESULT_ARCHIVE,
+        context: {
+          uri: getGraphqlUri(this.projectId),
+        },
+        variables: {
+          version: this.version,
+        },
+        fetchPolicy: 'no-cache',
+      })
+      .result();
+
+    return getOr(
+      None<ResultHistogramsStructure>(),
+      [
+        'project',
+        'resourceBase',
+        'generateCalculationResultArchive',
+        'processId',
+      ],
+      responseData,
+    );
+  }
+
+  async getCalculationArchive(url: string): Promise<CalculationResponse> {
     const DEFAULT_FILENAME = 'result.zip';
 
     const token = await this.identity.getToken();
-    const serverResponse = await fetch(getDownloadResultUri(this.projectId), {
+    const serverResponse = await fetch(url, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

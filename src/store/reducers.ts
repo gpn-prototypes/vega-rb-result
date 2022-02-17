@@ -9,6 +9,7 @@ import { combineReducers } from 'redux';
 import { GeneralReducers } from './general/generalReducers';
 import { NotifyReducers } from './notify/notifyReducers';
 import { SettingsReducers } from './settings/settingsReducers';
+import { WebsocketReducers } from './websocket/websocketReducers';
 import competitiveAccessDuck from './competitiveAccessDuck';
 import sensitiveAnalysisDuck from './sensitiveAnalysisDuck';
 import { RootState } from './types';
@@ -24,5 +25,6 @@ export default combineReducers<RootState>({
   sensitiveAnalysis: sensitiveAnalysisDuck.reducer,
   settings: SettingsReducers,
   notify: NotifyReducers,
+  websocket: WebsocketReducers,
   general: GeneralReducers,
 });

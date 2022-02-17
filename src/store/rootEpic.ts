@@ -3,8 +3,11 @@ import errorsDuck from '@app/store/errorsDuck';
 import projectDuck from '@app/store/projectDuck';
 import { combineEpics } from 'redux-observable';
 
+import { WebsocketEpics } from './websocket/websocketEpics';
+
 export default combineEpics(
   ...Object.values(alertDuck.epics),
   ...projectDuck.epics,
   ...errorsDuck.epics,
+  ...WebsocketEpics,
 );
