@@ -7,8 +7,11 @@ import { CalculationResponse } from './types';
 export const loadArchive = (
   statistics: boolean,
   samples: boolean,
+  plots: boolean,
 ): Observable<CalculationResponse> => {
-  return from(projectService.getCalculationArchive(statistics, samples)).pipe(
+  return from(
+    projectService.getCalculationArchive(statistics, samples, plots),
+  ).pipe(
     tap(({ filename, data }) => {
       const url = window.URL.createObjectURL(data);
       const link = Object.assign(document.createElement('a'), {

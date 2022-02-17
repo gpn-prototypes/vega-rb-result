@@ -83,6 +83,7 @@ export const InitialModeContent: React.FC<ModalContentProps> = ({
         FileAction.fetchResultFile({
           statistics: checkedState[DownloadTypeEnum.statistics],
           samples: checkedState[DownloadTypeEnum.samples],
+          plots: checkedState[DownloadTypeEnum.plots],
         }),
       );
     } catch (error) {

@@ -26,7 +26,11 @@ const fetchResultFileEpic: Epic<
     ofAction(FileAction.fetchResultFile),
     tap(() => dispatch(LoaderAction.setLoading('file'))),
     switchMap((action: { payload: FetchFilePayload }) =>
-      loadArchive(action.payload.statistics, action.payload.samples).pipe(
+      loadArchive(
+        action.payload.statistics,
+        action.payload.samples,
+        action.payload.plots,
+      ).pipe(
         tap(() => dispatch(FileAction.fetchResultFileFulfilled())),
         takeUntil(
           action$.ofType(FileAction.stopFetchingFile).pipe(

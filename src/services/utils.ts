@@ -13,13 +13,13 @@ export const getBaseApiUrl = (): string => {
 export const getGraphqlUri = (projectId: string): string =>
   `${getBaseApiUrl()}/graphql/${projectId}`;
 
-// TODO: добавить plots: boolean, когда появится на бэке
 export const getDownloadResultUri = (
   id: string,
   statistics: boolean,
   samples: boolean,
+  plots: boolean,
 ): string =>
-  `${getBaseApiUrl()}/files/calculation_result/${id}?statistics=${statistics}&samples=${samples}`;
+  `${getBaseApiUrl()}/files/calculation_result/${id}?statistics=${statistics}&samples=${samples}&plots=${plots}`;
 
 export const wrapConception = (conception: ConceptionInput): RbProjectInput => {
   return {

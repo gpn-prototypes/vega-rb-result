@@ -350,6 +350,7 @@ class ProjectService implements IProjectService {
   async getCalculationArchive(
     statistics: boolean,
     samples: boolean,
+    plots: boolean,
   ): Promise<CalculationResponse> {
     const DEFAULT_FILENAME = 'result.zip';
     // TODO: придумать общее решение для отмены запроса
@@ -358,7 +359,7 @@ class ProjectService implements IProjectService {
 
     const token = await this.identity.getToken();
     const serverResponse = await fetch(
-      getDownloadResultUri(this.projectId, statistics, samples),
+      getDownloadResultUri(this.projectId, statistics, samples, plots),
       {
         headers: {
           Authorization: `Bearer ${token}`,
