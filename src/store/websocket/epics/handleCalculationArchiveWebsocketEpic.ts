@@ -107,12 +107,20 @@ export const handleCalculationArchiveMessageEpic: Epic<
                 {
                   label: 'Скачать архив',
                   onClick: () => {
-                    dispatch(NotifyActions.removeItem(payload.id));
+                    dispatch(
+                      NotifyActions.appendItem({
+                        key: payload.id,
+                        message: 'Идет скачивание файла',
+                        status: 'system',
+                      }),
+                    );
 
                     loadArchive(
                       (message.payload as WebSocketCompleteDownloadPayload)
                         .attachment_url,
-                    );
+                    ).then(() => {
+                      dispatch(NotifyActions.removeItem(payload.id));
+                    });
                   },
                 },
               ],
