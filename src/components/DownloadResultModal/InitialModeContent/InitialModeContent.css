@@ -1,0 +1,67 @@
+.InitialModeContent {
+  &__Header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-m);
+
+    .Text {
+      flex-grow: 1;
+    }
+  }
+
+  &__Body {
+    margin-bottom: var(--space-xl);
+
+    .Text_view_alert {
+      margin-top: var(--space-m);
+    }
+  }
+
+  &__Footer {
+    display: flex;
+    justify-content: flex-end;
+
+    .Button:first-child {
+      margin-right: var(--space-s);
+    }
+  }
+
+  &__Checkbox-group {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: var(--space-xs) var(--space-s);
+    border: 1px solid var(--color-bg-border);
+    border-radius: 4px;
+
+    .Checkbox-Label {
+      font-size: var(--size-text-s);
+    }
+  }
+
+  &__Checkbox-group-label {
+    margin-bottom: var(--space-xl);
+  }
+
+  &__Checkbox-group-header {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: var(--space-xs);
+
+    .Text {
+      flex: 1 1 auto;
+      padding-right: var(--space-s);
+    }
+  }
+
+  &__Checkbox-group-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    &:not(:last-child) {
+      margin-bottom: var(--space-m);
+    }
+  }
+}

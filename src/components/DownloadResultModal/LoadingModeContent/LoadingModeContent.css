@@ -1,0 +1,27 @@
+.LoadingModeContent {
+  &__Header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-m);
+
+    .Text {
+      flex-grow: 1;
+    }
+  }
+
+  &__Body {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: var(--space-xl);
+
+    .Loader {
+      margin: var(--space-3xl) 0;
+    }
+  }
+
+  &__Footer {
+    display: flex;
+    justify-content: flex-end;
+  }
+}
