@@ -7,14 +7,14 @@ import { reducerWithInitialState } from 'typescript-fsa-reducers';
 
 export interface SensitiveAnalysisStore {
   payload: SensitiveAnalysis[] | undefined;
-  statistic: SensitiveAnalysisStatistic | undefined;
+  statistic: SensitiveAnalysisStatistic[] | undefined;
 }
 
 const factory = actionCreatorFactory('sensitiveAnalysis');
 
 const actions = {
   setSensitiveAnalysis: factory<SensitiveAnalysis[]>('SET_SENSITIVE_ANALYSIS'),
-  setSensitiveAnalysisStatistic: factory<SensitiveAnalysisStatistic>(
+  setSensitiveAnalysisStatistic: factory<SensitiveAnalysisStatistic[]>(
     'SET_SENSITIVE_ANALYSIS_STATISTIC',
   ),
   resetState: factory('RESET_STATE'),
@@ -36,7 +36,10 @@ const reducer = reducerWithInitialState<SensitiveAnalysisStore>(initialState)
   )
   .case(
     actions.setSensitiveAnalysisStatistic,
-    (state: SensitiveAnalysisStore, statistic: SensitiveAnalysisStatistic) => ({
+    (
+      state: SensitiveAnalysisStore,
+      statistic: SensitiveAnalysisStatistic[],
+    ) => ({
       ...state,
       statistic,
     }),

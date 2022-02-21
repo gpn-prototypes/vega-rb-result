@@ -8,6 +8,7 @@
     font-size: 18px;
     font-weight: 400;
     line-height: 21px;
+    padding-right: 5px;
     cursor: pointer;
     color: var(--color-typo-primary);
   }
@@ -15,7 +16,6 @@
   &__content {
     margin-top: var(--space-m);
     display: grid;
-    grid-template-rows: 1fr 1fr;
     min-height: 246px;
     .tabsWrapper {
       width: 224px;
@@ -29,5 +29,8 @@
   &__actions {
     padding: var(--space-m) 0;
     text-align: right;
+  }
+  &:first-of-type {
+    padding-bottom: var(--space-m) !important;
   }
 }

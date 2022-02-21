@@ -16,7 +16,7 @@ type Sorted = {
 };
 
 export const SensitiveAnalysisChartComponent: FC<
-  SensitiveAnalysis & { availableNames: string[] }
+  Omit<SensitiveAnalysis, 'title'> & { availableNames: string[] }
 > = ({ names, percentiles, resultMinMax, zeroPoint, availableNames }) => {
   const d3Container = useRef(null);
 
@@ -30,28 +30,29 @@ export const SensitiveAnalysisChartComponent: FC<
   );
 
   useEffect(() => {
-    /**
-     * Пока что нет сортировки на backend, приходится вручную сортировать все
-     * Сортируем путям вычитания максимального значения из минимального
-     * И полученный результат сортируем с сохранением индекса у изначальных данных
-     */
-    const resultSorted: Sorted[] = resultMinMax
-      .map((result: number[], index: number) => ({
+    // /**
+    //  * Пока что нет сортировки на backend, приходится вручную сортировать все
+    //  * Сортируем путям вычитания максимального значения из минимального
+    //  * И полученный результат сортируем с сохранением индекса у изначальных данных
+    //  */
+    const resultSorted: Sorted[] = resultMinMax.map(
+      (result: number[], index: number) => ({
         range: result[1] - result[0],
         index,
-      }))
-      .sort((a: Sorted, b: Sorted) => {
-        if (a.range < b.range) {
-          return -1;
-        }
-
-        if (a.range > b.range) {
-          return 1;
-        }
-
-        return 0;
-      })
-      .reverse();
+      }),
+    );
+    // .sort((a: Sorted, b: Sorted) => {
+    //   if (a.range < b.range) {
+    //     return -1;
+    //   }
+    //
+    //   if (a.range > b.range) {
+    //     return 1;
+    //   }
+    //
+    //   return 0;
+    // })
+    // .reverse();
 
     const result = resultSorted
       .map(({ index }) => percentiles[index])
@@ -89,35 +90,26 @@ export const SensitiveAnalysisChartComponent: FC<
       availableNames.includes(names[index]),
     );
 
-    cloneResultMinMax
-      .sort((a: number[], b: number[]) => {
-        if (a[0] === b[0]) {
-          return a[1] - b[1];
-        }
-
-        return b[0] - a[0];
-      })
-      .reverse()
-      .forEach((result: number[]) => {
-        const getIndexByResult = (innerResult: number[]) => {
-          const equals = (a, b) =>
-            a.length === b.length && a.every((v, i) => v === b[i]);
-
-          return resultMinMax.findIndex((res: number[]) =>
-            equals(res, innerResult),
-          );
-        };
-        result.forEach((currentResult: number, innerIndex: number) => {
-          data.push({
-            name: names[getIndexByResult(result)],
-            value:
-              innerIndex === 0
-                ? zeroPoint - currentResult
-                : currentResult - zeroPoint,
-            category: innerIndex === 0 ? 0 : 1,
-          });
+    cloneResultMinMax.forEach((result: number[], index) => {
+      // const getIndexByResult = (innerResult: number[]) => {
+      //   const equals = (a, b) =>
+      //     a.length === b.length && a.every((v, i) => v === b[i]);
+      //
+      //   return resultMinMax.findIndex((res: number[]) =>
+      //     equals(res, innerResult),
+      //   );
+      // };
+      result.forEach((currentResult: number, innerIndex: number) => {
+        data.push({
+          name: names[index],
+          value:
+            innerIndex === 0
+              ? zeroPoint - currentResult
+              : currentResult - zeroPoint,
+          category: innerIndex === 0 ? 0 : 1,
         });
       });
+    });
 
     const { series, bias, options } = SensitiveAnalysisChart.getAxisData(data);
 
@@ -172,7 +164,7 @@ export const SensitiveAnalysisChartComponent: FC<
     if (d3Container.current) {
       draw();
     }
-  }, [draw, currentPercentiles]);
+  }, [draw, currentPercentiles, availableNames]);
 
   return (
     <div className="chart">

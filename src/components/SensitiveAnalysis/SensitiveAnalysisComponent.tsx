@@ -1,8 +1,10 @@
 import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { EFluidType } from '@app/constants/Enums';
 import {
   MenuContextItem,
   MenuContextItemAnalysis,
+  MenuContextItemSwitchAnalysis,
 } from '@app/interfaces/ContextMenuInterface';
 import {
   SensitiveAnalysis,
@@ -17,6 +19,7 @@ import { TableActions } from '@app/store/table/tableActions';
 import { RootState } from '@app/store/types';
 import { GridActiveRow } from '@app/types/typesTable';
 import { Button } from '@consta/uikit/Button';
+import { ChoiceGroup } from '@consta/uikit/ChoiceGroup';
 import { Loader } from '@consta/uikit/Loader';
 import { Sidebar } from '@consta/uikit/Sidebar';
 import { useMount } from '@gpn-prototypes/vega-ui';
@@ -27,8 +30,6 @@ import { SensitiveAnalysisChartComponent } from './chart/Chart';
 import { SensitiveAnalysisStatisticComponent } from './statistic/SensitiveAnalysisStatisticComponent';
 
 import './SensitiveAnalysisComponent.css';
-import { ChoiceGroup } from '@consta/uikit/ChoiceGroup';
-import { EFluidType } from '@app/constants/Enums';
 
 interface P {
   sidebarRow: GridActiveRow;
@@ -60,10 +61,11 @@ export const SensitiveAnalysisComponent: FC<P> = ({ sidebarRow }) => {
   const sensitiveAnalysisData: SensitiveAnalysis[] | undefined = useSelector(
     ({ sensitiveAnalysis }: RootState) => sensitiveAnalysis.payload,
   );
-  const sensitiveAnalysisStatisticData: SensitiveAnalysisStatistic | undefined =
-    useSelector(
-      ({ sensitiveAnalysis }: RootState) => sensitiveAnalysis.statistic,
-    );
+  const sensitiveAnalysisStatisticData:
+    | SensitiveAnalysisStatistic[]
+    | undefined = useSelector(
+    ({ sensitiveAnalysis }: RootState) => sensitiveAnalysis.statistic,
+  );
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isLoadingStatistic, setIsLoadingStatistic] = useState<boolean>(false);
@@ -76,7 +78,6 @@ export const SensitiveAnalysisComponent: FC<P> = ({ sidebarRow }) => {
     setIsLoading(true);
     setIsLoadingStatistic(true);
 
-    // загрузка диаграммы, без setIsLoading(false) не отобразится даже при успехе
     loadSensitiveAnalysisData(dispatch, sidebarRow.title.split(',')).then(
       () => {
         setIsLoading(false);
@@ -90,8 +91,6 @@ export const SensitiveAnalysisComponent: FC<P> = ({ sidebarRow }) => {
     return resetState;
   });
 
-  const ref = useRef<HTMLHeadingElement>(null);
-
   useEffect(() => {
     /** Заполняем пункты меню данными из бека */
     if (!sensitiveAnalysisData) {
@@ -100,26 +99,26 @@ export const SensitiveAnalysisComponent: FC<P> = ({ sidebarRow }) => {
 
     const items: MenuContextItemAnalysis[][] = [];
 
-    for (let i = 0; i < sensitiveAnalysisData.length; i++) {
-      let title = sensitiveAnalysisData[i].title;
+    for (let i = 0; i < sensitiveAnalysisData.length; i += 1) {
+      const { title } = sensitiveAnalysisData[i];
 
-      const extendedItems =
+      const mappedNames =
         sensitiveAnalysisData[i].names.map((name: string) => {
           return {
             name,
             code: name,
             switch: true,
+            id: Math.random() * 800 - 1,
           };
         }) || [];
 
-      items.push([{ title, ...extendedItems }]);
+      items.push([
+        { title, ...mappedNames },
+        payloadMenuItem,
+      ] as MenuContextItemAnalysis[]);
     }
 
-    // items.push(payloadMenuItem);
-
     setMenuItems(items);
-    // @ts-ignore
-    window.menuItems = menuItems;
 
     const availableTabsItems: string[] = [];
 
@@ -127,57 +126,97 @@ export const SensitiveAnalysisComponent: FC<P> = ({ sidebarRow }) => {
     setAvailableTabs(availableTabsItems);
 
     // Изначально активный таб
-    availableTabsItems.includes(EFluidType.OIL) && setActiveTab(EFluidType.OIL);
+    if (availableTabsItems.includes(EFluidType.OIL)) {
+      setActiveTab(EFluidType.OIL);
+    }
   }, [sensitiveAnalysisData]);
 
-  // вызывается на изменение свичей
-  const handleChange = (item: MenuContextItem) => {
-    // console.log('handleChange');
-    // const updatedMenuItems = menuItems.map((menuItem: MenuContextItem) => {
-    //   const cloneItem = { ...menuItem };
-    //   if (cloneItem.code === item.code) {
-    //     cloneItem.switch = !menuItem.switch;
-    //
-    //     if (cloneItem.code === 'stat') {
-    //       setIsShowStatistic(cloneItem.switch);
-    //     }
-    //   }
-    //
-    //   return cloneItem;
-    // });
-    //
-    // setMenuItems(updatedMenuItems);
+  // На изменение свичей
+  const handleChange = (item: MenuContextItemSwitchAnalysis) => {
+    const updatedMenuItems = menuItems.map((i) =>
+      i.map((k, index) => {
+        const cloneItem: any = { ...k };
+
+        if (index === 0) {
+          Object.values(cloneItem).map((j: any) => {
+            if (j.code === item.code) {
+              return Object.values(cloneItem).map((a: any, cloneItemIndex) => {
+                // eslint-disable-next-line no-return-assign
+                return a.code === item.code && a.id === item.id
+                  ? (cloneItem[cloneItemIndex].switch = !a.switch)
+                  : a;
+              });
+            }
+            return null;
+          });
+        } else if (index === 1) {
+          if (item.code === 'stat' && cloneItem.code === 'stat') {
+            cloneItem.switch = !k.switch;
+            setIsShowStatistic(cloneItem.switch);
+          }
+        }
+        return cloneItem;
+      }),
+    );
+
+    setMenuItems(updatedMenuItems);
   };
 
-  const getAvailableNames = (): string[] => {
-    const result: string[] = [];
+  const getAvailableNames = (index: number): string[] => {
+    let result: string[] = [];
 
-    // menuItems?.length
-    //   ? menuItems[0]
-    //       .filter((item: MenuContextItemAnalysis) => item.code !== 'stat')
-    //       .filter((item: MenuContextItemAnalysis) => item.switch === true)
-    //       .forEach((item: MenuContextItemAnalysis) => {
-    //         if (item.name != null) {
-    //           result.push(item.name);
-    //         }
-    //       })
-    //   : null;
+    if (index === 0) {
+      const names = Object.values(menuItems[index][0])
+        .filter((i) => typeof i !== 'string')
+        .filter((j) => j.switch);
+
+      // eslint-disable-next-line no-unused-expressions
+      result.length ? (result = []) : result;
+
+      names.forEach((i: any) => result.push(i.name));
+
+      menuItems
+        .filter((item: MenuContextItemAnalysis[]) => item[0].code !== 'stat')
+        .filter((item: MenuContextItemAnalysis[]) => item[0].switch)
+        .forEach((item: MenuContextItemAnalysis[]) => {
+          return result.push(item[0].name ? item[0].name : '');
+        });
+    } else if (index === 1) {
+      const names = Object.values(menuItems[index][0])
+        .filter((i) => typeof i !== 'string')
+        .filter((j) => j.switch);
+
+      // eslint-disable-next-line no-unused-expressions
+      result.length ? (result = []) : result;
+
+      names.forEach((i) => result.push(i.name));
+
+      menuItems
+        .filter((item: MenuContextItemAnalysis[]) => item[1].code !== 'stat')
+        .filter((item: MenuContextItemAnalysis[]) => item[1].switch);
+
+      // eslint-disable-next-line no-unused-expressions
+      result.length ? (result = []) : result;
+
+      names.forEach((i) => result.push(i.name));
+    }
 
     return result;
   };
 
   const chart = sensitiveAnalysisData?.length
-    ? sensitiveAnalysisData.map((i) => {
-        return (
-          <SensitiveAnalysisChartComponent
-            percentiles={i.percentiles}
-            resultMinMax={i.resultMinMax}
-            names={i.names}
-            zeroPoint={i.zeroPoint}
-            availableNames={getAvailableNames()}
-            title={'fd'}
-          />
-        );
+    ? sensitiveAnalysisData.map((i, index) => {
+        return activeTab === i.title ? (
+          <div>
+            <SensitiveAnalysisChartComponent
+              percentiles={i.percentiles}
+              resultMinMax={i.resultMinMax}
+              names={i.names}
+              zeroPoint={i.zeroPoint}
+              availableNames={getAvailableNames(index)}
+            />
+          </div>
+        ) : null;
       })
     : null;
 
@@ -185,29 +224,37 @@ export const SensitiveAnalysisComponent: FC<P> = ({ sidebarRow }) => {
     <div className="sensitive-analysis">
       <div>
         <div className="sensitive-analysis__title">Статистика</div>
-
         {isLoadingStatistic || !sensitiveAnalysisStatisticData ? (
           <Loader />
         ) : (
           <SensitiveAnalysisStatisticComponent
-            statistic={sensitiveAnalysisStatisticData}
+            statistic={
+              sensitiveAnalysisStatisticData[
+                activeTab === EFluidType.OIL ? 0 : 1
+              ]
+            }
           />
         )}
       </div>
     </div>
   );
 
-  // @ts-ignore
   return (
     <div className="sensitive-analysis">
       <Sidebar.Content>
-        {/* График */}
-        {console.log('render sa')}
         <div className="sensitive-analysis__title">
           <VerticalMoreContextMenu
             menuItems={menuItems}
             title="Анализ чувствительности"
-            onChange={handleChange}
+            onChange={(item, id) => handleChange({ ...item, id })}
+          />
+          <Button
+            view="ghost"
+            onClick={resetSidebarRow}
+            width="default"
+            form="default"
+            label="Закрыть"
+            size="m"
           />
         </div>
 
@@ -229,21 +276,18 @@ export const SensitiveAnalysisComponent: FC<P> = ({ sidebarRow }) => {
               />
             </div>
           ) : null}
-          <div>
+          <>
+            {/* График */}
             {isLoading ? (
               <Loader className="sensitive-analysis__loader" />
             ) : (
               chart
             )}
-          </div>
+          </>
           {/* Статистика */}
           {isShowStatistic ? statistic : null}
         </div>
       </Sidebar.Content>
-
-      <Sidebar.Actions className="sensitive-analysis__actions">
-        <Button onClick={resetSidebarRow} label="Закрыть" size="m" />
-      </Sidebar.Actions>
     </div>
   );
 };

@@ -3033,12 +3033,12 @@ export type ResultHistogramsStructure = {
 
 export type SensitivityAnalysisStructure = {
   __typename?: 'HistogramResultQuery';
-  getSensitivityAnalysis: SensitiveAnalysis;
+  getSensitivityAnalysis: SensitiveAnalysis[];
 };
 
 export type SensitivityAnalysisStatisticStructure = {
   __typename?: 'HistogramResultQuery';
-  getSensitivityAnalysisStatistics: SensitiveAnalysisStatistic;
+  getSensitivityAnalysisStatistics: SensitiveAnalysisStatistic[];
 };
 
 export type ResultTableQuery = {

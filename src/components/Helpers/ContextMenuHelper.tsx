@@ -3,6 +3,7 @@ import SvgMoreVertical from '@app/assets/icons/components/MoreVertical';
 import {
   MenuContextItem,
   MenuContextItemAnalysis,
+  MenuContextItemSwitchAnalysis,
 } from '@app/interfaces/ContextMenuInterface';
 import { Button } from '@consta/uikit/Button';
 import { ChoiceGroup } from '@consta/uikit/ChoiceGroup';
@@ -12,60 +13,88 @@ import { TextField } from '@consta/uikit/TextField';
 
 import './ContextMenuHelper.css';
 
-interface ContextMenuBaseItemProps {
+interface SensitiveAnalysisDropdownMenuProps {
   menuItem: Omit<MenuContextItemAnalysis, 'title'>;
-  handleContextClick?: (menuItem: MenuContextItem) => void;
-  column?: boolean;
-  getDisabled?: (item: any) => boolean;
+  onChange: (
+    menuItem: Omit<MenuContextItemSwitchAnalysis, 'id'>,
+    id: number,
+  ) => void;
 }
 
-export const MenuContextItemBlock: FC<ContextMenuBaseItemProps> = ({
+export const SensitiveAnalysisDropdownMenu: FC<SensitiveAnalysisDropdownMenuProps> =
+  ({ menuItem, onChange }) => {
+    const onChangeCallback = (): void =>
+      onChange(
+        menuItem as Omit<MenuContextItemSwitchAnalysis, 'id'>,
+        menuItem.id,
+      );
+
+    return (
+      <>
+        <div
+          className={`menu__title ${menuItem.border ? 'menu__border' : ''}`}
+          role="button"
+          tabIndex={0}
+        >
+          <div className="menu__left">
+            <div>{menuItem.name}</div>
+          </div>
+          <div>
+            <Switch
+              size="m"
+              checked={menuItem.switch}
+              onChange={onChangeCallback}
+              key="Switch"
+              className="menu__switch-element"
+            />
+          </div>
+        </div>
+      </>
+    );
+  };
+
+interface ContextMenuBaseItemProps {
+  menuItem: Omit<MenuContextItemAnalysis, 'title'>;
+  column?: boolean;
+  getDisabled?: (item: any) => boolean;
+  handleContextClick?: (menuItem: MenuContextItem) => void;
+  // eslint-disable-next-line react/no-unused-prop-types
+  onChange: (
+    menuItem: Omit<MenuContextItemSwitchAnalysis, 'id'>,
+    id: number,
+  ) => void;
+}
+
+export const ContextMenuBaseItem: FC<ContextMenuBaseItemProps> = ({
   menuItem,
   handleContextClick,
   column,
   getDisabled,
   children,
 }) => {
-  // for (let menuItemKey in menuItem) {
-  //   console.log(menuItem[menuItemKey]);
-  // }
-  // for (const [key, value] of Object.entries(menuItem)) {
-  //   console.log(`${key}: ${value}`);
-  // }
-
-  console.log(menuItem);
   return (
-    <>
-      <div
-        className={`menu__title ${menuItem.border ? 'menu__border' : ''} ${
-          getDisabled && getDisabled(menuItem) ? 'menu__disabled' : ''
-        } ${column ? 'menu__column' : ''}`}
-        onClick={() => {
-          if (handleContextClick) {
-            console.log('vsds');
-            // menuItem.name ? handleContextClick(menuItem) : null;
-          }
-        }}
-        onKeyUp={() => {}}
-        role="button"
-        tabIndex={0}
-      >
-        <div className="menu__left">
-          {menuItem.icon && (
-            <div className="menu__icon">{menuItem.icon}icon</div>
-          )}
+    <div
+      className={`menu__title ${menuItem.border ? 'menu__border' : ''} ${
+        getDisabled && getDisabled(menuItem) ? 'menu__disabled' : ''
+      } ${column ? 'menu__column' : ''}`}
+      onClick={() => {}}
+      onKeyUp={() => {}}
+      role="button"
+      tabIndex={0}
+    >
+      <div className="menu__left">
+        {menuItem.icon && <div className="menu__icon">{menuItem.icon()}</div>}
 
-          <div>{menuItem.name}</div>
-        </div>
-
-        <div>{children}</div>
+        <div>{menuItem.name}</div>
       </div>
-    </>
+
+      <div>{children}</div>
+    </div>
   );
 };
 
 export const ItemWithChoice: React.FC<{
-  menuItem: MenuContextItem;
+  menuItem: MenuContextItem | any;
   setIsOpenContextMenu: (isOpened: boolean) => void;
   onChange?: (item: MenuContextItem) => void;
   getDisabled?: (item: MenuContextItem) => boolean;
@@ -107,14 +136,19 @@ export const ItemWithChoice: React.FC<{
   };
 
   return (
-    <ContextMenuBaseItem menuItem={menuItem} column getDisabled={getDisabled}>
+    <ContextMenuBaseItem
+      menuItem={menuItem}
+      column
+      getDisabled={getDisabled}
+      onChange={() => {}}
+    >
       <ChoiceGroup
         value={String(menuItem.choice?.value)}
         items={stringifyValues || []}
         className="menu__choice"
         name={`choice_${menuItem.code}`}
         size="xs"
-        width={'default'}
+        width="default"
         multiple={false}
         getLabel={(item) => item}
         onChange={({ value }) => handleChange(value)}
@@ -153,136 +187,55 @@ export const ItemWithChoice: React.FC<{
   );
 };
 
-interface SensitiveAnalysisDropdown {
+interface ContextMenuDropdownProps {
   ref: React.RefObject<HTMLHeadingElement>;
   menuItems: MenuContextItemAnalysis[][] | MenuContextItem[];
-  setIsOpenContextMenu: (isOpened: boolean) => void;
+  setIsOpenContextMenu: (isOpen: boolean) => void;
   position: Position;
-  onClick?: (item: MenuContextItem) => void;
-  onChange?: (item: MenuContextItem) => void;
-  getDisabled?: (item: MenuContextItem) => boolean;
+  onChange: (
+    item: Omit<MenuContextItemSwitchAnalysis, 'id'>,
+    id: number,
+  ) => void;
 }
 
-export const SensitiveAnalysisDropdown: FC<SensitiveAnalysisDropdown> = ({
+export const ContextMenuDropdown: FC<ContextMenuDropdownProps> = ({
   ref,
   menuItems,
-  onClick,
   onChange,
   position,
   setIsOpenContextMenu,
-  getDisabled,
 }) => {
-  /** Обработка клика по контекстному меню */
-  const handleContextClick = (menuItem: MenuContextItem) => {
-    if (onClick) {
-      console.log('nnn', menuItem);
-      onClick(menuItem);
-    }
-    setIsOpenContextMenu(false);
-  };
-
-  // const itemWithSwitch = (menuItem: MenuContextItem) => (
-  //   <ContextMenuBaseItem menuItem={menuItem} getDisabled={getDisabled}>
-  //     <Switch
-  //       size="m"
-  //       checked={menuItem.switch}
-  //       onChange={() => onChange && onChange(menuItem)}
-  //       key="Switch"
-  //       className="menu__switch-element"
-  //     />
-  //   </ContextMenuBaseItem>
-  // );
-
-  // const simpleItem = (menuItem: MenuContextItem & { title: string }) => (
-  //   <MenuContextItemBlock
-  //     menuItem={menuItem}
-  //     handleContextClick={handleContextClick}
-  //     getDisabled={getDisabled}
-  //   />
-  // );
-
-  // const items2 = menuItems.map(
-  //   (menuItem: MenuContextItem & { title: string }) => {
-  //     // return menuItem.title
-  //     return simpleItem(menuItem);
-  //   },
-  // );
-
-  // const items = menuItems().map((menuItem: any) => {
-  //   // if (menuItem.switch !== undefined) {
-  //   //   return itemWithSwitch(menuItem);
-  //   // }
-  //
-  //   // if (menuItem.choice !== undefined) {
-  //   //   return (
-  //   //     <ItemWithChoice
-  //   //       menuItem={menuItem}
-  //   //       onChange={onChange}
-  //   //       getDisabled={getDisabled}
-  //   //       setIsOpenContextMenu={setIsOpenContextMenu}
-  //   //     />
-  //   //   );
-  //   // }
-  //
-  //   return simpleItem(menuItem);
-  // });
-
   return (
     <>
-      {console.log(menuItems, 'menuItemsLOL')}
-      {console.dir(menuItems, 'menuItemsLOL')}
       <Popover
         anchorRef={ref}
-        onClickOutside={() => setIsOpenContextMenu(false)} // TODO
+        onClickOutside={() => setIsOpenContextMenu(false)}
         direction="downStartLeft"
         className="menusWrapper"
         position={position}
+        equalAnchorWidth={false}
       >
-        {/* @ts-ignore*/}
         {menuItems.map((i) => {
           return (
             <div className="menu">
-              <div className="menu__title">{i[0].title}</div>
-              {Object.values(i[0]).map((j: any) => (
-                <MenuContextItemBlock menuItem={j} />
-              ))}
+              <div className="menu__title menu__borderTitle">{i[0].title}</div>
+              {Object.values(i[0])
+                .filter((k: any) => typeof k !== 'string')
+                .map((j: any) => (
+                  <SensitiveAnalysisDropdownMenu
+                    menuItem={j}
+                    onChange={onChange}
+                  />
+                ))}
             </div>
           );
         })}
+        <SensitiveAnalysisDropdownMenu
+          menuItem={menuItems[0][1]}
+          onChange={onChange}
+        />
       </Popover>
     </>
-  );
-};
-
-export const ContextMenuBaseItem: FC<ContextMenuBaseItemProps> = ({
-  menuItem,
-  handleContextClick,
-  column,
-  getDisabled,
-  children,
-}) => {
-  return (
-    <div
-      className={`menu__title ${menuItem.border ? 'menu__border' : ''} ${
-        getDisabled && getDisabled(menuItem) ? 'menu__disabled' : ''
-      } ${column ? 'menu__column' : ''}`}
-      onClick={() => {
-        if (handleContextClick) {
-          // handleContextClick(menuItem);
-        }
-      }}
-      onKeyUp={() => {}}
-      role="button"
-      tabIndex={0}
-    >
-      <div className="menu__left">
-        {menuItem.icon && <div className="menu__icon">{menuItem.icon()}</div>}
-
-        <div>{menuItem.name}</div>
-      </div>
-
-      <div>{children}</div>
-    </div>
   );
 };
 
@@ -308,15 +261,18 @@ export const CustomContextMenu: FC<ContextMenuProps> = ({
   /** Обработка клика по контекстному меню */
   const handleContextClick = (menuItem: MenuContextItem) => {
     if (onClick) {
-      console.log('click CustomContextMenu', menuItem);
       onClick(menuItem);
     }
 
     setIsOpenContextMenu(false);
   };
 
-  const itemWithSwitch = (menuItem: MenuContextItem) => (
-    <ContextMenuBaseItem menuItem={menuItem} getDisabled={getDisabled}>
+  const itemWithSwitch = (menuItem: MenuContextItem | any) => (
+    <ContextMenuBaseItem
+      menuItem={menuItem}
+      getDisabled={getDisabled}
+      onChange={() => {}}
+    >
       <Switch
         size="m"
         checked={menuItem.switch}
@@ -327,16 +283,16 @@ export const CustomContextMenu: FC<ContextMenuProps> = ({
     </ContextMenuBaseItem>
   );
 
-  const simpleItem = (menuItem: MenuContextItem) => (
+  const simpleItem = (menuItem: MenuContextItem | any) => (
     <ContextMenuBaseItem
       menuItem={menuItem}
       handleContextClick={handleContextClick}
       getDisabled={getDisabled}
+      onChange={() => {}}
     />
   );
 
-  // @ts-ignore
-  const items = menuItems.map((menuItem: MenuContextItem) => {
+  const items = menuItems.map((menuItem: MenuContextItem | any) => {
     if (menuItem.switch !== undefined) {
       return itemWithSwitch(menuItem);
     }
@@ -368,13 +324,16 @@ export const CustomContextMenu: FC<ContextMenuProps> = ({
   );
 };
 
-interface VerticalMoreContextMenu {
+interface VerticalContextMenu {
   title: string;
   menuItems: MenuContextItemAnalysis[][] | MenuContextItem[];
-  onChange: (item: MenuContextItem) => void;
+  onChange: (
+    item: Omit<MenuContextItemSwitchAnalysis, 'id'>,
+    id: number,
+  ) => void;
 }
 
-export const VerticalMoreContextMenu: FC<VerticalMoreContextMenu> = ({
+export const VerticalMoreContextMenu: FC<VerticalContextMenu> = ({
   menuItems,
   title,
   onChange,
@@ -391,7 +350,6 @@ export const VerticalMoreContextMenu: FC<VerticalMoreContextMenu> = ({
 
   const openDropdown = () => {
     if (!isOpenContextMenu) {
-      console.log('click dr', menuItems?.length ? menuItems.length : 'f');
       setIsOpenContextMenu(() => true);
     }
   };
@@ -401,8 +359,8 @@ export const VerticalMoreContextMenu: FC<VerticalMoreContextMenu> = ({
       <div
         onClick={openDropdown}
         className="vertical__title"
-        ref={ref}
         role="button"
+        ref={ref}
         tabIndex={0}
         aria-hidden="true"
       >
@@ -410,19 +368,9 @@ export const VerticalMoreContextMenu: FC<VerticalMoreContextMenu> = ({
         <SvgMoreVertical />
       </div>
       {isOpenContextMenu && menuItems.length > 0 && (
-        // <CustomContextMenu
-        //   ref={ref}
-        //   menuItems={menuItems}
-        //   onClick={() => {}} // оставить
-        //   onChange={onChange}
-        //   position={getPosition()}
-        //   setIsOpenContextMenu={setIsOpenContextMenu}
-        // />
-
-        <SensitiveAnalysisDropdown
+        <ContextMenuDropdown
           ref={ref}
           menuItems={menuItems}
-          onClick={() => {}} // оставить
           onChange={onChange}
           position={getPosition()}
           setIsOpenContextMenu={setIsOpenContextMenu}
