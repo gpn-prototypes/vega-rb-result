@@ -12,7 +12,7 @@ import {
 import { MathHelper } from '@app/utils/MathHelper';
 import { Table } from '@consta/uikit/Table';
 
-interface P {
+interface Props {
   statistic: SensitiveAnalysisStatistic;
 }
 
@@ -53,7 +53,9 @@ const getMappedRow = (
   return row;
 };
 
-export const SensitiveAnalysisStatisticComponent: FC<P> = ({ statistic }) => {
+export const SensitiveAnalysisStatisticComponent: FC<Props> = ({
+  statistic,
+}) => {
   const columns: any[] = statistic.headers?.map(
     (header: SensitiveAnalysisStatisticHeaders) => {
       if (header?.children && header?.children?.length > 0) {

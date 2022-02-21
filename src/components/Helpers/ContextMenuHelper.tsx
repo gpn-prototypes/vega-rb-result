@@ -10,48 +10,11 @@ import { ChoiceGroup } from '@consta/uikit/ChoiceGroup';
 import { Popover, Position } from '@consta/uikit/Popover';
 import { Switch } from '@consta/uikit/Switch';
 import { TextField } from '@consta/uikit/TextField';
+import cn from 'classnames';
+
+import { SensitiveAnalysisDropdownMenu } from '../SensitiveAnalysis/SensitiveAnalysisDropdownMenu';
 
 import './ContextMenuHelper.css';
-
-interface SensitiveAnalysisDropdownMenuProps {
-  menuItem: Omit<MenuContextItemAnalysis, 'title'>;
-  onChange: (
-    menuItem: Omit<MenuContextItemSwitchAnalysis, 'id'>,
-    id: number,
-  ) => void;
-}
-
-export const SensitiveAnalysisDropdownMenu: FC<SensitiveAnalysisDropdownMenuProps> =
-  ({ menuItem, onChange }) => {
-    const onChangeCallback = (): void =>
-      onChange(
-        menuItem as Omit<MenuContextItemSwitchAnalysis, 'id'>,
-        menuItem.id,
-      );
-
-    return (
-      <>
-        <div
-          className={`menu__title ${menuItem.border ? 'menu__border' : ''}`}
-          role="button"
-          tabIndex={0}
-        >
-          <div className="menu__left">
-            <div>{menuItem.name}</div>
-          </div>
-          <div>
-            <Switch
-              size="m"
-              checked={menuItem.switch}
-              onChange={onChangeCallback}
-              key="Switch"
-              className="menu__switch-element"
-            />
-          </div>
-        </div>
-      </>
-    );
-  };
 
 interface ContextMenuBaseItemProps {
   menuItem: Omit<MenuContextItemAnalysis, 'title'>;
@@ -74,16 +37,21 @@ export const ContextMenuBaseItem: FC<ContextMenuBaseItemProps> = ({
 }) => {
   return (
     <div
-      className={`menu__title ${menuItem.border ? 'menu__border' : ''} ${
-        getDisabled && getDisabled(menuItem) ? 'menu__disabled' : ''
-      } ${column ? 'menu__column' : ''}`}
+      className={cn(
+        'menu__title',
+        menuItem.border ? 'menu__border' : '',
+        getDisabled && getDisabled(menuItem) ? 'menu__disabled' : '',
+        column ? 'menu__column' : '',
+      )}
       onClick={() => {}}
       onKeyUp={() => {}}
       role="button"
       tabIndex={0}
     >
-      <div className="menu__left">
-        {menuItem.icon && <div className="menu__icon">{menuItem.icon()}</div>}
+      <div className={cn('menu__left')}>
+        {menuItem.icon && (
+          <div className={cn('menu__icon')}>{menuItem.icon()}</div>
+        )}
 
         <div>{menuItem.name}</div>
       </div>
@@ -145,7 +113,7 @@ export const ItemWithChoice: React.FC<{
       <ChoiceGroup
         value={String(menuItem.choice?.value)}
         items={stringifyValues || []}
-        className="menu__choice"
+        className={cn('menu__choice')}
         name={`choice_${menuItem.code}`}
         size="xs"
         width="default"
@@ -154,7 +122,7 @@ export const ItemWithChoice: React.FC<{
         onChange={({ value }) => handleChange(value)}
       />
 
-      <div className="menu__choice-edit">
+      <div className={cn('menu__choice-edit')}>
         {!isOpenEdit && (
           <Button
             label="Указать вручную"
@@ -178,7 +146,7 @@ export const ItemWithChoice: React.FC<{
               size="s"
               onClick={() => handleInputSave()}
               disabled={inputValue <= 10 || inputValue >= 10000}
-              className="menu__button"
+              className={cn('menu__button')}
             />
           </div>
         )}
@@ -192,10 +160,7 @@ interface ContextMenuDropdownProps {
   menuItems: MenuContextItemAnalysis[][] | MenuContextItem[];
   setIsOpenContextMenu: (isOpen: boolean) => void;
   position: Position;
-  onChange: (
-    item: Omit<MenuContextItemSwitchAnalysis, 'id'>,
-    id: number,
-  ) => void;
+  onChange: (item: MenuContextItemSwitchAnalysis) => void;
 }
 
 export const ContextMenuDropdown: FC<ContextMenuDropdownProps> = ({
@@ -211,14 +176,18 @@ export const ContextMenuDropdown: FC<ContextMenuDropdownProps> = ({
         anchorRef={ref}
         onClickOutside={() => setIsOpenContextMenu(false)}
         direction="downStartLeft"
-        className="menusWrapper"
+        className={cn('menusWrapper')}
         position={position}
-        equalAnchorWidth={false}
       >
         {menuItems.map((i) => {
           return (
-            <div className="menu">
-              <div className="menu__title menu__borderTitle">{i[0].title}</div>
+            <div
+              className={cn('menu')}
+              key={i[0].id ? i[0].id : Math.random() * 800 - 1}
+            >
+              <div className={cn('menu__title menu__borderTitle')}>
+                {i[0].title}
+              </div>
               {Object.values(i[0])
                 .filter((k: any) => typeof k !== 'string')
                 .map((j: any) => (
@@ -278,7 +247,7 @@ export const CustomContextMenu: FC<ContextMenuProps> = ({
         checked={menuItem.switch}
         onChange={() => onChange && onChange(menuItem)}
         key="Switch"
-        className="menu__switch-element"
+        className={cn('menu__switch-element')}
       />
     </ContextMenuBaseItem>
   );
@@ -316,7 +285,7 @@ export const CustomContextMenu: FC<ContextMenuProps> = ({
       anchorRef={ref}
       onClickOutside={() => setIsOpenContextMenu(false)}
       direction="downStartLeft"
-      className="menu"
+      className={cn('menu')}
       position={position}
     >
       {items}
@@ -327,10 +296,7 @@ export const CustomContextMenu: FC<ContextMenuProps> = ({
 interface VerticalContextMenu {
   title: string;
   menuItems: MenuContextItemAnalysis[][] | MenuContextItem[];
-  onChange: (
-    item: Omit<MenuContextItemSwitchAnalysis, 'id'>,
-    id: number,
-  ) => void;
+  onChange: (item: MenuContextItemSwitchAnalysis) => void;
 }
 
 export const VerticalMoreContextMenu: FC<VerticalContextMenu> = ({
@@ -358,7 +324,7 @@ export const VerticalMoreContextMenu: FC<VerticalContextMenu> = ({
     <div className="vertical">
       <div
         onClick={openDropdown}
-        className="vertical__title"
+        className={cn('vertical__title')}
         role="button"
         ref={ref}
         tabIndex={0}

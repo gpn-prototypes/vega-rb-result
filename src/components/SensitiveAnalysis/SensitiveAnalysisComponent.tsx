@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
+import React, { FC, useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { EFluidType } from '@app/constants/Enums';
 import {
@@ -23,6 +23,7 @@ import { ChoiceGroup } from '@consta/uikit/ChoiceGroup';
 import { Loader } from '@consta/uikit/Loader';
 import { Sidebar } from '@consta/uikit/Sidebar';
 import { useMount } from '@gpn-prototypes/vega-ui';
+import cn from 'classnames';
 
 import { VerticalMoreContextMenu } from '../Helpers/ContextMenuHelper';
 
@@ -163,15 +164,12 @@ export const SensitiveAnalysisComponent: FC<P> = ({ sidebarRow }) => {
   };
 
   const getAvailableNames = (index: number): string[] => {
-    let result: string[] = [];
+    const result: string[] = [];
 
     if (index === 0) {
       const names = Object.values(menuItems[index][0])
         .filter((i) => typeof i !== 'string')
         .filter((j) => j.switch);
-
-      // eslint-disable-next-line no-unused-expressions
-      result.length ? (result = []) : result;
 
       names.forEach((i: any) => result.push(i.name));
 
@@ -186,17 +184,11 @@ export const SensitiveAnalysisComponent: FC<P> = ({ sidebarRow }) => {
         .filter((i) => typeof i !== 'string')
         .filter((j) => j.switch);
 
-      // eslint-disable-next-line no-unused-expressions
-      result.length ? (result = []) : result;
-
       names.forEach((i) => result.push(i.name));
 
       menuItems
         .filter((item: MenuContextItemAnalysis[]) => item[1].code !== 'stat')
         .filter((item: MenuContextItemAnalysis[]) => item[1].switch);
-
-      // eslint-disable-next-line no-unused-expressions
-      result.length ? (result = []) : result;
 
       names.forEach((i) => result.push(i.name));
     }
@@ -207,7 +199,7 @@ export const SensitiveAnalysisComponent: FC<P> = ({ sidebarRow }) => {
   const chart = sensitiveAnalysisData?.length
     ? sensitiveAnalysisData.map((i, index) => {
         return activeTab === i.title ? (
-          <div>
+          <div key={i.title}>
             <SensitiveAnalysisChartComponent
               percentiles={i.percentiles}
               resultMinMax={i.resultMinMax}
@@ -221,9 +213,9 @@ export const SensitiveAnalysisComponent: FC<P> = ({ sidebarRow }) => {
     : null;
 
   const statistic = (
-    <div className="sensitive-analysis">
+    <div className={cn('sensitive-analysis')}>
       <div>
-        <div className="sensitive-analysis__title">Статистика</div>
+        <div className={cn('sensitive-analysis__title')}>Статистика</div>
         {isLoadingStatistic || !sensitiveAnalysisStatisticData ? (
           <Loader />
         ) : (
@@ -240,13 +232,13 @@ export const SensitiveAnalysisComponent: FC<P> = ({ sidebarRow }) => {
   );
 
   return (
-    <div className="sensitive-analysis">
+    <div className={cn('sensitive-analysis')}>
       <Sidebar.Content>
-        <div className="sensitive-analysis__title">
+        <div className={cn('sensitive-analysis__title')}>
           <VerticalMoreContextMenu
             menuItems={menuItems}
             title="Анализ чувствительности"
-            onChange={(item, id) => handleChange({ ...item, id })}
+            onChange={handleChange}
           />
           <Button
             view="ghost"
@@ -258,14 +250,14 @@ export const SensitiveAnalysisComponent: FC<P> = ({ sidebarRow }) => {
           />
         </div>
 
-        <div className="sensitive-analysis__content">
+        <div className={cn('sensitive-analysis__content')}>
           {menuItems.length > 1 ? (
             <div className="tabsWrapper">
               <ChoiceGroup
                 value={activeTab}
                 items={availableTabs}
                 name="SensitiveAnaLysisChoiceGroup"
-                className="SensitiveAnaLysisChoiceGroup"
+                className={cn('SensitiveAnaLysisChoiceGroup')}
                 size="s"
                 view="ghost"
                 width="full"
@@ -279,7 +271,7 @@ export const SensitiveAnalysisComponent: FC<P> = ({ sidebarRow }) => {
           <>
             {/* График */}
             {isLoading ? (
-              <Loader className="sensitive-analysis__loader" />
+              <Loader className={cn('sensitive-analysis__loader')} />
             ) : (
               chart
             )}

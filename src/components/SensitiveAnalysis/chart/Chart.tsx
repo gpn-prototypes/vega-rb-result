@@ -30,11 +30,11 @@ export const SensitiveAnalysisChartComponent: FC<
   );
 
   useEffect(() => {
-    // /**
-    //  * Пока что нет сортировки на backend, приходится вручную сортировать все
-    //  * Сортируем путям вычитания максимального значения из минимального
-    //  * И полученный результат сортируем с сохранением индекса у изначальных данных
-    //  */
+    /**
+     * Пока что нет сортировки на backend, приходится вручную сортировать все
+     * Сортируем путям вычитания максимального значения из минимального
+     * И полученный результат сортируем с сохранением индекса у изначальных данных
+     */
     const resultSorted: Sorted[] = resultMinMax.map(
       (result: number[], index: number) => ({
         range: result[1] - result[0],
@@ -91,14 +91,6 @@ export const SensitiveAnalysisChartComponent: FC<
     );
 
     cloneResultMinMax.forEach((result: number[], index) => {
-      // const getIndexByResult = (innerResult: number[]) => {
-      //   const equals = (a, b) =>
-      //     a.length === b.length && a.every((v, i) => v === b[i]);
-      //
-      //   return resultMinMax.findIndex((res: number[]) =>
-      //     equals(res, innerResult),
-      //   );
-      // };
       result.forEach((currentResult: number, innerIndex: number) => {
         data.push({
           name: names[index],
