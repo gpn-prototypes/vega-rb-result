@@ -45,7 +45,12 @@ export const CALCULATION_PROJECT = gql`
 `;
 
 export const GENERATE_CALCULATION_RESULT_ARCHIVE = gql`
-  mutation generateCalculationResultArchive($version: Int!) {
+  mutation generateCalculationResultArchive(
+    $version: Int!
+    $plots: Boolean
+    $samples: Boolean
+    $statistics: Boolean
+  ) {
     project(version: $version) {
       ... on UpdateProjectInnerDiff {
         ...ResourceBaseDiffFragment
@@ -59,7 +64,11 @@ export const GENERATE_CALCULATION_RESULT_ARCHIVE = gql`
       }
       ... on ProjectMutation {
         resourceBase {
-          generateCalculationResultArchive {
+          generateCalculationResultArchive(
+            samples: $samples
+            statistics: $statistics
+            plots: $plots
+          ) {
             ... on ProcessId {
               processId
               __typename

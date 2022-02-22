@@ -1,14 +1,8 @@
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { DownloadResultModal } from '@app/components/DownloadResultModal/DownloadResultModal';
 import { HistogramComponent } from '@app/components/Histograms/HistogramComponent';
 import NotifyComponent from '@app/components/Notify/Notify';
-import { ProjectContext } from '@app/components/Providers';
 import { SensitiveAnalysisComponent } from '@app/components/SensitiveAnalysis/SensitiveAnalysisComponent';
 import { TableErrorAlert } from '@app/components/TableErrorAlert';
 import Table from '@app/components/TableResultRbController';
@@ -30,7 +24,6 @@ import { TableActions } from '@app/store/table/tableActions';
 import treeDuck from '@app/store/treeDuck';
 import { RootState } from '@app/store/types';
 import { GridActiveRow, GridCollection } from '@app/types/typesTable';
-import { createWebsocket } from '@app/utils/websocketHelper';
 import { Checkbox } from '@consta/uikit/Checkbox';
 import { ChoiceGroup } from '@consta/uikit/ChoiceGroup';
 import { IconCollapse } from '@consta/uikit/IconCollapse';
@@ -55,8 +48,6 @@ const RbResultPage: React.FC = () => {
     dispatch(treeDuck.actions.resetState());
   }, [dispatch]);
 
-  const { vid: projectId } = useContext(ProjectContext).project;
-
   const setFluidType = useCallback(
     (type: EFluidType) => dispatch(TableActions.setFluidType(type)),
     [dispatch],
@@ -71,9 +62,11 @@ const RbResultPage: React.FC = () => {
       dispatch(competitiveAccessDuck.actions.setRecentlyEdited(recentlyEdited)),
     [dispatch],
   );
+
   const treeEditorRef = useRef<HTMLDivElement>(null);
   const settingsRef = useRef<HTMLDivElement>(null);
   const [isShownTree, setIsShownTree] = useState(true);
+  const [openedModal, setOpenedModal] = useState<boolean>(false);
 
   const data: GridCollection = useSelector(({ table }: RootState) => table);
   const sidebarRow: GridActiveRow | undefined = useSelector(
@@ -127,21 +120,6 @@ const RbResultPage: React.FC = () => {
       })
       .catch(() => setRecentlyEdited(false));
   });
-
-  const downloadResult = async (): Promise<void> => {
-    try {
-      const id =
-        await projectService.generateCalculationResultArchiveProcessId();
-
-      createWebsocket({
-        id,
-        projectId,
-        dispatch,
-      });
-    } catch (e) {
-      console.warn(e);
-    }
-  };
 
   if (isNotFound) {
     return (
@@ -217,7 +195,7 @@ const RbResultPage: React.FC = () => {
 
                         <span ref={settingsRef} className="result__icon">
                           <IconDownload
-                            onClick={() => downloadResult()}
+                            onClick={() => setOpenedModal(true)}
                             size="m"
                           />
                         </span>
@@ -280,6 +258,10 @@ const RbResultPage: React.FC = () => {
               </div>
             </SplitPanes.Pane>
           </SplitPanes>
+
+          {openedModal && (
+            <DownloadResultModal handleClose={() => setOpenedModal(false)} />
+          )}
 
           <NotifyComponent />
           <TableErrorAlert />

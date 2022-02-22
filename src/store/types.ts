@@ -4,6 +4,8 @@ import { GridCollection } from '@app/types/typesTable';
 import { History } from 'history';
 import { AnyAction, Dispatch } from 'redux';
 
+import { FileStore } from './file/fileActions';
+import { LoaderStore } from './loader/loaderActions';
 import { NotifyStore } from './notify/notifyActions';
 import { SettingStore } from './settings/settingsActions';
 import { WebsocketStore } from './websocket/websocketActions';
@@ -58,6 +60,8 @@ export interface RootState {
   notify: NotifyStore;
   websocket: WebsocketStore;
   general: GeneralStore;
+  loader: LoaderStore;
+  file: FileStore;
 }
 
 export type TypedColumnsList = {

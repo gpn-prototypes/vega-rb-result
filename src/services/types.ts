@@ -28,6 +28,8 @@ export interface IProjectService {
 
   version: number;
 
+  projectId: string;
+
   init(initialProps: ProjectServiceProps): IProjectService;
 
   getStructure(): Promise<ProjectStructure>;
@@ -37,4 +39,10 @@ export interface IProjectService {
   getProjectName(): Promise<string>;
 
   getResourceBaseData(): Promise<ResultProjectStructure>;
+
+  generateCalculationResultArchiveProcessId(
+    statistics: boolean,
+    samples: boolean,
+    plots: boolean,
+  ): Promise<string>;
 }

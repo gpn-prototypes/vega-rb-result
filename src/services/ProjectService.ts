@@ -347,7 +347,11 @@ class ProjectService implements IProjectService {
     }
   }
 
-  async generateCalculationResultArchiveProcessId(): Promise<string> {
+  async generateCalculationResultArchiveProcessId(
+    statistics: boolean,
+    samples: boolean,
+    plots: boolean,
+  ): Promise<string> {
     const { data: responseData } = await this.client
       .watchQuery<Query>({
         query: GENERATE_CALCULATION_RESULT_ARCHIVE,
@@ -356,6 +360,9 @@ class ProjectService implements IProjectService {
         },
         variables: {
           version: this.version,
+          statistics,
+          samples,
+          plots,
         },
         fetchPolicy: 'no-cache',
       })
