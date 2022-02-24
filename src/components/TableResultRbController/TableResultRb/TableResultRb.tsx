@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { CustomContextMenu } from '@app/components/Helpers/ContextMenuHelper';
 import { EFluidType, EFluidTypeCode, EGeoCategory } from '@app/constants/Enums';
-import { RbDomainEntityInput } from '@app/generated/graphql';
 import { MenuContextItem } from '@app/interfaces/ContextMenuInterface';
 import {
   TableActions,
@@ -26,8 +25,8 @@ import './TableResultRb.css';
 
 interface Props {
   rows: RowEntity[];
-  columns: Column<RbDomainEntityInput>[];
-  actualColumns: Column<RbDomainEntityInput>[];
+  columns: Column[];
+  actualColumns: Column[];
   filter: TreeFilter;
 }
 
@@ -77,7 +76,7 @@ const menuItems = (): MenuContextItem[] => [
 
 /** Проверка, есть ли в отфильтрованных строках данные с учетом фильтрации колонок */
 const isHasAnyValuesInFilteredRows = (
-  columns: Column<RbDomainEntityInput>[],
+  columns: Column[],
   rows: RowEntity[],
 ): boolean => {
   return (
@@ -88,12 +87,12 @@ const isHasAnyValuesInFilteredRows = (
      */
     columns
       .filter(
-        (column: Column<RbDomainEntityInput>) =>
+        (column: Column) =>
           !column.hidden &&
           column.geoType !== '' &&
           column.geoType !== undefined,
       )
-      .find((column: Column<RbDomainEntityInput>) => {
+      .find((column: Column) => {
         let isHasAnyValue = false;
 
         rows.forEach((row: RowEntity) => {
@@ -137,8 +136,7 @@ export const TableResultRb: React.FC<Props> = ({
 
   const rowRef = useRef(null);
   const [filteredRows, setFilteredRows] = useState<RowEntity[]>(rows);
-  const [filteredColumns, setFilteredColumns] =
-    useState<Column<RbDomainEntityInput>[]>(columns);
+  const [filteredColumns, setFilteredColumns] = useState<Column[]>(columns);
   const [visible, setContextMenu] = useState<boolean>(false);
   const [currentColumnCode, setCurrentColumnCode] = useState<string>('');
   const [position, setPosition] = useState<Position>({ x: 0, y: 0 });
@@ -175,8 +173,7 @@ export const TableResultRb: React.FC<Props> = ({
 
     if (filter?.columnKeys?.length > 0 && filter?.rowsIdx?.length > 0) {
       filteredColumnsData = filteredColumnsData.filter(
-        (column: Column<RbDomainEntityInput>) =>
-          !filter.columnKeys.includes(column.accessor),
+        (column: Column) => !filter.columnKeys.includes(column.accessor),
       );
 
       filteredRowsData = filteredRowsData.filter(
@@ -187,28 +184,26 @@ export const TableResultRb: React.FC<Props> = ({
     }
 
     /** Фильтрация колонок по типу флюида */
-    filteredColumnsData = filteredColumnsData.map(
-      (column: Column<RbDomainEntityInput>) => {
-        if (
-          fluidType === EFluidType.ALL ||
-          fluidType === EFluidType.OIL_N_GAS ||
-          fluidType === undefined ||
-          !column?.geoType ||
-          (column?.geoType === EFluidTypeCode[EFluidType.OIL_N_GAS] &&
-            column.accessor !== 'GAS_VOLUME_TO_ENTIRE_RESERVOIR')
-        ) {
-          return column;
-        }
+    filteredColumnsData = filteredColumnsData.map((column: Column) => {
+      if (
+        fluidType === EFluidType.ALL ||
+        fluidType === EFluidType.OIL_N_GAS ||
+        fluidType === undefined ||
+        !column?.geoType ||
+        (column?.geoType === EFluidTypeCode[EFluidType.OIL_N_GAS] &&
+          column.accessor !== 'GAS_VOLUME_TO_ENTIRE_RESERVOIR')
+      ) {
+        return column;
+      }
 
-        const cloneColumn = { ...column };
+      const cloneColumn = { ...column };
 
-        if (EFluidTypeCode[fluidType] !== column?.geoType) {
-          cloneColumn.hidden = true;
-        }
+      if (EFluidTypeCode[fluidType] !== column?.geoType) {
+        cloneColumn.hidden = true;
+      }
 
-        return cloneColumn;
-      },
-    );
+      return cloneColumn;
+    });
 
     /** Фильтрация строк по типу флюида */
     filteredRowsData = filteredRowsData.filter((row: RowEntity) => {
@@ -225,9 +220,8 @@ export const TableResultRb: React.FC<Props> = ({
     });
 
     if (
-      filteredColumnsData.find((column: Column<RbDomainEntityInput>) =>
-        Boolean(column.geoType),
-      ) === undefined ||
+      filteredColumnsData.find((column: Column) => Boolean(column.geoType)) ===
+        undefined ||
       isHasAnyValuesInFilteredRows(filteredColumnsData, filteredRowsData) ===
         false
     ) {
@@ -238,6 +232,7 @@ export const TableResultRb: React.FC<Props> = ({
     setFilteredColumns(filteredColumnsData);
 
     const { accessor } = filteredColumnsData[0];
+
     if (
       filteredColumnsData.length > 0 &&
       filteredRowsData.length > 0 &&
@@ -280,9 +275,7 @@ export const TableResultRb: React.FC<Props> = ({
       const rect = element.getBoundingClientRect();
 
       setCurrentColumnCode(
-        columns.find(
-          (column: Column<RbDomainEntityInput>) => column.title === text,
-        )?.accessor || '',
+        columns.find((column: Column) => column.title === text)?.accessor || '',
       );
 
       setPosition({
@@ -328,7 +321,6 @@ export const TableResultRb: React.FC<Props> = ({
   }, [onContextMenuClick, hiddenColumns]);
 
   const handleClickRow = ({
-    id,
     e,
   }: {
     id: string | undefined;

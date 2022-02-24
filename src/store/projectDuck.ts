@@ -43,7 +43,11 @@ const fetchParamsEpic: Epic<
   action$.pipe(
     ofAction(actions.fetchParams.started),
     mergeMap((action) =>
-      from(new Promise((resolve) => resolve(paramsResponse))).pipe(
+      from(
+        new Promise((resolve) => {
+          resolve(paramsResponse);
+        }),
+      ).pipe(
         mergeMap((response) => {
           const decodeResult = ParamArray.decode(response);
           const params = E.getOrElse(() => [] as Param[])(
@@ -58,6 +62,7 @@ const fetchParamsEpic: Epic<
               }),
             );
           }
+
           return throwError(PathReporter.report(decodeResult));
         }),
         catchError((e) =>

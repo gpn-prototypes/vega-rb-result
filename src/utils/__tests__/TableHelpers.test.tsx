@@ -127,9 +127,7 @@ describe('TableHelpers', () => {
   });
 
   test('getNodeListFromTableData', async () => {
-    const empty: TreeItem<TreeItemData>[] = getNodeListFromTableData<
-      TreeItem<TreeItemData>
-    >(
+    const empty: TreeItem<TreeItemData>[] = getNodeListFromTableData(
       {
         columns: [],
         rows: [],
@@ -139,9 +137,7 @@ describe('TableHelpers', () => {
 
     expect(empty.length).toEqual(1);
 
-    const result1: TreeItem<TreeItemData>[] = getNodeListFromTableData<
-      TreeItem<TreeItemData>
-    >(
+    const result1: TreeItem<TreeItemData>[] = getNodeListFromTableData(
       {
         columns: TableMock.columns,
         rows: [],
@@ -151,9 +147,7 @@ describe('TableHelpers', () => {
 
     expect(result1.length).toEqual(1);
 
-    const result2: TreeItem<TreeItemData>[] = getNodeListFromTableData<
-      TreeItem<TreeItemData>
-    >(
+    const result2: TreeItem<TreeItemData>[] = getNodeListFromTableData(
       {
         columns: TableMock.columns,
         rows: TableMock.rows,

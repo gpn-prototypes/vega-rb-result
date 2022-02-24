@@ -1,4 +1,4 @@
-import { Item } from '@consta/uikit/SnackBar';
+import { Item } from '@consta/uikit/__internal__/src/components/SnackBar/helper';
 import actionCreatorFactory from 'typescript-fsa';
 
 const factory = actionCreatorFactory('settings');

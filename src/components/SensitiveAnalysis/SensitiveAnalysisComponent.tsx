@@ -145,7 +145,9 @@ export const SensitiveAnalysisComponent: React.FC<Props> = ({ sidebarRow }) => {
   const statistic = (
     <div className="sensitive-analysis">
       <div>
-        <div className="sensitive-analysis__title">Статистика</div>
+        <div className="sensitive-analysis__title sensitive-analysis__title--statistic">
+          Статистика
+        </div>
 
         {isLoadingStatistic || !sensitiveAnalysisStatisticData ? (
           <Loader />

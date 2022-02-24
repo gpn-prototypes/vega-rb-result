@@ -1,7 +1,9 @@
 module.exports = {
   // eslint-disable-next-line global-require
   ...require('@gpn-prototypes/frontend-configs/stylelintrc'),
-  rules: {
-    'length-zero-no-unit': true,
+  ...{
+    rules: {
+      'selector-class-pattern': null,
+    },
   },
 };

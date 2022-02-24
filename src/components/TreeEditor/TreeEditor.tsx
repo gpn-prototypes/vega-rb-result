@@ -2,10 +2,10 @@ import React, { PropsWithChildren, useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import SvgResource from '@app/assets/icons/components/Resource';
 import { cnTreeEditor } from '@app/components/TreeEditor/cn-tree-editor';
-import { RbDomainEntityInput } from '@app/generated/graphql';
 import treeFilterDuck from '@app/store/treeDuck';
 import { RootState, TreeFilter } from '@app/store/types';
-import { Text, Tree, useMount } from '@gpn-prototypes/vega-ui';
+import { Text } from '@consta/uikit/Text';
+import { Tree, useMount } from '@gpn-prototypes/vega-ui';
 
 import {
   getNodeListFromTableData,
@@ -26,8 +26,8 @@ const icons = {
   'red-line': <SvgResource color="#00eeaa" />,
 };
 
-interface StructureTreeEditorProps<T = any> {
-  columns: Column<RbDomainEntityInput>[];
+interface StructureTreeEditorProps {
+  columns: Column[];
   rows: RowEntity[];
   isOpen: boolean;
 }
@@ -67,9 +67,11 @@ export default React.forwardRef<HTMLDivElement, StructureTreeEditorProps>(
     const onSelect = (selectedItems: TargetData[]) => {
       if (selectedItems.length) {
         const node = searchInTree(tree, selectedItems[0].id);
+
         if (node && node.data) {
           const { columnIdx } = node.data.position[0];
           const rowsIds = node.data.position.map(({ rowIdx }) => rowIdx);
+
           setFilter({
             columnKeys:
               columns

@@ -23,6 +23,7 @@ export function resolveDomainObjects(
   const localBeforeUpdate = diffPatcher.unpatch(cloneDeep(local), diff);
 
   let updatedState = cloneDeep(remote);
+
   Object.entries(diff).forEach((diffValue) => {
     const key = diffValue[0];
 
@@ -60,6 +61,7 @@ export function resolveDomainObjects(
 
           if (!diffValue[1]?.domainObjectPath) {
             updatedDomainObjectPath.push(remoteObjectPath || objectPath);
+
             return;
           }
 
@@ -130,6 +132,7 @@ export function resolveDomainObjects(
           if (isMovingItem) {
             const movingFromIdx = pathIdxBeforeUpdate;
             const movingToIdx = movingPath[1];
+
             updatedDomainObjectPath = [
               ...updatedDomainObjectPath.slice(0, movingFromIdx),
               ...updatedDomainObjectPath.slice(movingFromIdx + 1),
@@ -143,7 +146,7 @@ export function resolveDomainObjects(
         });
 
         // resolve changing columns in AttributeValues
-        remote[0].attributeValues.forEach((remoteAttr, index) => {
+        remote[0].attributeValues.forEach((remoteAttr) => {
           const attrIdx = localItem.attributeValues.findIndex(
             (attr) => attr.code === remoteAttr.code,
           );
@@ -156,6 +159,7 @@ export function resolveDomainObjects(
 
           if (!diffValue[1]?.attributeValues) {
             updatedAttributeValues.push(remoteAttributeValue || attributeValue);
+
             return;
           }
 
@@ -226,6 +230,7 @@ export function resolveDomainObjects(
           if (isMovingItem) {
             const movingFromIdx = attrIdxBeforeUpdate;
             const movingToIdx = movingAttr[1];
+
             updatedAttributeValues = [
               ...updatedAttributeValues.slice(0, movingFromIdx),
               ...updatedAttributeValues.slice(movingFromIdx + 1),
@@ -252,6 +257,7 @@ export function resolveDomainObjects(
 
           if (!diffValue[1]?.risksValues) {
             updatedRiskValues.push(remoteRiskValue || riskValue);
+
             return;
           }
 
@@ -318,6 +324,7 @@ export function resolveDomainObjects(
           if (isMovingItem) {
             const movingFromIdx = riskIdxBeforeUpdate;
             const movingToIdx = movingRisk[1];
+
             updatedRiskValues = [
               ...updatedRiskValues.slice(0, movingFromIdx),
               ...updatedRiskValues.slice(movingFromIdx + 1),
@@ -387,5 +394,6 @@ export function resolveDomainObjects(
       }
     }
   });
+
   return updatedState;
 }

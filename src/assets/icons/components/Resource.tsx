@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-function SvgResource(props: React.SVGProps<SVGSVGElement>) {
+const SvgResource = (props: React.SVGProps<SVGSVGElement>) => {
   return (
     <svg
       width={12}
@@ -25,6 +25,6 @@ function SvgResource(props: React.SVGProps<SVGSVGElement>) {
       />
     </svg>
   );
-}
+};
 
 export default SvgResource;

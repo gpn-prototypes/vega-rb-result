@@ -50,12 +50,16 @@ const reducer = reducerWithInitialState<AlertState>(initialState)
   }))
   .case(actions.hideLoader, (state) => ({ ...state, loaderText: '' }));
 
-const showAlertEpic: Epic<AnyAction, AnyAction, RootState, StoreDependencies> =
-  (action$) =>
-    action$.pipe(
-      ofAction(actions.showSuccessMessage),
-      mergeMap(() => of(actions.hideSuccessMessage()).pipe(delay(2000))),
-    );
+const showAlertEpic: Epic<
+  AnyAction,
+  AnyAction,
+  RootState,
+  StoreDependencies
+> = (action$) =>
+  action$.pipe(
+    ofAction(actions.showSuccessMessage),
+    mergeMap(() => of(actions.hideSuccessMessage()).pipe(delay(2000))),
+  );
 
 export default {
   reducer,
