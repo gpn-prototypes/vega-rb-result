@@ -10,8 +10,9 @@
     cursor: pointer;
     user-select: none;
     color: var(--color-typo-primary);
+
     &--statistic {
-       cursor: initial;
+      cursor: initial;
     }
   }
 
