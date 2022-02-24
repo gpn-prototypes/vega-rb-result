@@ -7,8 +7,9 @@ import { loadHistogramData } from '@app/services/histogramService';
 import histogramDuck from '@app/store/histogramDuck';
 import { RootState } from '@app/store/types';
 import { GridActiveRow, GridCollection } from '@app/types/typesTable';
+import { Loader } from '@consta/uikit/Loader';
 import { Text } from '@consta/uikit/Text';
-import { Loader, useMount } from '@gpn-prototypes/vega-ui';
+import { useMount } from '@gpn-prototypes/vega-ui';
 
 import ChartComponent from './chart/Chart';
 import { HistogramStatisticsComponent } from './statistic/HistogramStatisticsComponent';
@@ -177,22 +178,21 @@ export const HistogramComponent: React.FC<Props> = ({ grid }) => {
     </div>
   );
 
-  const topContent =
-    histogramsPayload?.length > 0 ? (
+  const topContent = histogramsPayload?.length ? (
+    <div>
       <div>
-        <div>
-          <VerticalMoreContextMenu
-            menuItems={() => (() => menuItems)()}
-            title="Гистограмма запасов"
-            onChange={handleChange}
-            onClick={handleClick}
-          />
-        </div>
-        {histograms}
+        <VerticalMoreContextMenu
+          menuItems={() => (() => menuItems)()}
+          title="Гистограмма запасов"
+          onChange={handleChange}
+          onClick={handleClick}
+        />
       </div>
-    ) : (
-      <Text>Данные не найдены</Text>
-    );
+      {histograms}
+    </div>
+  ) : (
+    <Text>Данные не найдены</Text>
+  );
 
   const statistic = isShowStatistic && (
     <HistogramStatisticsComponent

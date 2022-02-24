@@ -13,7 +13,7 @@ export class ErrorBoundary<T> extends React.Component<T, ErrorBoundaryProps> {
   }
 
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-  static getDerivedStateFromError(error: Error) {
+  static getDerivedStateFromError() {
     return { hasError: true };
   }
 

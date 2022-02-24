@@ -27,7 +27,12 @@ export namespace DrawHelper {
     domain: number[] | { valueOf(): number }[],
     position: number[],
   ): d3.ScaleLinear<number, number> =>
-    d3.scaleLinear().domain(domain).nice().range(position);
+    // eslint-disable-next-line prettier/prettier
+    d3
+      .scaleLinear()
+      .domain(domain)
+      .nice()
+      .range(position);
 
   /** Домен */
   export const getDomain = (

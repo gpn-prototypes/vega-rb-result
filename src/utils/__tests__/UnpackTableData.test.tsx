@@ -5,7 +5,6 @@ import {
   Column,
   RowEntity,
 } from '../../components/TableResultRbController/TableResultRb/types';
-import { RbDomainEntityInput } from '../../generated/graphql';
 import {
   getNameWithParents,
   prepareColumns,
@@ -13,7 +12,7 @@ import {
   unpackTableData,
 } from '../unpackTableData';
 
-function isCorrectCompileColumns(columns: Column<RbDomainEntityInput>[]) {
+function isCorrectCompileColumns(columns: Column[]) {
   return (
     columns.find(
       (column) =>

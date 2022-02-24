@@ -1,6 +1,7 @@
 import React from 'react';
+import { Item } from '@consta/uikit/__internal__/src/components/SnackBar/helper';
 import { IconAlert } from '@consta/uikit/IconAlert';
-import { Item, SnackBar } from '@consta/uikit/SnackBar';
+import { SnackBar } from '@consta/uikit/SnackBar';
 
 import { cnAlert } from './cn-alert';
 

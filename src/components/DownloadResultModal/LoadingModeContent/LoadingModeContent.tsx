@@ -11,10 +11,8 @@ import './LoadingModeContent.css';
 export const cn = block('LoadingModeContent');
 
 export const LoadingModeContent: React.FC<ModalContentProps> = ({
-  handleCloseContent,
   setModalContent,
   isFileWithImg,
-  setFileWithImg,
 }) => {
   /** Handlers */
   const handleClose = (): void => {

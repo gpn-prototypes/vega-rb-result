@@ -28,6 +28,7 @@ const App: React.FC<Partial<ShellToolkit>> = (props) => {
     const init = async () => {
       try {
         const initProps = await getInitProps(props);
+
         projectService.init({
           client: initProps.graphqlClient,
           project: initProps.currentProject,

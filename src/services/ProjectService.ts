@@ -330,6 +330,7 @@ class ProjectService implements IProjectService {
         data.project.rbResult?.result?.resultTable?.template,
       );
       // TODO - refactor after work with data
+
       this.projectMod = isTemplateProject
         ? ({
             ...data.project,
@@ -354,6 +355,7 @@ class ProjectService implements IProjectService {
   ): Promise<CalculationResponse> {
     const DEFAULT_FILENAME = 'result.zip';
     // TODO: придумать общее решение для отмены запроса
+
     this.abortControllerMod = new AbortController();
     const { signal } = this.abortControllerMod;
 

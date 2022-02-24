@@ -22,7 +22,7 @@
 
     text {
       font-size: var(--size-text-xs);
-      color: rgba(246, 251, 253, 0.6);
+      color: rgb(246 251 253 / 60%);
       transform: translateY(10px);
     }
 
@@ -89,8 +89,8 @@
 }
 
 .grid line {
-  stroke: rgba(246, 251, 253, 0.28);
-  shape-rendering: crispEdges;
+  stroke: rgb(246 251 253 / 28%);
+  shape-rendering: crispedges;
   stroke-dasharray: 2px;
 }
 

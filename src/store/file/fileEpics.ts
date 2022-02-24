@@ -39,6 +39,7 @@ const fetchResultFileEpic: Epic<
             }),
             catchError((e) => {
               console.error('Error occured while cancelling request. ', e);
+
               return of(LoaderAction.setLoaded('file'));
             }),
           ),

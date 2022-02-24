@@ -53,11 +53,8 @@ export const getNameWithParents = (
 export const prepareColumns = ({
   domainEntities,
   attributes,
-}: ResultProjectStructure): Column<RbDomainEntityInput>[] => {
-  const getClass = (
-    row: RowEntity,
-    domainEntity: ResultDomainEntity | ResultAttribute,
-  ): string => {
+}: ResultProjectStructure): Column[] => {
+  const getClass = (row: RowEntity): string => {
     const baseClass = row.isAll ? '_all' : '';
 
     return baseClass;
@@ -75,8 +72,8 @@ export const prepareColumns = ({
     control,
     columnAccessorGroup,
     renderCell,
-  }: Column<RbDomainEntityInput>): Column<RbDomainEntityInput> => {
-    const column: Column<RbDomainEntityInput> = {
+  }: Column): Column => {
+    const column: Column = {
       title,
       accessor,
       align,
@@ -101,7 +98,7 @@ export const prepareColumns = ({
 
   const preparedEntities = domainEntities.map(
     (domainEntity: ResultDomainEntity, index: number) => {
-      const column: Column<RbDomainEntityInput> = getPreparedColumn({
+      const column: Column = getPreparedColumn({
         title: domainEntity.name,
         accessor: domainEntity.code as keyof RbDomainEntityInput,
         visible: domainEntity?.visible,
@@ -119,7 +116,7 @@ export const prepareColumns = ({
 
           return (
             <div
-              className={getClass(row, domainEntity)}
+              className={getClass(row)}
               data-code={codeWithParents}
               data-name={getNameWithParents(
                 index,
@@ -140,14 +137,13 @@ export const prepareColumns = ({
 
   /** Первая колонка аттрибутов */
   const firstMain = attributes.filter(
-    (innerAttribute: ResultAttribute, index: number) =>
+    (innerAttribute: ResultAttribute) =>
       innerAttribute.viewType === 'attribute',
   )[0];
 
   /** Первая колонка рисков */
   const firstRisk = attributes.filter(
-    (innerAttribute: ResultAttribute, index: number) =>
-      innerAttribute.viewType === 'risk',
+    (innerAttribute: ResultAttribute) => innerAttribute.viewType === 'risk',
   )[0];
 
   const isAttributeFirst = (attribute: ResultAttribute) =>
@@ -162,14 +158,17 @@ export const prepareColumns = ({
   /** Получение группы колонок, которые можно скрывать */
   const getColumnAccessorGroup = (attribute: ResultAttribute) => {
     if (isAttributeOrRiskFirst(attribute)) {
-      return attributes
-        .filter(
-          (innerAttribute: ResultAttribute, index: number) =>
-            innerAttribute.viewType ===
-            (isAttributeFirst(attribute) ? 'attribute' : 'risk'),
-        )
-        .filter((_, index: number) => index !== 0)
-        .map((innerAttribute: ResultAttribute) => innerAttribute.code as any);
+      return (
+        attributes
+          .filter(
+            (innerAttribute: ResultAttribute) =>
+              innerAttribute.viewType ===
+              (isAttributeFirst(attribute) ? 'attribute' : 'risk'),
+          )
+          .filter((_, index: number) => index !== 0)
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .map((innerAttribute: ResultAttribute) => innerAttribute.code as any)
+      );
     }
 
     return undefined;
@@ -178,7 +177,9 @@ export const prepareColumns = ({
   /** Первая колонка аттрибутов */
   const getColumnControl = (attribute: ResultAttribute) => {
     if (isAttributeOrRiskFirst(attribute)) {
-      return ({ column }) => <ColumnExpanderComponent column={column} />;
+      return function ({ column }) {
+        return <ColumnExpanderComponent column={column} />;
+      };
     }
 
     return undefined;
@@ -188,6 +189,7 @@ export const prepareColumns = ({
   const getDecimalValue = (attribute: ResultAttribute): number => {
     const decimalFromLocalStorage: DecimalFixed | null =
       LocalStorageHelper.getParsed<DecimalFixed>(LocalStorageKey.DecimalFixed);
+
     if (
       decimalFromLocalStorage &&
       decimalFromLocalStorage[attribute.code] !== undefined
@@ -200,53 +202,49 @@ export const prepareColumns = ({
       : DEFAULT_DECIMAL_FIXED;
   };
 
-  const preparedAttributes = attributes.map(
-    (attribute: ResultAttribute, index: number) => {
-      const column: Column<RbDomainEntityInput> = getPreparedColumn({
-        title: [attribute.shortName, attribute.units]
-          .filter(Boolean)
-          .join(', '),
-        accessor: attribute.code as keyof RbDomainEntityInput,
-        align: attribute.code === 'PERCENTILE' ? 'left' : 'right',
-        visible: attribute?.visible,
-        geoType: attribute?.geoType,
-        control: getColumnControl(attribute),
-        columnAccessorGroup: getColumnAccessorGroup(attribute),
-        decimal: getDecimalValue(attribute),
-        renderCell: (row: RowEntity) => {
-          /** Заполняем коды и названия с учетом родителей, нужно для отправки данных в отображение гистограм */
-          const codeWithParents = domainEntities
-            .map((entity: ResultDomainEntity) => entity.code)
-            .join(',');
-          const nameWithParents = domainEntities
-            .map((entity: ResultDomainEntity) => row[entity.code]?.value || '')
-            .join(',');
+  const preparedAttributes = attributes.map((attribute: ResultAttribute) => {
+    const column: Column = getPreparedColumn({
+      title: [attribute.shortName, attribute.units].filter(Boolean).join(', '),
+      accessor: attribute.code as keyof RbDomainEntityInput,
+      align: attribute.code === 'PERCENTILE' ? 'left' : 'right',
+      visible: attribute?.visible,
+      geoType: attribute?.geoType,
+      control: getColumnControl(attribute),
+      columnAccessorGroup: getColumnAccessorGroup(attribute),
+      decimal: getDecimalValue(attribute),
+      renderCell: (row: RowEntity) => {
+        /** Заполняем коды и названия с учетом родителей, нужно для отправки данных в отображение гистограм */
+        const codeWithParents = domainEntities
+          .map((entity: ResultDomainEntity) => entity.code)
+          .join(',');
+        const nameWithParents = domainEntities
+          .map((entity: ResultDomainEntity) => row[entity.code]?.value || '')
+          .join(',');
 
-          const value = row[attribute.code]?.formattedValue;
+        const value = row[attribute.code]?.formattedValue;
 
-          const formattedValue =
-            // eslint-disable-next-line no-restricted-globals
-            isNaN(Number(value)) || value === undefined
-              ? value
-              : getNumberWithSpaces(value);
+        const formattedValue =
+          // eslint-disable-next-line no-restricted-globals
+          isNaN(Number(value)) || value === undefined
+            ? value
+            : getNumberWithSpaces(value);
 
-          return (
-            <div
-              className={getClass(row, attribute)}
-              id={attribute.code}
-              data-code={codeWithParents}
-              data-name={nameWithParents}
-            >
-              {/* TODO: Сделать хелпер */}
-              {Number(formattedValue) === 0 ? '—' : formattedValue || '—'}
-            </div>
-          );
-        },
-      });
+        return (
+          <div
+            className={getClass(row)}
+            id={attribute.code}
+            data-code={codeWithParents}
+            data-name={nameWithParents}
+          >
+            {/* TODO: Сделать хелпер */}
+            {Number(formattedValue) === 0 ? '—' : formattedValue || '—'}
+          </div>
+        );
+      },
+    });
 
-      return column;
-    },
-  );
+    return column;
+  });
 
   return [...preparedEntities, ...preparedAttributes];
 };
@@ -267,7 +265,7 @@ export const prepareRows = ({
     let isAllEmitted = false;
 
     domainObject.attributeValues.forEach(
-      (attributeValue: ResultAttributeValue, attributeIndex: number) => {
+      (attributeValue: ResultAttributeValue) => {
         attributeValue.percentiles.forEach((percentile, percIndex) => {
           /** Проверяем, есть ли элемент, и если нет - создаем */
           if (!row[percIndex]) {
@@ -346,8 +344,7 @@ export function unpackTableData(
   version: number,
   setEntitiesCount: (count: number) => Action,
 ): GridCollection {
-  const columns: Column<RbDomainEntityInput>[] =
-    prepareColumns(projectStructure);
+  const columns: Column[] = prepareColumns(projectStructure);
   const rows: RowEntity[] = getDecimalRows(
     prepareRows(projectStructure),
     columns,

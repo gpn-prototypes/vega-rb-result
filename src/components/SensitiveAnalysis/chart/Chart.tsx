@@ -107,6 +107,7 @@ export const SensitiveAnalysisChartComponent: React.FC<
             equals(res, innerResult),
           );
         };
+
         result.forEach((currentResult: number, innerIndex: number) => {
           data.push({
             name: names[getIndexByResult(result)],
@@ -157,7 +158,7 @@ export const SensitiveAnalysisChartComponent: React.FC<
       .attr('class', 'chart__bar')
       .attr('x', (d) => xScale(d[0]))
       .attr('y', ({ data: [name] }: any) => yScale(name) || 0)
-      .attr('rx', (d) => 2)
+      .attr('rx', () => 2)
       .attr('width', (d) => xScale(d[1]) - xScale(d[0]))
       .attr('height', yScale.bandwidth())
       .append('title');

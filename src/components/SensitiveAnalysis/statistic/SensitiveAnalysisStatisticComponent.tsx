@@ -1,16 +1,12 @@
 import React from 'react';
 import {
-  Column,
-  RowEntity,
-} from '@app/components/TableResultRbController/TableResultRb/types';
-import {
   SensitiveAnalysisStatistic,
   SensitiveAnalysisStatisticCell,
   SensitiveAnalysisStatisticHeaders,
   SensitiveAnalysisStatisticRows,
 } from '@app/interfaces/SensitiveAnalysisInterface';
 import { MathHelper } from '@app/utils/MathHelper';
-import { Table } from '@consta/uikit/Table';
+import { Table, TableColumn, TableRow } from '@consta/uikit/Table';
 
 interface Props {
   statistic: SensitiveAnalysisStatistic;
@@ -19,12 +15,13 @@ interface Props {
 const getMappedColumn = (
   header: SensitiveAnalysisStatisticHeaders,
   isLeft = true,
-): Column<any> => {
-  const column: Column<any> = {
+): TableColumn<TableRow> => {
+  const column: TableColumn<TableRow> = {
     title: header.name,
-    accessor: header.code,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    accessor: header.code as any,
     align: isLeft ? 'left' : 'right',
-    renderCell: (row: RowEntity) => {
+    renderCell: (row: TableRow) => {
       if (Number(row[header.code]) === 0) {
         return '—';
       }
@@ -43,10 +40,8 @@ const getMappedColumn = (
   return column;
 };
 
-const getMappedRow = (
-  cells: SensitiveAnalysisStatisticCell[],
-): Record<string, string> => {
-  const row: Record<string, string> = {};
+const getMappedRow = (cells: SensitiveAnalysisStatisticCell[]): TableRow => {
+  const row: TableRow = {} as TableRow;
 
   cells.forEach((cell: SensitiveAnalysisStatisticCell) => {
     row[cell.code] = cell.value;
@@ -58,7 +53,7 @@ const getMappedRow = (
 export const SensitiveAnalysisStatisticComponent: React.FC<Props> = ({
   statistic,
 }) => {
-  const columns: any[] = statistic.headers.map(
+  const columns: TableColumn<TableRow>[] = statistic.headers.map(
     (header: SensitiveAnalysisStatisticHeaders) => {
       if (header?.children && header?.children?.length > 0) {
         return {
@@ -74,9 +69,9 @@ export const SensitiveAnalysisStatisticComponent: React.FC<Props> = ({
     },
   );
 
-  const rows: Record<string, string>[] = statistic.rows.map(
+  const rows: TableRow[] = statistic.rows.map(
     (row: SensitiveAnalysisStatisticRows) => getMappedRow(row.cells),
   );
 
-  return <Table columns={columns} rows={rows as any} zebraStriped="odd" />;
+  return <Table columns={columns} rows={rows} zebraStriped="odd" />;
 };

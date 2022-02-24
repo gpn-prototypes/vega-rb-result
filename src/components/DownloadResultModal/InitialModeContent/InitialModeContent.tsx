@@ -35,7 +35,6 @@ type DownloadData = {
 export const InitialModeContent: React.FC<ModalContentProps> = ({
   handleCloseContent,
   setModalContent,
-  isFileWithImg,
   setFileWithImg,
 }) => {
   /* Store */
@@ -93,6 +92,7 @@ export const InitialModeContent: React.FC<ModalContentProps> = ({
 
   const handleStartDownload = (): void => {
     const withImages: boolean = checkedState[DownloadTypeEnum.plots];
+
     downloadResult();
     setFileWithImg(withImages);
     setModalContent(ModalMode.loading);
