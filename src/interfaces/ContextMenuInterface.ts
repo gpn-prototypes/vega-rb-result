@@ -3,6 +3,12 @@ export interface MenuContextItemChoice {
   value: number;
 }
 
+export interface MenuContextGroup {
+  id: number;
+  title: string;
+  children: MenuContextItem[];
+}
+
 export interface MenuContextItem {
   name: string;
   code?: string;
@@ -10,22 +16,5 @@ export interface MenuContextItem {
   border?: boolean;
   choice?: MenuContextItemChoice;
   icon?: () => React.ReactNode;
-}
-
-export interface MenuContextItemAnalysis {
-  name?: string;
-  code?: string;
-  switch?: boolean;
-  border?: boolean;
-  choice?: MenuContextItemChoice;
-  icon?: () => React.ReactNode;
-  title?: string;
-  id: number;
-}
-
-export interface MenuContextItemSwitchAnalysis {
-  name: string;
-  code: string;
-  switch: boolean;
-  id: number;
+  id?: string;
 }

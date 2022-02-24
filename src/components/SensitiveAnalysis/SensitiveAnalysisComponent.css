@@ -1,8 +1,9 @@
-.sensitive-analysis {
+.SensitiveAnalysis {
   overflow: auto;
   width: 100%;
+  position: relative;
 
-  &__title {
+  &__Title {
     display: flex;
     justify-content: space-between;
     font-size: 18px;
@@ -13,7 +14,7 @@
     color: var(--color-typo-primary);
   }
 
-  &__content {
+  &__Content {
     margin-top: var(--space-m);
     display: grid;
     min-height: 246px;
@@ -22,11 +23,11 @@
     }
   }
 
-  &__loader {
+  &__Loader {
     margin-top: var(--space-4xl);
   }
 
-  &__actions {
+  &__Actions {
     padding: var(--space-m) 0;
     text-align: right;
   }

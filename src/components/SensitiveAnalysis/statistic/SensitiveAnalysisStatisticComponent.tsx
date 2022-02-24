@@ -56,7 +56,7 @@ const getMappedRow = (
 export const SensitiveAnalysisStatisticComponent: FC<Props> = ({
   statistic,
 }) => {
-  const columns: any[] = statistic.headers?.map(
+  const columns: any[] = statistic?.headers?.map(
     (header: SensitiveAnalysisStatisticHeaders) => {
       if (header?.children && header?.children?.length > 0) {
         return {

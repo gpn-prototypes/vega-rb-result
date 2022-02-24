@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { VerticalMoreContextMenu } from '@app/components/Helpers/ContextMenuHelper';
+import { VerticalMoreContextMenu } from '@app/components/Helpers/VerticalMoreContextMenu/VerticalMoreContextMenu';
 import { Histogram } from '@app/generated/graphql';
 import { MenuContextItem } from '@app/interfaces/ContextMenuInterface';
 import { loadHistogramData } from '@app/services/histogramService';
@@ -154,6 +154,10 @@ export const HistogramComponent: React.FC<Props> = ({ grid }) => {
     }
   };
 
+  const handleClick = (item: MenuContextItem) => {
+    console.info('DEV: handle click', item);
+  };
+
   const histograms = (
     <div className="histogram__content">
       {histogramsPayload?.map((histogram: Histogram, index: number) => {
@@ -180,6 +184,7 @@ export const HistogramComponent: React.FC<Props> = ({ grid }) => {
           menuItems={menuItems}
           title="Гистограмма запасов"
           onChange={handleChange}
+          onClick={handleClick}
         />
       </div>
       {histograms}

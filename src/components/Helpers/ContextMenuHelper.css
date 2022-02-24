@@ -1,100 +1,63 @@
-/* TODO: поправить на константы */
-.vertical {
-  display: flex;
-
-  &__title {
-    display: flex;
-    font-size: 18px;
-    font-weight: 400;
-    line-height: 21px;
-    cursor: pointer;
-    color: var(--color-typo-primary);
-  }
-
-  &__more {
-    margin-left: 28px;
-  }
-}
-
-.menusWrapper {
-  width: 235px !important;
-  padding: 16px 12px;
+.Menu {
+  display: grid;
+  padding: 18px var(--space-s);
+  grid-gap: var(--space-m);
   background-color: var(--color-bg-default);
   border: 1px solid var(--color-bg-border);
-  border-radius: 4px;
+  border-radius: var(--control-radius);
   box-shadow: 0 2px 2px rgba(0, 0, 0, 0.04), 0 4px 16px rgba(0, 32, 51, 0.18);
-}
 
-.menu {
-  display: grid;
-  grid-gap: var(--space-m);
-  &__title {
+  &__AnalysisTitle {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    padding-bottom: var(--space-2xs);
+    font-size: var(--size-text-2xs);
+    line-height: 120%;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: -8px;
+  }
+
+  &__Title {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 14px;
-    line-height: 17px;
+    font-size: var(--size-text-s);
+    line-height: 20px;
     cursor: pointer;
     color: var(--color-typo-primary);
   }
 
-  &__left {
+  &__Left {
     display: flex;
   }
 
-  &__disabled {
+  &__Disabled {
     pointer-events: none;
     color: var(--color-control-typo-disable);
   }
 
-  &__switch {
+  &__Switch {
     display: flex;
     justify-content: space-between;
     align-items: center;
   }
 
-  &__switch-element {
-    margin-left: var(--space-s);
-  }
-
-  &__column {
+  &__Column {
     flex-direction: column;
     align-items: initial;
   }
 
-  &__border {
+  &__Border {
     padding-top: 15px;
-    margin-top: 15px;
     border-top: 1px solid var(--color-bg-border);
   }
 
-  &__borderTitle {
-    padding-bottom: 4px;
-    border-bottom: 1px solid var(--color-bg-border);
-  }
-
-  &__choice {
-    margin-top: var(--space-m);
-  }
-
-  &__choice-edit {
-    margin-top: var(--space-m);
-
-    .TextField {
-      border: 0 !important;
-    }
-  }
-
-  &__button {
-    margin-top: var(--space-m);
-    margin-left: var(--space-m);
-  }
-
-  &__icon {
+  &__Icon {
     margin-right: var(--space-xs);
   }
   &:not(:first-child) {
-    & .menu__borderTitle {
+    & .Menu__BorderTitle {
       margin-top: 15px;
     }
   }
