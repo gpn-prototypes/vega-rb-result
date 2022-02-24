@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { DownloadResultModal } from '@app/components/DownloadResultModal/DownloadResultModal';
 import { HistogramComponent } from '@app/components/Histograms/HistogramComponent';
 import NotifyComponent from '@app/components/Notify/Notify';
 import { SensitiveAnalysisComponent } from '@app/components/SensitiveAnalysis/SensitiveAnalysisComponent';
@@ -12,7 +13,6 @@ import {
   IS_PROJECT_RECENTLY_EDITED_INTERVAL_IN_MS,
 } from '@app/constants/GeneralConstants';
 import projectService from '@app/services/ProjectService';
-import { loadArchive } from '@app/services/utilsService';
 import competitiveAccessDuck from '@app/store/competitiveAccessDuck';
 import { GeneralActions } from '@app/store/general/generalActions';
 import histogramDuck from '@app/store/histogramDuck';
@@ -24,7 +24,6 @@ import { TableActions } from '@app/store/table/tableActions';
 import treeDuck from '@app/store/treeDuck';
 import { RootState } from '@app/store/types';
 import { GridActiveRow, GridCollection } from '@app/types/typesTable';
-import { Item } from '@consta/uikit/__internal__/src/components/SnackBar/helper';
 import { Checkbox } from '@consta/uikit/Checkbox';
 import { ChoiceGroup } from '@consta/uikit/ChoiceGroup';
 import { IconCollapse } from '@consta/uikit/IconCollapse';
@@ -62,17 +61,11 @@ const RbResultPage: React.FC = () => {
       dispatch(competitiveAccessDuck.actions.setRecentlyEdited(recentlyEdited)),
     [dispatch],
   );
-  const appendItem = useCallback(
-    (item: Item) => dispatch(NotifyActions.appendItem(item)),
-    [dispatch],
-  );
-  const removeItem = useCallback(
-    (id: string) => dispatch(NotifyActions.removeItem(id)),
-    [dispatch],
-  );
+
   const treeEditorRef = useRef<HTMLDivElement>(null);
   const settingsRef = useRef<HTMLDivElement>(null);
   const [isShownTree, setIsShownTree] = useState(true);
+  const [openedModal, setOpenedModal] = useState<boolean>(false);
 
   const data: GridCollection = useSelector(({ table }: RootState) => table);
   const sidebarRow: GridActiveRow | undefined = useSelector(
@@ -126,25 +119,6 @@ const RbResultPage: React.FC = () => {
       })
       .catch(() => setRecentlyEdited(false));
   });
-
-  const downloadResult = async (): Promise<void> => {
-    try {
-      appendItem({
-        key: 'notify',
-        message: 'Идет генерация файла',
-        status: 'system',
-      });
-
-      /** Таймаут добавлен для того, что бы визуально не мелькала нотификация */
-      setTimeout(async () => {
-        await loadArchive();
-
-        removeItem('notify');
-      }, 1500);
-    } catch (e) {
-      console.warn(e);
-    }
-  };
 
   if (isNotFound) {
     return (
@@ -220,7 +194,7 @@ const RbResultPage: React.FC = () => {
 
                         <span ref={settingsRef} className="result__icon">
                           <IconDownload
-                            onClick={() => downloadResult()}
+                            onClick={() => setOpenedModal(true)}
                             size="m"
                           />
                         </span>
@@ -283,6 +257,10 @@ const RbResultPage: React.FC = () => {
               </div>
             </SplitPanes.Pane>
           </SplitPanes>
+
+          {openedModal && (
+            <DownloadResultModal handleClose={() => setOpenedModal(false)} />
+          )}
 
           <NotifyComponent />
           <TableErrorAlert />

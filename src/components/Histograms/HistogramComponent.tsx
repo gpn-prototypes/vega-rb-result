@@ -178,22 +178,21 @@ export const HistogramComponent: React.FC<Props> = ({ grid }) => {
     </div>
   );
 
-  const topContent =
-    histogramsPayload?.length ? (
+  const topContent = histogramsPayload?.length ? (
+    <div>
       <div>
-        <div>
-          <VerticalMoreContextMenu
-            menuItems={() => (() => menuItems)()}
-            title="Гистограмма запасов"
-            onChange={handleChange}
-            onClick={handleClick}
-          />
-        </div>
-        {histograms}
+        <VerticalMoreContextMenu
+          menuItems={() => (() => menuItems)()}
+          title="Гистограмма запасов"
+          onChange={handleChange}
+          onClick={handleClick}
+        />
       </div>
-    ) : (
-      <Text>Данные не найдены</Text>
-    );
+      {histograms}
+    </div>
+  ) : (
+    <Text>Данные не найдены</Text>
+  );
 
   const statistic = isShowStatistic && (
     <HistogramStatisticsComponent
