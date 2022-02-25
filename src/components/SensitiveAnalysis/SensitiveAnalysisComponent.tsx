@@ -23,7 +23,6 @@ import { Loader } from '@consta/uikit/Loader';
 import { Sidebar } from '@consta/uikit/Sidebar';
 import { useMount } from '@gpn-prototypes/vega-ui';
 import { block } from 'bem-cn';
-import { v4 as uuidv4 } from 'uuid';
 
 import { VerticalMoreContextMenu } from '../Helpers/VerticalMoreContextMenu/VerticalMoreContextMenu';
 
@@ -43,7 +42,6 @@ const statisticMenuItem: MenuContextItem = {
   code: 'stat',
   switch: true,
   border: true,
-  id: uuidv4(),
 };
 
 export const SensitiveAnalysisComponent: FC<Props> = ({ sidebarRow }) => {
@@ -100,16 +98,14 @@ export const SensitiveAnalysisComponent: FC<Props> = ({ sidebarRow }) => {
     if (!sensitiveAnalysisData) {
       return;
     }
-
     const menuContextGroup: MenuContextGroup[] = sensitiveAnalysisData.map(
       (sensitiveAnalysisElement, index) => {
         const children: MenuContextItem[] =
           sensitiveAnalysisElement.names.map((name: string) => {
             return {
               name,
-              code: name,
+              code: `${sensitiveAnalysisData[index].title}__${name}`,
               switch: true,
-              id: uuidv4(),
             };
           }) || [];
 
@@ -135,11 +131,12 @@ export const SensitiveAnalysisComponent: FC<Props> = ({ sidebarRow }) => {
 
   // На изменение свичей
   const handleChange = (item: MenuContextItem) => {
+    // TODO: подумать над вынесением в хелпер
     const updatedMenuItems = menuItems.map((menuGroupItem) => {
       const cloneMenuGroupItem = { ...menuGroupItem };
 
       const changingItem = cloneMenuGroupItem.children.find(
-        (menuItem) => menuItem.id === item.id,
+        (menuItem) => menuItem.code === item.code,
       );
 
       menuGroupItem.children.forEach(
@@ -226,24 +223,15 @@ export const SensitiveAnalysisComponent: FC<Props> = ({ sidebarRow }) => {
           form="default"
           label="Закрыть"
           size="m"
-          style={{ position: 'absolute', right: '0' }}
+          style={{ position: 'absolute', right: '5px' }}
         />
         <div className={cn('Title')}>
-          {menuItems.length === 1 ? (
-            <VerticalMoreContextMenu
-              groupItems={menuItems}
-              title="Анализ чувствительности"
-              onChange={handleChange}
-              onClick={handleClick}
-            />
-          ) : (
-            <VerticalMoreContextMenu
-              groupItems={menuItems}
-              title="Анализ чувствительности"
-              onChange={handleChange}
-              onClick={handleClick}
-            />
-          )}
+          <VerticalMoreContextMenu
+            groupItems={menuItems}
+            title="Анализ чувствительности"
+            onChange={handleChange}
+            onClick={handleClick}
+          />
         </div>
 
         <div className={cn('Content')}>

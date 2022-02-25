@@ -1,6 +1,6 @@
 import React, { FC, useRef, useState } from 'react';
 import SvgMoreVertical from '@app/assets/icons/components/MoreVertical';
-import { ContextMenuDropdown } from '@app/components/Helpers/ContextMenuHelper';
+import { ContextMenuDropdown } from '@app/components/Helpers/ContextMenuDropdown';
 import {
   MenuContextGroup,
   MenuContextItem,

@@ -1,8 +1,10 @@
 import React, { FC } from 'react';
 import { MenuContextItem } from '@app/interfaces/ContextMenuInterface';
-import cn from 'classnames';
+import { block } from 'bem-cn';
 
-import '../ContextMenuHelper.css';
+import './ContextMenuBaseItem.css';
+
+const cn = block('ContextMenuBaseItem');
 
 interface ContextMenuBaseItemProps {
   menuItem: MenuContextItem;
@@ -20,10 +22,10 @@ export const ContextMenuBaseItem: FC<ContextMenuBaseItemProps> = ({
 }) => {
   return (
     <div
-      className={cn('Menu__Title', {
-        Menu__Border: menuItem.border,
-        Menu__Column: column,
-        Menu__Disabled: getDisabled && getDisabled(menuItem),
+      className={cn('Title', {
+        Border: menuItem.border,
+        Column: column,
+        Disabled: getDisabled && getDisabled(menuItem),
       })}
       onClick={() => {
         if (handleContextClick) {
@@ -34,9 +36,19 @@ export const ContextMenuBaseItem: FC<ContextMenuBaseItemProps> = ({
       role="button"
       tabIndex={0}
     >
-      <div className={cn('Menu__Left')}>
+      <div
+        className={cn('Title', {
+          Left: true,
+        })}
+      >
         {menuItem.icon && (
-          <div className={cn('Menu__Icon')}>{menuItem.icon()}</div>
+          <div
+            className={cn('Title', {
+              Icon: true,
+            })}
+          >
+            {menuItem.icon()}
+          </div>
         )}
 
         <div>{menuItem.name}</div>

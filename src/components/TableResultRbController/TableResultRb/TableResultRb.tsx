@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { ContextMenuDropdown } from '@app/components/Helpers/ContextMenuHelper';
+import { ContextMenuDropdown } from '@app/components/Helpers/ContextMenuDropdown';
 import { EFluidType, EFluidTypeCode, EGeoCategory } from '@app/constants/Enums';
 import { RbDomainEntityInput } from '@app/generated/graphql';
 import { MenuContextItem } from '@app/interfaces/ContextMenuInterface';

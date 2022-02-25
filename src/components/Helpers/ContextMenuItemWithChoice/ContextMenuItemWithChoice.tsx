@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { FC, useMemo, useState } from 'react';
 import { ContextMenuBaseItem } from '@app/components/Helpers/ContextMenuBaseItem/ContextMenuBaseItem';
 import { MenuContextItem } from '@app/interfaces/ContextMenuInterface';
 import { Button } from '@consta/uikit/Button';
@@ -10,8 +10,8 @@ import './ContextMenuItemWithChoice.css';
 
 const cn = block('ItemWithChoice');
 
-export const ItemWithChoice: React.FC<{
-  menuItem: MenuContextItem | any;
+export const ItemWithChoice: FC<{
+  menuItem: MenuContextItem;
   setIsOpenContextMenu: (isOpened: boolean) => void;
   onChange?: (item: MenuContextItem) => void;
   getDisabled?: (item: MenuContextItem) => boolean;
@@ -20,7 +20,6 @@ export const ItemWithChoice: React.FC<{
     !menuItem.choice?.values.includes(menuItem.choice.value || 0) || false,
   );
   const [inputValue, setValue] = useState<number>(menuItem.choice?.value || 50);
-  const handleInputChange = ({ value }) => setValue(value);
 
   if (!menuItem.choice || !onChange) {
     return null;
@@ -41,16 +40,56 @@ export const ItemWithChoice: React.FC<{
     setIsOpenContextMenu(false);
   };
 
-  const handleInputSave = () => {
-    const cloneMenuItem = { ...menuItem };
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const isOpenEditMemo = useMemo(() => {
+    const handleInputSave = () => {
+      const cloneMenuItem = { ...menuItem };
 
-    if (cloneMenuItem.choice?.value) {
-      cloneMenuItem.choice.value = Number(inputValue);
-    }
+      if (cloneMenuItem.choice?.value) {
+        cloneMenuItem.choice.value = Number(inputValue);
+      }
 
-    onChange(cloneMenuItem);
-    setIsOpenContextMenu(false);
-  };
+      onChange(cloneMenuItem);
+      setIsOpenContextMenu(false);
+    };
+
+    const handleInputChange = ({ value }) => setValue(value);
+
+    return (
+      isOpenEdit && (
+        <div>
+          <TextField
+            placeholder="Укажите количество"
+            onChange={handleInputChange}
+            value={inputValue?.toString() || ''}
+            size="s"
+            view="default"
+          />
+
+          <Button
+            label="Указать вручную"
+            size="s"
+            onClick={() => handleInputSave()}
+            disabled={inputValue <= 10 || inputValue >= 10000}
+            className={cn('Button')}
+          />
+        </div>
+      )
+    );
+  }, [onChange, menuItem, setIsOpenContextMenu, isOpenEdit, inputValue]);
+
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const isNotOpenEditMemo = useMemo(() => {
+    return (
+      !isOpenEdit && (
+        <Button
+          label="Указать вручную"
+          size="s"
+          onClick={() => setIsOpenEdit(true)}
+        />
+      )
+    );
+  }, [isOpenEdit, setIsOpenEdit]);
 
   return (
     <ContextMenuBaseItem menuItem={menuItem} column getDisabled={getDisabled}>
@@ -67,33 +106,8 @@ export const ItemWithChoice: React.FC<{
       />
 
       <div className={cn('Edit')}>
-        {!isOpenEdit && (
-          <Button
-            label="Указать вручную"
-            size="s"
-            onClick={() => setIsOpenEdit(true)}
-          />
-        )}
-
-        {isOpenEdit && (
-          <div>
-            <TextField
-              placeholder="Укажите количество"
-              onChange={handleInputChange}
-              value={inputValue?.toString() || ''}
-              size="s"
-              view="default"
-            />
-
-            <Button
-              label="Указать вручную"
-              size="s"
-              onClick={() => handleInputSave()}
-              disabled={inputValue <= 10 || inputValue >= 10000}
-              className={cn('Button')}
-            />
-          </div>
-        )}
+        {isOpenEditMemo}
+        {isNotOpenEditMemo}
       </div>
     </ContextMenuBaseItem>
   );

@@ -9,9 +9,9 @@ import { Popover, Position } from '@consta/uikit/Popover';
 import { Switch } from '@consta/uikit/Switch';
 import { block } from 'bem-cn';
 
-import './ContextMenuHelper.css';
+import './ContextMenuDropdown.css';
 
-const cn = block('Menu');
+const cn = block('ContextMenuDropdown');
 
 interface ContextMenuDropdownProps {
   ref: React.RefObject<HTMLHeadingElement>;
