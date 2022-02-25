@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { CustomContextMenu } from '@app/components/Helpers/ContextMenuHelper';
+import { ContextMenuDropdown } from '@app/components/Helpers/ContextMenuDropdown';
 import { EFluidType, EFluidTypeCode, EGeoCategory } from '@app/constants/Enums';
 import { MenuContextItem } from '@app/interfaces/ContextMenuInterface';
 import {
@@ -61,7 +61,7 @@ const setActiveClass = (title: string) => {
     });
 };
 
-const menuItems = (): MenuContextItem[] => [
+const menuItems: MenuContextItem[] = [
   {
     code: 'remove',
     name: 'Уменьшить разрядность',
@@ -401,13 +401,14 @@ export const TableResultRb: React.FC<Props> = ({
       />
 
       {visible && (
-        <CustomContextMenu
-          menuItems={() => menuItems()}
+        <ContextMenuDropdown
+          menuItems={menuItems}
           ref={rowRef}
           onClick={handleContextMenuClick}
           setIsOpenContextMenu={(isVisible) => setContextMenu(isVisible)}
           position={position}
           getDisabled={isContextMenuDisabled}
+          onChange={() => {}}
         />
       )}
     </div>

@@ -1,6 +1,13 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { FC, useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { MenuContextItem } from '@app/interfaces/ContextMenuInterface';
+import {
+  EFluidType,
+  ESensitiveAnalysisAvailableTabs,
+} from '@app/constants/Enums';
+import {
+  MenuContextGroup,
+  MenuContextItem,
+} from '@app/interfaces/ContextMenuInterface';
 import {
   SensitiveAnalysis,
   SensitiveAnalysisStatistic,
@@ -14,51 +21,65 @@ import { TableActions } from '@app/store/table/tableActions';
 import { RootState } from '@app/store/types';
 import { GridActiveRow } from '@app/types/typesTable';
 import { Button } from '@consta/uikit/Button';
+import { ChoiceGroup } from '@consta/uikit/ChoiceGroup';
 import { Loader } from '@consta/uikit/Loader';
 import { Sidebar } from '@consta/uikit/Sidebar';
 import { useMount } from '@gpn-prototypes/vega-ui';
+import { block } from 'bem-cn';
 
-import { VerticalMoreContextMenu } from '../Helpers/ContextMenuHelper';
+import { VerticalMoreContextMenu } from '../Helpers/VerticalMoreContextMenu/VerticalMoreContextMenu';
 
 import { SensitiveAnalysisChartComponent } from './chart/Chart';
 import { SensitiveAnalysisStatisticComponent } from './statistic/SensitiveAnalysisStatisticComponent';
 
 import './SensitiveAnalysisComponent.css';
 
+const cn = block('SensitiveAnalysis');
+
 interface Props {
   sidebarRow: GridActiveRow;
 }
 
-const payloadMenuItem: MenuContextItem = {
+const statisticMenuItem: MenuContextItem = {
   name: 'Показывать статистику',
   code: 'stat',
   switch: true,
   border: true,
 };
 
-export const SensitiveAnalysisComponent: React.FC<Props> = ({ sidebarRow }) => {
+export const SensitiveAnalysisComponent: FC<Props> = ({ sidebarRow }) => {
   const dispatch = useDispatch();
+
+  // при клике вне окна
   const resetState = useCallback(() => {
     dispatch(sensitiveAnalysisDuck.actions.resetState());
     dispatch(TableActions.resetSidebarRow());
   }, [dispatch]);
-  const resetSidebarRow = useCallback(
-    () => dispatch(TableActions.resetSidebarRow()),
-    [dispatch],
-  );
 
-  const [menuItems, setMenuItems] = useState<MenuContextItem[]>([]);
-  const sensitiveAnalysisData: SensitiveAnalysis | undefined = useSelector(
+  // при клике вне окна и кнопке закрыть
+  const resetSidebarRow = useCallback(() => {
+    dispatch(TableActions.resetSidebarRow());
+  }, [dispatch]);
+
+  const [menuItems, setMenuItems] = useState<MenuContextGroup[]>([]);
+  const sensitiveAnalysisData: SensitiveAnalysis[] | undefined = useSelector(
     ({ sensitiveAnalysis }: RootState) => sensitiveAnalysis.payload,
   );
-  const sensitiveAnalysisStatisticData: SensitiveAnalysisStatistic | undefined =
-    useSelector(
-      ({ sensitiveAnalysis }: RootState) => sensitiveAnalysis.statistic,
-    );
+  const sensitiveAnalysisStatisticData:
+    | SensitiveAnalysisStatistic[]
+    | undefined = useSelector(
+    ({ sensitiveAnalysis }: RootState) => sensitiveAnalysis.statistic,
+  );
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isLoadingStatistic, setIsLoadingStatistic] = useState<boolean>(false);
   const [isShowStatistic, setIsShowStatistic] = useState<boolean>(true);
+
+  const [availableTabs, setAvailableTabs] = useState<
+    ESensitiveAnalysisAvailableTabs['tabs'][]
+  >([]);
+  const [activeTab, setActiveTab] =
+    useState<ESensitiveAnalysisAvailableTabs['tabs']>(null);
 
   useMount(() => {
     setIsLoading(true);
@@ -78,38 +99,64 @@ export const SensitiveAnalysisComponent: React.FC<Props> = ({ sidebarRow }) => {
   });
 
   useEffect(() => {
-    /** Заполняем пункты меню, данными из бекенда */
+    /** Заполняем пункты меню данными из бека */
     if (!sensitiveAnalysisData) {
       return;
     }
+    const menuContextGroup: MenuContextGroup[] = sensitiveAnalysisData.map(
+      (sensitiveAnalysisElement, index) => {
+        const children: MenuContextItem[] =
+          sensitiveAnalysisElement.names.map((name: string) => {
+            return {
+              name,
+              code: `${sensitiveAnalysisData[index].title}__${name}`,
+              switch: true,
+            };
+          }) || [];
 
-    const items: MenuContextItem[] =
-      sensitiveAnalysisData.names.map((name: string) => {
-        return {
-          name,
-          code: name,
-          switch: true,
-        };
-      }) || [];
+        return { id: index, title: sensitiveAnalysisElement.title, children };
+      },
+    );
 
-    items.push(payloadMenuItem);
+    menuContextGroup[menuContextGroup.length - 1].children.push(
+      statisticMenuItem,
+    );
 
-    setMenuItems(items);
+    setMenuItems(menuContextGroup);
+
+    const availableTabsItems = [];
+
+    sensitiveAnalysisData.forEach((i) => availableTabsItems.push(i.title));
+    setAvailableTabs(availableTabsItems);
+    // Изначально активный таб
+    if (availableTabsItems.includes(EFluidType.OIL)) {
+      setActiveTab(EFluidType.OIL);
+    }
   }, [sensitiveAnalysisData]);
 
+  // На изменение свичей
   const handleChange = (item: MenuContextItem) => {
-    const updatedMenuItems = menuItems.map((menuItem: MenuContextItem) => {
-      const cloneItem = { ...menuItem };
+    // TODO: подумать над вынесением в хелпер
+    const updatedMenuItems = menuItems.map((menuGroupItem) => {
+      const cloneMenuGroupItem = { ...menuGroupItem };
 
-      if (cloneItem.code === item.code) {
-        cloneItem.switch = !menuItem.switch;
+      const changingItem = cloneMenuGroupItem.children.find(
+        (menuItem) => menuItem.code === item.code,
+      );
 
-        if (cloneItem.code === 'stat') {
-          setIsShowStatistic(cloneItem.switch);
-        }
-      }
+      menuGroupItem.children.forEach(
+        // eslint-disable-next-line no-return-assign
+        (menuContextItem) => {
+          if (changingItem && menuContextItem.code === item.code) {
+            changingItem.switch = !item.switch;
+            if (item.code === 'stat') {
+              setIsShowStatistic(() => !!item.switch);
+            }
+          }
+        },
+      );
 
-      return cloneItem;
+      return cloneMenuGroupItem;
     });
 
     setMenuItems(updatedMenuItems);
@@ -119,41 +166,53 @@ export const SensitiveAnalysisComponent: React.FC<Props> = ({ sidebarRow }) => {
     console.info('DEV: handle click', item);
   };
 
-  const getAvailableNames = (): string[] => {
-    const result: string[] = [];
+  const getAvailableNames = (data: MenuContextGroup[]): string[][] => {
+    const result: string[][] = [];
 
-    menuItems
-      .filter((item: MenuContextItem) => item.code !== 'stat')
-      .filter((item: MenuContextItem) => item.switch === true)
-      .forEach((item: MenuContextItem) => {
-        result.push(item.name);
-      });
+    data.forEach((menuContextGroup) => {
+      const names: string[] = [];
+
+      menuContextGroup.children
+        .filter((menuContextItem) => menuContextItem.code !== 'stat')
+        .filter((menuContextItem) => menuContextItem.switch)
+        .forEach((menuContextItem) => names.push(menuContextItem.name));
+
+      return result.push(names);
+    });
 
     return result;
   };
 
-  const chart = sensitiveAnalysisData && (
-    <SensitiveAnalysisChartComponent
-      percentiles={sensitiveAnalysisData.percentiles}
-      resultMinMax={sensitiveAnalysisData.resultMinMax}
-      names={sensitiveAnalysisData.names}
-      zeroPoint={sensitiveAnalysisData.zeroPoint}
-      availableNames={getAvailableNames()}
-    />
-  );
+  const chart = sensitiveAnalysisData?.length
+    ? sensitiveAnalysisData.map((sensitiveAnalysisItem, index) => {
+        return activeTab === sensitiveAnalysisItem.title ? (
+          <div key={sensitiveAnalysisItem.title}>
+            <SensitiveAnalysisChartComponent
+              percentiles={sensitiveAnalysisItem.percentiles}
+              resultMinMax={sensitiveAnalysisItem.resultMinMax}
+              names={sensitiveAnalysisItem.names}
+              zeroPoint={sensitiveAnalysisItem.zeroPoint}
+              availableNames={getAvailableNames(menuItems)[index]}
+              title=""
+            />
+          </div>
+        ) : null;
+      })
+    : null;
 
   const statistic = (
-    <div className="sensitive-analysis">
+    <div className={cn()}>
       <div>
-        <div className="sensitive-analysis__title sensitive-analysis__title--statistic">
-          Статистика
-        </div>
-
+        <div className={cn('Title')}>Статистика</div>
         {isLoadingStatistic || !sensitiveAnalysisStatisticData ? (
           <Loader />
         ) : (
           <SensitiveAnalysisStatisticComponent
-            statistic={sensitiveAnalysisStatisticData}
+            statistic={
+              sensitiveAnalysisStatisticData[
+                activeTab === EFluidType.OIL ? 0 : 1
+              ]
+            }
           />
         )}
       </div>
@@ -161,35 +220,49 @@ export const SensitiveAnalysisComponent: React.FC<Props> = ({ sidebarRow }) => {
   );
 
   return (
-    <div className="sensitive-analysis">
+    <div className={cn()}>
       <Sidebar.Content>
-        {/* График */}
-        <div className="sensitive-analysis__title">
+        <Button
+          view="ghost"
+          onClick={resetSidebarRow}
+          width="default"
+          form="default"
+          label="Закрыть"
+          size="m"
+          style={{ position: 'absolute', right: '5px' }}
+        />
+        <div className={cn('Title')}>
           <VerticalMoreContextMenu
-            menuItems={() => (() => menuItems)()}
+            groupItems={menuItems}
             title="Анализ чувствительности"
             onChange={handleChange}
             onClick={handleClick}
           />
         </div>
 
-        <div className="sensitive-analysis__content">
-          <div>
-            {isLoading ? (
-              <Loader className="sensitive-analysis__loader" />
-            ) : (
-              chart
-            )}
-          </div>
-
+        <div className={cn('Content')}>
+          {menuItems.length > 1 ? (
+            <div className="tabsWrapper">
+              <ChoiceGroup
+                value={activeTab}
+                items={availableTabs}
+                name="SensitiveAnaLysisChoiceGroup"
+                size="s"
+                view="ghost"
+                width="full"
+                multiple={false}
+                getLabel={(item) => item}
+                onChange={({ value }) => setActiveTab(() => value)}
+                data-testid="Sensitive-analysis-tabs"
+              />
+            </div>
+          ) : null}
+          {/* График */}
+          {isLoading ? <Loader className={cn('Loader')} /> : chart}
           {/* Статистика */}
           {isShowStatistic ? statistic : null}
         </div>
       </Sidebar.Content>
-
-      <Sidebar.Actions className="sensitive-analysis__actions">
-        <Button onClick={resetSidebarRow} label="Закрыть" size="m" />
-      </Sidebar.Actions>
     </div>
   );
 };

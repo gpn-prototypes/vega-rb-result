@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FC } from 'react';
 import {
   SensitiveAnalysisStatistic,
   SensitiveAnalysisStatisticCell,
@@ -50,10 +50,10 @@ const getMappedRow = (cells: SensitiveAnalysisStatisticCell[]): TableRow => {
   return row;
 };
 
-export const SensitiveAnalysisStatisticComponent: React.FC<Props> = ({
+export const SensitiveAnalysisStatisticComponent: FC<Props> = ({
   statistic,
 }) => {
-  const columns: TableColumn<TableRow>[] = statistic.headers.map(
+  const columns: TableColumn<TableRow>[] = statistic?.headers.map(
     (header: SensitiveAnalysisStatisticHeaders) => {
       if (header?.children && header?.children?.length > 0) {
         return {
@@ -69,7 +69,7 @@ export const SensitiveAnalysisStatisticComponent: React.FC<Props> = ({
     },
   );
 
-  const rows: TableRow[] = statistic.rows.map(
+  const rows: TableRow[] = statistic?.rows.map(
     (row: SensitiveAnalysisStatisticRows) => getMappedRow(row.cells),
   );
 

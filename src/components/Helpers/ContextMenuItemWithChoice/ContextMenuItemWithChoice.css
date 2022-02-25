@@ -1,0 +1,16 @@
+.ItemWithChoice {
+  margin-top: var(--space-m);
+
+  &__Edit {
+    margin-top: var(--space-m);
+
+    .TextField {
+      border: 0 !important;
+    }
+  }
+
+  &__Button {
+    margin-top: var(--space-m);
+    margin-left: var(--space-m);
+  }
+}

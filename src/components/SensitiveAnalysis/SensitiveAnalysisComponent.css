@@ -1,34 +1,39 @@
-.sensitive-analysis {
+.SensitiveAnalysis {
   overflow: auto;
   width: 100%;
+  position: relative;
 
-  &__title {
-    display: inline-block;
+  &__Title {
+    display: flex;
+    justify-content: space-between;
     font-size: 18px;
     font-weight: 400;
     line-height: 21px;
+    padding-right: 5px;
     cursor: pointer;
-    user-select: none;
     color: var(--color-typo-primary);
+  }
 
-    &--statistic {
-      cursor: initial;
+  &__Content {
+    margin-top: var(--space-m);
+    display: grid;
+    min-height: 246px;
+
+    .tabsWrapper {
+      width: 224px;
     }
   }
 
-  &__content {
-    margin-top: var(--space-m);
-    display: grid;
-    grid-template-rows: 1fr 1fr;
-    min-height: 246px;
-  }
-
-  &__loader {
+  &__Loader {
     margin-top: var(--space-4xl);
   }
 
-  &__actions {
+  &__Actions {
     padding: var(--space-m) 0;
     text-align: right;
+  }
+
+  &:first-of-type {
+    padding-bottom: var(--space-m) !important;
   }
 }
