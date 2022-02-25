@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { VerticalMoreContextMenu } from '@app/components/Helpers/ContextMenuHelper';
+import { VerticalMoreContextMenu } from '@app/components/Helpers/VerticalMoreContextMenu/VerticalMoreContextMenu';
 import { Histogram } from '@app/generated/graphql';
 import { MenuContextItem } from '@app/interfaces/ContextMenuInterface';
 import { loadHistogramData } from '@app/services/histogramService';
@@ -182,7 +182,7 @@ export const HistogramComponent: React.FC<Props> = ({ grid }) => {
     <div>
       <div>
         <VerticalMoreContextMenu
-          menuItems={() => (() => menuItems)()}
+          menuItems={menuItems}
           title="Гистограмма запасов"
           onChange={handleChange}
           onClick={handleClick}
