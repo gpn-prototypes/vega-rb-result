@@ -76,10 +76,10 @@ export const SensitiveAnalysisComponent: FC<Props> = ({ sidebarRow }) => {
   const [isShowStatistic, setIsShowStatistic] = useState<boolean>(true);
 
   const [availableTabs, setAvailableTabs] = useState<
-    ESensitiveAnalysisAvailableTabs['tabs'][]
+    ESensitiveAnalysisAvailableTabs[]
   >([]);
   const [activeTab, setActiveTab] =
-    useState<ESensitiveAnalysisAvailableTabs['tabs']>(null);
+    useState<ESensitiveAnalysisAvailableTabs | null>(null);
 
   useMount(() => {
     setIsLoading(true);
@@ -124,9 +124,11 @@ export const SensitiveAnalysisComponent: FC<Props> = ({ sidebarRow }) => {
 
     setMenuItems(menuContextGroup);
 
-    const availableTabsItems = [];
+    const availableTabsItems: ESensitiveAnalysisAvailableTabs[] = [];
 
-    sensitiveAnalysisData.forEach((i) => availableTabsItems.push(i.title));
+    sensitiveAnalysisData.forEach((i) =>
+      availableTabsItems.push(i.title as ESensitiveAnalysisAvailableTabs),
+    );
     setAvailableTabs(availableTabsItems);
     // Изначально активный таб
     if (availableTabsItems.includes(EFluidType.OIL)) {
