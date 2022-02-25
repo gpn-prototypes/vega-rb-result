@@ -1,4 +1,4 @@
-import { Item } from '@consta/uikit/SnackBar';
+import { Item } from '@consta/uikit/__internal__/src/components/SnackBar/helper';
 import { reducerWithInitialState } from 'typescript-fsa-reducers';
 
 import { NotifyActions, NotifyStore } from './notifyActions';

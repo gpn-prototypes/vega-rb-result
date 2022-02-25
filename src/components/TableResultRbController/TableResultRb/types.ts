@@ -20,7 +20,7 @@ export type Row = {
   isAll?: boolean;
   isRisk?: boolean;
 };
-export interface Column<T = any> {
+export interface Column {
   sortable?: boolean;
   accessor: string;
   title: string;

@@ -4,7 +4,6 @@ import {
 } from '@app/components/TableResultRbController/TableResultRb/types';
 import { EFluidType } from '@app/constants/Enums';
 import { LocalStorageKey } from '@app/constants/LocalStorageKeyConstants';
-import { RbDomainEntityInput } from '@app/generated/graphql';
 import {
   DecimalFixed,
   GridActiveRow,
@@ -50,16 +49,12 @@ export const tableInitialState: GridCollection = {
   entitiesCount: 0,
 };
 
-export const getDecimalByColumns = (
-  columns: Column<RbDomainEntityInput>[],
-): DecimalFixed => {
+export const getDecimalByColumns = (columns: Column[]): DecimalFixed => {
   const decimalFixed: DecimalFixed = {};
 
   columns
-    .filter(
-      (column: Column<RbDomainEntityInput>) => column.decimal !== undefined,
-    )
-    .forEach((column: Column<RbDomainEntityInput>) => {
+    .filter((column: Column) => column.decimal !== undefined)
+    .forEach((column: Column) => {
       decimalFixed[column.accessor] =
         column.decimal !== undefined ? column.decimal : DEFAULT_DECIMAL_FIXED;
     });
@@ -69,7 +64,7 @@ export const getDecimalByColumns = (
 
 export const getDecimalRows = (
   rows: RowEntity[],
-  columns: Column<RbDomainEntityInput>[],
+  columns: Column[],
   decimalFixed: DecimalFixed = tableInitialState.decimalFixed || {},
 ): RowEntity[] => {
   const resultRows = [...rows].map((row: RowEntity) => {
@@ -107,12 +102,10 @@ export const getDecimalRows = (
 export const getActualColumns = (
   state: GridCollection,
   payload: HiddenColumns = hiddenColumnsFromLocalStorage,
-): Column<RbDomainEntityInput>[] => {
-  const findColumnByAccessor = (
-    accessor: string,
-  ): Column<RbDomainEntityInput> | undefined => {
+): Column[] => {
+  const findColumnByAccessor = (accessor: string): Column | undefined => {
     const found = state.columns.find(
-      (column: Column<RbDomainEntityInput>) => column.accessor === accessor,
+      (column: Column) => column.accessor === accessor,
     );
 
     if (found === undefined) {
@@ -128,11 +121,9 @@ export const getActualColumns = (
     if (payload[key] === true) {
       const hiddenColumnsGroup = findColumnByAccessor(key)?.columnAccessorGroup;
 
-      actualColumns = actualColumns.filter(
-        (column: Column<RbDomainEntityInput>) => {
-          return !hiddenColumnsGroup?.includes(column.accessor);
-        },
-      );
+      actualColumns = actualColumns.filter((column: Column) => {
+        return !hiddenColumnsGroup?.includes(column.accessor);
+      });
     }
   });
 

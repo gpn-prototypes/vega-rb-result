@@ -7,6 +7,7 @@ import treeDuck from '@app/store/treeDuck';
 import { combineReducers } from 'redux';
 
 import { GeneralReducers } from './general/generalReducers';
+import { LoaderReducers } from './loader/loaderReducers';
 import { NotifyReducers } from './notify/notifyReducers';
 import { SettingsReducers } from './settings/settingsReducers';
 import competitiveAccessDuck from './competitiveAccessDuck';
@@ -25,4 +26,5 @@ export default combineReducers<RootState>({
   settings: SettingsReducers,
   notify: NotifyReducers,
   general: GeneralReducers,
+  loader: LoaderReducers,
 });

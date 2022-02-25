@@ -1,6 +1,5 @@
 import React, { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { RbDomainEntityInput } from '@app/generated/graphql';
 import { TableActions } from '@app/store/table/tableActions';
 import { RootState } from '@app/store/types';
 import { HiddenColumns } from '@app/types/typesTable';
@@ -11,7 +10,7 @@ import { IconRemove } from '@consta/uikit/IconRemove';
 import { Column } from '../TableResultRbController/TableResultRb/types';
 
 interface Props {
-  column: Column<RbDomainEntityInput>;
+  column: Column;
 }
 
 export const ColumnExpanderComponent: React.FC<Props> = ({ column }) => {

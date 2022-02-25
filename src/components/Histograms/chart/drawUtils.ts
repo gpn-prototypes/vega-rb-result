@@ -107,7 +107,6 @@ export namespace Chart {
     bins,
     numberOfIterationBin,
     cdf,
-    sample,
   }: GetScaleArguments): Scale => {
     const xScale: ScaleLinear<number, number> = d3
       .scaleLinear()
@@ -130,6 +129,7 @@ export namespace Chart {
       .fill(1)
       .map((_, index) => {
         const currentBin = numberOfIterationBin[index * step];
+
         return currentBin <= 1000 ? 1000 : Math.round(currentBin / 1000) * 1000;
       });
 
@@ -406,6 +406,7 @@ export namespace Chart {
       g
         .attr('transform', `translate(0,${Height - Margin.bottom})`)
         .attr('class', 'chart__grid')
+        // eslint-disable-next-line newline-per-chained-call
         .call(d3.axisBottom(scale).ticks(5).tickSize(-Height)),
     );
   };
@@ -427,13 +428,9 @@ export namespace Chart {
 
   export const DrawCdfLineWithGrid = ({
     cumulativeXScale,
-    probabilityDensityXScale,
-    xScale,
     cumulativeYScale,
     svg,
     cdf,
-    id,
-    sample,
     percentiles,
   }: DrawCdfLineWithGridArguments): void => {
     const projectionLinesFromPoint = (

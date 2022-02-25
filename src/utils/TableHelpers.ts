@@ -1,4 +1,3 @@
-import { RbDomainEntityInput } from '@app/generated/graphql';
 import { TreeItem } from '@gpn-prototypes/vega-ui';
 import arrayToTree from 'array-to-tree';
 import { get, groupBy, mergeWith } from 'lodash/fp';
@@ -88,6 +87,7 @@ export function searchInTree<T>(
 
   while (stack.length) {
     const node = stack[reverse ? 'pop' : 'shift']();
+
     if (node) {
       if (node[key] === value) return node;
       if (node.nodeList) {
@@ -95,6 +95,7 @@ export function searchInTree<T>(
       }
     }
   }
+
   return null;
 }
 
@@ -115,13 +116,14 @@ export function mergeObjectsInUnique<T>(array: T[], properties: string[]): T[] {
       newArray.set(propertyValue, item);
     }
   });
+
   return Array.from(newArray.values());
 }
 
 /** TODO: Рафактор, что то тут с типами намудрено */
-export function getNodeListFromTableData<T>(
+export function getNodeListFromTableData(
   data: {
-    columns: Column<RbDomainEntityInput>[];
+    columns: Column[];
     rows: RowEntity[];
   },
   projectName: string,
@@ -145,7 +147,7 @@ export function getNodeListFromTableData<T>(
     }
 
     return structurecolumnKeys.some(
-      ({ key, name }) => key !== 'id' && row[key]?.value,
+      ({ key }) => key !== 'id' && row[key]?.value,
     );
   });
 

@@ -330,6 +330,7 @@ class ProjectService implements IProjectService {
         data.project.rbResult?.result?.resultTable?.template,
       );
       // TODO - refactor after work with data
+
       this.projectMod = isTemplateProject
         ? ({
             ...data.project,
@@ -347,15 +348,27 @@ class ProjectService implements IProjectService {
     }
   }
 
-  async getCalculationArchive(): Promise<CalculationResponse> {
+  async getCalculationArchive(
+    statistics: boolean,
+    samples: boolean,
+    plots: boolean,
+  ): Promise<CalculationResponse> {
     const DEFAULT_FILENAME = 'result.zip';
+    // TODO: придумать общее решение для отмены запроса
+
+    this.abortControllerMod = new AbortController();
+    const { signal } = this.abortControllerMod;
 
     const token = await this.identity.getToken();
-    const serverResponse = await fetch(getDownloadResultUri(this.projectId), {
-      headers: {
-        Authorization: `Bearer ${token}`,
+    const serverResponse = await fetch(
+      getDownloadResultUri(this.projectId, statistics, samples, plots),
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        signal,
       },
-    });
+    );
     const filename = serverResponse.headers
       .get('Content-Disposition')
       ?.match('filename="(?<filename>.*)"')?.groups?.filename;

@@ -6,7 +6,8 @@ import { GeneralActions } from '@app/store/general/generalActions';
 import { TableActions } from '@app/store/table/tableActions';
 import { RootState } from '@app/store/types';
 import { GridCollection } from '@app/types/typesTable';
-import { Loader, useMount } from '@gpn-prototypes/vega-ui';
+import { Loader } from '@consta/uikit/Loader';
+import { useMount } from '@gpn-prototypes/vega-ui';
 
 export const Table: React.FC = () => {
   const dispatch = useDispatch();

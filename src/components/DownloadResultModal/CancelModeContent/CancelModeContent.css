@@ -1,0 +1,29 @@
+.Modal-Window {
+  min-height: auto;
+}
+
+.CancelModeContent {
+  &__Header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-m);
+
+    .Text {
+      flex-grow: 1;
+    }
+  }
+
+  &__Body {
+    margin-bottom: var(--space-xl);
+  }
+
+  &__Footer {
+    display: flex;
+    justify-content: flex-end;
+
+    .Button:first-child {
+      margin-right: var(--space-s);
+    }
+  }
+}

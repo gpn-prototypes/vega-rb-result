@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-const SvgMoreVertical = (props: React.SVGProps<SVGSVGElement>) => {
+const SvgMoreVertical = () => {
   return (
     <svg
       width="24"
