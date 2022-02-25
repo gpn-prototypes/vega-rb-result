@@ -16,7 +16,7 @@ type Sorted = {
 };
 
 export const SensitiveAnalysisChartComponent: FC<
-  Omit<SensitiveAnalysis, 'title'> & { availableNames: string[] }
+  SensitiveAnalysis & { availableNames: string[] }
 > = ({ names, percentiles, resultMinMax, zeroPoint, availableNames }) => {
   const d3Container = useRef(null);
 

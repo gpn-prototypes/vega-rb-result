@@ -10,6 +10,7 @@ export async function loadSensitiveAnalysisData(
     const data = await projectService.getSensitiveAnalysisData(
       domainEntityNames,
     );
+
     dispatch(
       sensitiveAnalysisDuck.actions.setSensitiveAnalysis(
         data.getSensitivityAnalysis,
@@ -28,6 +29,7 @@ export async function loadSensitiveAnalysisStatistic(
     const data = await projectService.getSensitiveAnalysisStatistic(
       domainEntityNames,
     );
+
     dispatch(
       sensitiveAnalysisDuck.actions.setSensitiveAnalysisStatistic(
         data.getSensitivityAnalysisStatistics,

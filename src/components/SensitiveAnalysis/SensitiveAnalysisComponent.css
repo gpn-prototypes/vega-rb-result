@@ -18,6 +18,7 @@
     margin-top: var(--space-m);
     display: grid;
     min-height: 246px;
+
     .tabsWrapper {
       width: 224px;
     }
@@ -31,6 +32,7 @@
     padding: var(--space-m) 0;
     text-align: right;
   }
+
   &:first-of-type {
     padding-bottom: var(--space-m) !important;
   }

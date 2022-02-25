@@ -46,6 +46,7 @@ export const VerticalMoreContextMenu: FC<VerticalContextMenu> = ({
   const isAbleContextMenu = (originMenuItems, originGroupItems): boolean => {
     const menuItemsLocal = originMenuItems?.length || 0;
     const groupItemsLocal = originGroupItems?.length || 0;
+
     return isOpenContextMenu && (menuItemsLocal > 0 || groupItemsLocal > 0);
   };
 

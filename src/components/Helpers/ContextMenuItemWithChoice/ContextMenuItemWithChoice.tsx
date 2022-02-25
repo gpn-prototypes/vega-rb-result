@@ -56,40 +56,36 @@ export const ItemWithChoice: FC<{
     const handleInputChange = ({ value }) => setValue(value);
 
     return (
-      isOpenEdit && (
-        <div>
-          <TextField
-            placeholder="Укажите количество"
-            onChange={handleInputChange}
-            value={inputValue?.toString() || ''}
-            size="s"
-            view="default"
-          />
+      <div>
+        <TextField
+          placeholder="Укажите количество"
+          onChange={handleInputChange}
+          value={inputValue?.toString() || ''}
+          size="s"
+          view="default"
+        />
 
-          <Button
-            label="Указать вручную"
-            size="s"
-            onClick={() => handleInputSave()}
-            disabled={inputValue <= 10 || inputValue >= 10000}
-            className={cn('Button')}
-          />
-        </div>
-      )
+        <Button
+          label="Указать вручную"
+          size="s"
+          onClick={() => handleInputSave()}
+          disabled={inputValue <= 10 || inputValue >= 10000}
+          className={cn('Button')}
+        />
+      </div>
     );
-  }, [onChange, menuItem, setIsOpenContextMenu, isOpenEdit, inputValue]);
+  }, [onChange, menuItem, setIsOpenContextMenu, inputValue]);
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const isNotOpenEditMemo = useMemo(() => {
     return (
-      !isOpenEdit && (
-        <Button
-          label="Указать вручную"
-          size="s"
-          onClick={() => setIsOpenEdit(true)}
-        />
-      )
+      <Button
+        label="Указать вручную"
+        size="s"
+        onClick={() => setIsOpenEdit(true)}
+      />
     );
-  }, [isOpenEdit, setIsOpenEdit]);
+  }, [setIsOpenEdit]);
 
   return (
     <ContextMenuBaseItem menuItem={menuItem} column getDisabled={getDisabled}>
@@ -106,8 +102,7 @@ export const ItemWithChoice: FC<{
       />
 
       <div className={cn('Edit')}>
-        {isOpenEditMemo}
-        {isNotOpenEditMemo}
+        {isOpenEdit ? isOpenEditMemo : isNotOpenEditMemo}
       </div>
     </ContextMenuBaseItem>
   );

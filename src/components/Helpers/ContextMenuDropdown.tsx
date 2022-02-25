@@ -95,17 +95,15 @@ export const ContextMenuDropdown: FC<ContextMenuDropdownProps> = ({
   };
 
   return (
-    <>
-      <Popover
-        anchorRef={ref}
-        onClickOutside={() => setIsOpenContextMenu(false)}
-        direction="downStartLeft"
-        className={cn()}
-        position={position}
-      >
-        {groupItems?.length ? renderGroupItems(groupItems) : null}
-        {menuItems?.length ? renderMenuItems(menuItems) : null}
-      </Popover>
-    </>
+    <Popover
+      anchorRef={ref}
+      onClickOutside={() => setIsOpenContextMenu(false)}
+      direction="downStartLeft"
+      className={cn()}
+      position={position}
+    >
+      {groupItems?.length ? renderGroupItems(groupItems) : null}
+      {menuItems?.length ? renderMenuItems(menuItems) : null}
+    </Popover>
   );
 };

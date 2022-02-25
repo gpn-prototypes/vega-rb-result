@@ -1,6 +1,9 @@
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { EFluidType } from '@app/constants/Enums';
+import {
+  EFluidType,
+  ESensitiveAnalysisAvailableTabs,
+} from '@app/constants/Enums';
 import {
   MenuContextGroup,
   MenuContextItem,
@@ -58,7 +61,6 @@ export const SensitiveAnalysisComponent: FC<Props> = ({ sidebarRow }) => {
     dispatch(TableActions.resetSidebarRow());
   }, [dispatch]);
 
-  // свичи из выпадающего окна
   const [menuItems, setMenuItems] = useState<MenuContextGroup[]>([]);
   const sensitiveAnalysisData: SensitiveAnalysis[] | undefined = useSelector(
     ({ sensitiveAnalysis }: RootState) => sensitiveAnalysis.payload,
@@ -73,8 +75,11 @@ export const SensitiveAnalysisComponent: FC<Props> = ({ sidebarRow }) => {
   const [isLoadingStatistic, setIsLoadingStatistic] = useState<boolean>(false);
   const [isShowStatistic, setIsShowStatistic] = useState<boolean>(true);
 
-  const [availableTabs, setAvailableTabs] = useState<string[]>([]);
-  const [activeTab, setActiveTab] = useState<string | null>(null);
+  const [availableTabs, setAvailableTabs] = useState<
+    ESensitiveAnalysisAvailableTabs['tabs'][]
+  >([]);
+  const [activeTab, setActiveTab] =
+    useState<ESensitiveAnalysisAvailableTabs['tabs']>(null);
 
   useMount(() => {
     setIsLoading(true);
@@ -119,7 +124,7 @@ export const SensitiveAnalysisComponent: FC<Props> = ({ sidebarRow }) => {
 
     setMenuItems(menuContextGroup);
 
-    const availableTabsItems: string[] = [];
+    const availableTabsItems = [];
 
     sensitiveAnalysisData.forEach((i) => availableTabsItems.push(i.title));
     setAvailableTabs(availableTabsItems);
@@ -179,15 +184,16 @@ export const SensitiveAnalysisComponent: FC<Props> = ({ sidebarRow }) => {
   };
 
   const chart = sensitiveAnalysisData?.length
-    ? sensitiveAnalysisData.map((i, index) => {
-        return activeTab === i.title ? (
-          <div key={i.title}>
+    ? sensitiveAnalysisData.map((sensitiveAnalysisItem, index) => {
+        return activeTab === sensitiveAnalysisItem.title ? (
+          <div key={sensitiveAnalysisItem.title}>
             <SensitiveAnalysisChartComponent
-              percentiles={i.percentiles}
-              resultMinMax={i.resultMinMax}
-              names={i.names}
-              zeroPoint={i.zeroPoint}
+              percentiles={sensitiveAnalysisItem.percentiles}
+              resultMinMax={sensitiveAnalysisItem.resultMinMax}
+              names={sensitiveAnalysisItem.names}
+              zeroPoint={sensitiveAnalysisItem.zeroPoint}
               availableNames={getAvailableNames(menuItems)[index]}
+              title=""
             />
           </div>
         ) : null;
@@ -251,10 +257,8 @@ export const SensitiveAnalysisComponent: FC<Props> = ({ sidebarRow }) => {
               />
             </div>
           ) : null}
-          <>
-            {/* График */}
-            {isLoading ? <Loader className={cn('Loader')} /> : chart}
-          </>
+          {/* График */}
+          {isLoading ? <Loader className={cn('Loader')} /> : chart}
           {/* Статистика */}
           {isShowStatistic ? statistic : null}
         </div>
