@@ -17,6 +17,4 @@ export enum EGeoCategory {
   RESERVES = 'Запасы',
 }
 
-export type ESensitiveAnalysisAvailableTabs = {
-  tabs: 'Нефть' | 'Газ';
-};
+export type SensitiveAnalysisAvailableTabs = 'Нефть' | 'Газ';
