@@ -86,16 +86,7 @@ export const GENERATE_CALCULATION_RESULT_ARCHIVE = gql`
       __typename
     }
     version
-  }
-
-  fragment ResourceBaseDiffFragment on UpdateProjectInnerDiff {
-    remoteProject {
-      ... on ProjectInner {
-        version
-        __typename
-      }
-      __typename
-    }
     __typename
   }
+  ${ResourceBaseDiffFragment}
 `;

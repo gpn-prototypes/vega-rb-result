@@ -206,7 +206,7 @@ export const HistogramComponent: React.FC<Props> = ({ grid }) => {
       {isLoading ? (
         <Loader className="histogram__loader" />
       ) : (
-        <div>
+        <div data-testid="histogram-wrapper">
           {topContent}
           {statistic}
         </div>

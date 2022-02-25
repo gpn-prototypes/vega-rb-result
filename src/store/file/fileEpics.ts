@@ -95,28 +95,21 @@ const fetchResultFileEpic: Epic<
                   key: payload.id,
                   message: message.payload.message,
                   status: 'alert',
+                  autoClose: 5,
+                  onAutoClose: () =>
+                    dispatch(NotifyActions.removeItem(payload.id)),
                 }),
               );
 
               break;
 
             case 'CALCULATION_RESULT_ARCHIVE/COMPLETE':
-              dispatch(
-                NotifyActions.appendItem({
-                  key: payload.id,
-                  message: 'Идет скачивание файла',
-                  status: 'system',
-                }),
-              );
-
               loadArchive(
                 (message.payload as WebSocketCompleteDownloadPayload)
                   .attachment_url,
               ).then(() => {
-                setTimeout(() => {
-                  dispatch(NotifyActions.removeItem(payload.id));
-                  dispatch(LoaderAction.setLoaded('file'));
-                }, 1000);
+                dispatch(NotifyActions.removeItem(payload.id));
+                dispatch(LoaderAction.setLoaded('file'));
               });
 
               break;
@@ -145,6 +138,17 @@ export const handleStopFetchingFile: Epic<
           message: {
             code: 'CALCULATION_RESULT_ARCHIVE/STOP',
           },
+        }),
+      );
+
+      dispatch(
+        NotifyActions.appendItem({
+          key: state$.value.file.websocketId,
+          message: 'Успешно остановлено',
+          status: 'normal',
+          autoClose: 3,
+          onAutoClose: () =>
+            dispatch(NotifyActions.removeItem(state$.value.file.websocketId)),
         }),
       );
     }),
