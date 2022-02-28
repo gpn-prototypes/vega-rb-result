@@ -24,13 +24,13 @@ import {
   SensitivityAnalysisStatisticStructure,
   SensitivityAnalysisStructure,
 } from '@app/generated/graphql';
+import { GENERATE_CALCULATION_RESULT_ARCHIVE } from '@app/pages/RbResult/mutations';
 import {
   CalculationResponse,
   IProjectService,
   ProjectServiceProps,
 } from '@app/services/types';
 import {
-  getDownloadResultUri,
   getGraphqlUri,
   // wrapConception,
 } from '@app/services/utils';
@@ -348,27 +348,48 @@ class ProjectService implements IProjectService {
     }
   }
 
-  async getCalculationArchive(
+  async generateCalculationResultArchiveProcessId(
     statistics: boolean,
     samples: boolean,
     plots: boolean,
-  ): Promise<CalculationResponse> {
-    const DEFAULT_FILENAME = 'result.zip';
-    // TODO: придумать общее решение для отмены запроса
+  ): Promise<string> {
+    const { data: responseData } = await this.client
+      .watchQuery<Query>({
+        query: GENERATE_CALCULATION_RESULT_ARCHIVE,
+        context: {
+          uri: getGraphqlUri(this.projectId),
+        },
+        variables: {
+          version: this.version,
+          statistics,
+          samples,
+          plots,
+        },
+        fetchPolicy: 'no-cache',
+      })
+      .result();
 
-    this.abortControllerMod = new AbortController();
-    const { signal } = this.abortControllerMod;
+    return getOr(
+      None<ResultHistogramsStructure>(),
+      [
+        'project',
+        'resourceBase',
+        'generateCalculationResultArchive',
+        'processId',
+      ],
+      responseData,
+    );
+  }
+
+  async getCalculationArchive(url: string): Promise<CalculationResponse> {
+    const DEFAULT_FILENAME = 'result.zip';
 
     const token = await this.identity.getToken();
-    const serverResponse = await fetch(
-      getDownloadResultUri(this.projectId, statistics, samples, plots),
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        signal,
+    const serverResponse = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${token}`,
       },
-    );
+    });
     const filename = serverResponse.headers
       .get('Content-Disposition')
       ?.match('filename="(?<filename>.*)"')?.groups?.filename;

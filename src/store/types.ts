@@ -1,12 +1,14 @@
-import { Dispatch } from 'react';
 import { Param } from '@app/model/Param';
 import { IProjectService } from '@app/services/types';
 import { GridCollection } from '@app/types/typesTable';
-import { AnyAction } from 'redux';
+import { History } from 'history';
+import { AnyAction, Dispatch } from 'redux';
 
+import { FileStore } from './file/fileActions';
 import { LoaderStore } from './loader/loaderActions';
 import { NotifyStore } from './notify/notifyActions';
 import { SettingStore } from './settings/settingsActions';
+import { WebsocketStore } from './websocket/websocketActions';
 import { HistogramStore } from './histogramDuck';
 import { SensitiveAnalysisStore } from './sensitiveAnalysisDuck';
 
@@ -56,8 +58,10 @@ export interface RootState {
   sensitiveAnalysis: SensitiveAnalysisStore;
   settings: SettingStore;
   notify: NotifyStore;
+  websocket: WebsocketStore;
   general: GeneralStore;
   loader: LoaderStore;
+  file: FileStore;
 }
 
 export type TypedColumnsList = {
@@ -75,7 +79,8 @@ export type RemovableError = {
   path: (string | number)[];
 };
 
-export type EpicDependencies = {
+export type StoreDependencies = {
   projectService: IProjectService;
+  history: History;
   dispatch: Dispatch<AnyAction>;
 };

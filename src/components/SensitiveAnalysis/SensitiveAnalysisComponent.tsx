@@ -2,7 +2,7 @@ import React, { FC, useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   EFluidType,
-  ESensitiveAnalysisAvailableTabs,
+  SensitiveAnalysisAvailableTabs,
 } from '@app/constants/Enums';
 import {
   MenuContextGroup,
@@ -76,10 +76,10 @@ export const SensitiveAnalysisComponent: FC<Props> = ({ sidebarRow }) => {
   const [isShowStatistic, setIsShowStatistic] = useState<boolean>(true);
 
   const [availableTabs, setAvailableTabs] = useState<
-    ESensitiveAnalysisAvailableTabs[]
+    SensitiveAnalysisAvailableTabs[]
   >([]);
   const [activeTab, setActiveTab] =
-    useState<ESensitiveAnalysisAvailableTabs | null>(null);
+    useState<SensitiveAnalysisAvailableTabs | null>(null);
 
   useMount(() => {
     setIsLoading(true);
@@ -124,11 +124,14 @@ export const SensitiveAnalysisComponent: FC<Props> = ({ sidebarRow }) => {
 
     setMenuItems(menuContextGroup);
 
-    const availableTabsItems: ESensitiveAnalysisAvailableTabs[] = [];
+    const availableTabsItems: SensitiveAnalysisAvailableTabs[] = [];
 
-    sensitiveAnalysisData.forEach((i) =>
-      availableTabsItems.push(i.title as ESensitiveAnalysisAvailableTabs),
+    sensitiveAnalysisData.forEach((sensitiveAnalysisElement) =>
+      availableTabsItems.push(
+        sensitiveAnalysisElement.title as SensitiveAnalysisAvailableTabs,
+      ),
     );
+
     setAvailableTabs(availableTabsItems);
     // Изначально активный таб
     if (availableTabsItems.includes(EFluidType.OIL)) {

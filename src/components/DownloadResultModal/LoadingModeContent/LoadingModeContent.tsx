@@ -1,4 +1,6 @@
 import React from 'react';
+import { useSelector } from 'react-redux';
+import { RootState } from '@app/store/types';
 import { Button } from '@consta/uikit/Button';
 import { Loader } from '@consta/uikit/Loader';
 import { Text } from '@consta/uikit/Text';
@@ -14,6 +16,9 @@ export const LoadingModeContent: React.FC<ModalContentProps> = ({
   setModalContent,
   isFileWithImg,
 }) => {
+  /** Store */
+  const status = useSelector(({ file }: RootState) => file.status);
+
   /** Handlers */
   const handleClose = (): void => {
     setModalContent(ModalMode.cancel);
@@ -28,7 +33,7 @@ export const LoadingModeContent: React.FC<ModalContentProps> = ({
       </div>
       <div className={cn('Body')}>
         <Text size="s" view="secondary">
-          Файл генерируется, пожалуйста, не закрывайте вкладку браузера.
+          {status}
         </Text>
         <Text size="s" view="secondary">
           Скачивание начнется автоматически.
