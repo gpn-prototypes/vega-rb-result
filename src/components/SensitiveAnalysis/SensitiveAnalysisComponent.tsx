@@ -1,9 +1,5 @@
-import React, { FC, useCallback, useEffect, useState } from 'react';
+import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  EFluidType,
-  SensitiveAnalysisAvailableTabs,
-} from '@app/constants/Enums';
 import {
   MenuContextGroup,
   MenuContextItem,
@@ -24,6 +20,7 @@ import { Button } from '@consta/uikit/Button';
 import { ChoiceGroup } from '@consta/uikit/ChoiceGroup';
 import { Loader } from '@consta/uikit/Loader';
 import { Sidebar } from '@consta/uikit/Sidebar';
+import { Text } from '@consta/uikit/Text';
 import { useMount } from '@gpn-prototypes/vega-ui';
 import { block } from 'bem-cn';
 
@@ -39,6 +36,11 @@ const cn = block('SensitiveAnalysis');
 interface Props {
   sidebarRow: GridActiveRow;
 }
+
+type Tab = {
+  idx: number;
+  title: string;
+};
 
 const statisticMenuItem: MenuContextItem = {
   name: 'Показывать статистику',
@@ -75,11 +77,8 @@ export const SensitiveAnalysisComponent: FC<Props> = ({ sidebarRow }) => {
   const [isLoadingStatistic, setIsLoadingStatistic] = useState<boolean>(false);
   const [isShowStatistic, setIsShowStatistic] = useState<boolean>(true);
 
-  const [availableTabs, setAvailableTabs] = useState<
-    SensitiveAnalysisAvailableTabs[]
-  >([]);
-  const [activeTab, setActiveTab] =
-    useState<SensitiveAnalysisAvailableTabs | null>(null);
+  const [tabItems, setTabItems] = useState<Tab[]>([]);
+  const [activeTab, setActiveTab] = useState<Tab | null>(null);
 
   useMount(() => {
     setIsLoading(true);
@@ -103,41 +102,50 @@ export const SensitiveAnalysisComponent: FC<Props> = ({ sidebarRow }) => {
     if (!sensitiveAnalysisData) {
       return;
     }
-    const menuContextGroup: MenuContextGroup[] = sensitiveAnalysisData.map(
-      (sensitiveAnalysisElement, index) => {
-        const children: MenuContextItem[] =
-          sensitiveAnalysisElement.names.map((name: string) => {
-            return {
-              name,
-              code: `${sensitiveAnalysisData[index].title}__${name}`,
-              switch: true,
-            };
-          }) || [];
 
-        return { id: index, title: sensitiveAnalysisElement.title, children };
+    const availableTabsItems: Tab[] = [];
+
+    sensitiveAnalysisData.forEach(
+      (sensitiveAnalysisElement: SensitiveAnalysis, index: number) =>
+        availableTabsItems.push({
+          idx: index,
+          title: sensitiveAnalysisElement.title,
+        }),
+    );
+
+    setTabItems(availableTabsItems);
+
+    setActiveTab(availableTabsItems[0]);
+  }, [sensitiveAnalysisData]);
+
+  /** Смотрим за изменением активного таба и устанавливаем значения конкретных итемов */
+  useEffect(() => {
+    if (!sensitiveAnalysisData) {
+      return;
+    }
+
+    const sensitiveAnalysisElement = sensitiveAnalysisData[activeTab?.idx || 0];
+    const children: MenuContextItem[] =
+      sensitiveAnalysisElement.names.map((name: string) => {
+        return {
+          name,
+          code: `${sensitiveAnalysisElement.title}__${name}`,
+          switch: true,
+        };
+      }) || [];
+
+    const menuContextGroup: MenuContextGroup[] = [
+      {
+        id: 0,
+        title: sensitiveAnalysisElement.title,
+        children,
       },
-    );
+    ];
 
-    menuContextGroup[menuContextGroup.length - 1].children.push(
-      statisticMenuItem,
-    );
+    menuContextGroup[0].children.push(statisticMenuItem);
 
     setMenuItems(menuContextGroup);
-
-    const availableTabsItems: SensitiveAnalysisAvailableTabs[] = [];
-
-    sensitiveAnalysisData.forEach((sensitiveAnalysisElement) =>
-      availableTabsItems.push(
-        sensitiveAnalysisElement.title as SensitiveAnalysisAvailableTabs,
-      ),
-    );
-
-    setAvailableTabs(availableTabsItems);
-    // Изначально активный таб
-    if (availableTabsItems.includes(EFluidType.OIL)) {
-      setActiveTab(EFluidType.OIL);
-    }
-  }, [sensitiveAnalysisData]);
+  }, [activeTab, sensitiveAnalysisData]);
 
   // На изменение свичей
   const handleChange = (item: MenuContextItem) => {
@@ -167,11 +175,15 @@ export const SensitiveAnalysisComponent: FC<Props> = ({ sidebarRow }) => {
     setMenuItems(updatedMenuItems);
   };
 
+  const isShowMixFluid = useMemo(() => {
+    return sensitiveAnalysisData && sensitiveAnalysisData.length > 1;
+  }, [sensitiveAnalysisData]);
+
   const handleClick = (item: MenuContextItem) => {
     console.info('DEV: handle click', item);
   };
 
-  const getAvailableNames = (data: MenuContextGroup[]): string[][] => {
+  const getAvailableNames = (data: MenuContextGroup[]): string[] => {
     const result: string[][] = [];
 
     data.forEach((menuContextGroup) => {
@@ -185,19 +197,19 @@ export const SensitiveAnalysisComponent: FC<Props> = ({ sidebarRow }) => {
       return result.push(names);
     });
 
-    return result;
+    return result[0];
   };
 
   const chart = sensitiveAnalysisData?.length
-    ? sensitiveAnalysisData.map((sensitiveAnalysisItem, index) => {
-        return activeTab === sensitiveAnalysisItem.title ? (
+    ? sensitiveAnalysisData.map((sensitiveAnalysisItem) => {
+        return activeTab?.title === sensitiveAnalysisItem.title ? (
           <div key={sensitiveAnalysisItem.title}>
             <SensitiveAnalysisChartComponent
               percentiles={sensitiveAnalysisItem.percentiles}
               resultMinMax={sensitiveAnalysisItem.resultMinMax}
               names={sensitiveAnalysisItem.names}
               zeroPoint={sensitiveAnalysisItem.zeroPoint}
-              availableNames={getAvailableNames(menuItems)[index]}
+              availableNames={getAvailableNames(menuItems)}
               title=""
             />
           </div>
@@ -207,17 +219,14 @@ export const SensitiveAnalysisComponent: FC<Props> = ({ sidebarRow }) => {
 
   const statistic = (
     <div className={cn()}>
-      <div>
-        <div className={cn('Title')}>Статистика</div>
+      <div className={cn('Statistic')}>
+        <Text>Статистика</Text>
+
         {isLoadingStatistic || !sensitiveAnalysisStatisticData ? (
           <Loader />
         ) : (
           <SensitiveAnalysisStatisticComponent
-            statistic={
-              sensitiveAnalysisStatisticData[
-                activeTab === EFluidType.OIL ? 0 : 1
-              ]
-            }
+            statistic={sensitiveAnalysisStatisticData[activeTab?.idx || 0]}
           />
         )}
       </div>
@@ -227,43 +236,46 @@ export const SensitiveAnalysisComponent: FC<Props> = ({ sidebarRow }) => {
   return (
     <div className={cn()}>
       <Sidebar.Content>
-        <Button
-          view="ghost"
-          onClick={resetSidebarRow}
-          width="default"
-          form="default"
-          label="Закрыть"
-          size="m"
-          style={{ position: 'absolute', right: '5px' }}
-        />
         <div className={cn('Title')}>
           <VerticalMoreContextMenu
             groupItems={menuItems}
             title="Анализ чувствительности"
             onChange={handleChange}
+            loading={isLoading}
             onClick={handleClick}
           />
-        </div>
 
-        <div className={cn('Content')}>
-          {menuItems.length > 1 ? (
-            <div className="tabsWrapper">
+          {isShowMixFluid ? (
+            <div className={cn('Tabs')}>
               <ChoiceGroup
                 value={activeTab}
-                items={availableTabs}
+                items={tabItems}
                 name="SensitiveAnaLysisChoiceGroup"
                 size="s"
                 view="ghost"
                 width="full"
                 multiple={false}
-                getLabel={(item) => item}
+                getLabel={(item) => item.title}
                 onChange={({ value }) => setActiveTab(() => value)}
                 data-testid="Sensitive-analysis-tabs"
               />
             </div>
           ) : null}
+
+          <Button
+            view="ghost"
+            onClick={resetSidebarRow}
+            width="default"
+            form="default"
+            label="Закрыть"
+            size="s"
+          />
+        </div>
+
+        <div className={cn('Content')}>
           {/* График */}
           {isLoading ? <Loader className={cn('Loader')} /> : chart}
+
           {/* Статистика */}
           {isShowStatistic ? statistic : null}
         </div>
