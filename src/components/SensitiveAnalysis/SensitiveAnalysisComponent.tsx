@@ -1,10 +1,6 @@
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-  EFluidType,
-  SensitiveAnalysisAvailableTabs,
-} from '@app/constants/Enums';
-import {
   MenuContextGroup,
   MenuContextItem,
 } from '@app/interfaces/ContextMenuInterface';
@@ -24,6 +20,7 @@ import { Button } from '@consta/uikit/Button';
 import { ChoiceGroup } from '@consta/uikit/ChoiceGroup';
 import { Loader } from '@consta/uikit/Loader';
 import { Sidebar } from '@consta/uikit/Sidebar';
+import { Text } from '@consta/uikit/Text';
 import { useMount } from '@gpn-prototypes/vega-ui';
 import { block } from 'bem-cn';
 
@@ -39,6 +36,11 @@ const cn = block('SensitiveAnalysis');
 interface Props {
   sidebarRow: GridActiveRow;
 }
+
+type Tab = {
+  idx: number;
+  title: string;
+};
 
 const statisticMenuItem: MenuContextItem = {
   name: 'Показывать статистику',
@@ -75,11 +77,8 @@ export const SensitiveAnalysisComponent: FC<Props> = ({ sidebarRow }) => {
   const [isLoadingStatistic, setIsLoadingStatistic] = useState<boolean>(false);
   const [isShowStatistic, setIsShowStatistic] = useState<boolean>(true);
 
-  const [availableTabs, setAvailableTabs] = useState<
-    SensitiveAnalysisAvailableTabs[]
-  >([]);
-  const [activeTab, setActiveTab] =
-    useState<SensitiveAnalysisAvailableTabs | null>(null);
+  const [tabItems, setTabItems] = useState<Tab[]>([]);
+  const [activeTab, setActiveTab] = useState<Tab | null>(null);
 
   useMount(() => {
     setIsLoading(true);
@@ -103,6 +102,7 @@ export const SensitiveAnalysisComponent: FC<Props> = ({ sidebarRow }) => {
     if (!sensitiveAnalysisData) {
       return;
     }
+
     const menuContextGroup: MenuContextGroup[] = sensitiveAnalysisData.map(
       (sensitiveAnalysisElement, index) => {
         const children: MenuContextItem[] =
@@ -124,19 +124,19 @@ export const SensitiveAnalysisComponent: FC<Props> = ({ sidebarRow }) => {
 
     setMenuItems(menuContextGroup);
 
-    const availableTabsItems: SensitiveAnalysisAvailableTabs[] = [];
+    const availableTabsItems: Tab[] = [];
 
-    sensitiveAnalysisData.forEach((sensitiveAnalysisElement) =>
-      availableTabsItems.push(
-        sensitiveAnalysisElement.title as SensitiveAnalysisAvailableTabs,
-      ),
+    sensitiveAnalysisData.forEach(
+      (sensitiveAnalysisElement: SensitiveAnalysis, index: number) =>
+        availableTabsItems.push({
+          idx: index,
+          title: sensitiveAnalysisElement.title,
+        }),
     );
 
-    setAvailableTabs(availableTabsItems);
-    // Изначально активный таб
-    if (availableTabsItems.includes(EFluidType.OIL)) {
-      setActiveTab(EFluidType.OIL);
-    }
+    setTabItems(availableTabsItems);
+
+    setActiveTab(availableTabsItems[0]);
   }, [sensitiveAnalysisData]);
 
   // На изменение свичей
@@ -190,7 +190,7 @@ export const SensitiveAnalysisComponent: FC<Props> = ({ sidebarRow }) => {
 
   const chart = sensitiveAnalysisData?.length
     ? sensitiveAnalysisData.map((sensitiveAnalysisItem, index) => {
-        return activeTab === sensitiveAnalysisItem.title ? (
+        return activeTab?.title === sensitiveAnalysisItem.title ? (
           <div key={sensitiveAnalysisItem.title}>
             <SensitiveAnalysisChartComponent
               percentiles={sensitiveAnalysisItem.percentiles}
@@ -207,17 +207,14 @@ export const SensitiveAnalysisComponent: FC<Props> = ({ sidebarRow }) => {
 
   const statistic = (
     <div className={cn()}>
-      <div>
-        <div className={cn('Title')}>Статистика</div>
+      <div className={cn('Statistic')}>
+        <Text>Статистика</Text>
+
         {isLoadingStatistic || !sensitiveAnalysisStatisticData ? (
           <Loader />
         ) : (
           <SensitiveAnalysisStatisticComponent
-            statistic={
-              sensitiveAnalysisStatisticData[
-                activeTab === EFluidType.OIL ? 0 : 1
-              ]
-            }
+            statistic={sensitiveAnalysisStatisticData[activeTab?.idx || 0]}
           />
         )}
       </div>
@@ -227,15 +224,6 @@ export const SensitiveAnalysisComponent: FC<Props> = ({ sidebarRow }) => {
   return (
     <div className={cn()}>
       <Sidebar.Content>
-        <Button
-          view="ghost"
-          onClick={resetSidebarRow}
-          width="default"
-          form="default"
-          label="Закрыть"
-          size="m"
-          style={{ position: 'absolute', right: '5px' }}
-        />
         <div className={cn('Title')}>
           <VerticalMoreContextMenu
             groupItems={menuItems}
@@ -243,23 +231,40 @@ export const SensitiveAnalysisComponent: FC<Props> = ({ sidebarRow }) => {
             onChange={handleChange}
             onClick={handleClick}
           />
-        </div>
 
-        <div className={cn('Content')}>
           {menuItems.length > 1 ? (
-            <div className="tabsWrapper">
+            <div className={cn('Tabs')}>
               <ChoiceGroup
                 value={activeTab}
-                items={availableTabs}
+                items={tabItems}
                 name="SensitiveAnaLysisChoiceGroup"
                 size="s"
                 view="ghost"
                 width="full"
                 multiple={false}
-                getLabel={(item) => item}
+                getLabel={(item) => item.title}
                 onChange={({ value }) => setActiveTab(() => value)}
                 data-testid="Sensitive-analysis-tabs"
               />
+            </div>
+          ) : null}
+
+          <Button
+            view="ghost"
+            onClick={resetSidebarRow}
+            width="default"
+            form="default"
+            label="Закрыть"
+            size="s"
+          />
+        </div>
+
+        <div className={cn('Content')}>
+          {menuItems.length > 1 ? (
+            <div className={cn('TabTitle')}>
+              <Text size="xs" weight="bold">
+                {activeTab?.title || 'Нет данных'}
+              </Text>
             </div>
           ) : null}
           {/* График */}

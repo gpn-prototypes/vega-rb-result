@@ -1,11 +1,13 @@
 import React, { FC, useRef, useState } from 'react';
-import SvgMoreVertical from '@app/assets/icons/components/MoreVertical';
+import { IconMoreVertical } from '@app/assets/icons/components/MoreVertical';
 import { ContextMenuDropdown } from '@app/components/Helpers/ContextMenuDropdown';
 import {
   MenuContextGroup,
   MenuContextItem,
 } from '@app/interfaces/ContextMenuInterface';
+import { Button } from '@consta/uikit/Button';
 import { Position } from '@consta/uikit/Popover';
+import { Text } from '@consta/uikit/Text';
 import { block } from 'bem-cn';
 
 import './VerticalMoreContextMenu.css';
@@ -53,15 +55,24 @@ export const VerticalMoreContextMenu: FC<VerticalContextMenu> = ({
   return (
     <div className={cn()}>
       <div
-        onClick={openDropdown}
         className={cn('Title')}
         role="button"
         ref={ref}
         tabIndex={0}
         aria-hidden="true"
       >
-        <div>{title}</div>
-        <SvgMoreVertical />
+        <div className={cn('Title', { block: true })}>
+          <Text>{title}</Text>
+        </div>
+
+        <Button
+          size="xs"
+          iconSize="m"
+          view="clear"
+          onClick={openDropdown}
+          onlyIcon
+          iconLeft={IconMoreVertical}
+        />
       </div>
       {isAbleContextMenu(menuItems, groupItems) && (
         <ContextMenuDropdown

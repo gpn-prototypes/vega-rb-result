@@ -41,18 +41,6 @@ export const SensitiveAnalysisChartComponent: FC<
         index,
       }),
     );
-    // .sort((a: Sorted, b: Sorted) => {
-    //   if (a.range < b.range) {
-    //     return -1;
-    //   }
-    //
-    //   if (a.range > b.range) {
-    //     return 1;
-    //   }
-    //
-    //   return 0;
-    // })
-    // .reverse();
 
     const result = resultSorted
       .map(({ index }) => percentiles[index])
@@ -99,6 +87,7 @@ export const SensitiveAnalysisChartComponent: FC<
               ? zeroPoint - currentResult
               : currentResult - zeroPoint,
           category: innerIndex === 0 ? 0 : 1,
+          percentile: currentPercentiles[index][innerIndex],
         });
       });
     });
@@ -143,8 +132,7 @@ export const SensitiveAnalysisChartComponent: FC<
       .attr('y', ({ data: [name] }: any) => yScale(name) || 0)
       .attr('rx', () => 2)
       .attr('width', (d) => xScale(d[1]) - xScale(d[0]))
-      .attr('height', yScale.bandwidth())
-      .append('title');
+      .attr('height', yScale.bandwidth());
 
     svg.append('g').call(yAxis);
     svg.append('g').call(y2Axis);
