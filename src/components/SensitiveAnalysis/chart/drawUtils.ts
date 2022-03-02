@@ -212,19 +212,6 @@ export namespace SensitiveAnalysisChart {
       return currentTick;
     };
 
-    // const getAxisTextByXScale = (value: number) => {
-    //   if (value === 0) {
-    //     return zeroPoint.toFixed(3);
-    //   }
-
-    //   return resultMinMax
-    //     .flat(1)
-    //     .reduce((prev, curr) => {
-    //       return Math.abs(curr - value) < Math.abs(prev - value) ? curr : prev;
-    //     })
-    //     .toFixed(3);
-    // };
-
     /** Добавление оси X, а так же добавление полосок */
     const xAxis = (g) =>
       g

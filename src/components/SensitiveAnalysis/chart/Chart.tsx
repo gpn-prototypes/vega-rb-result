@@ -81,13 +81,15 @@ export const SensitiveAnalysisChartComponent: FC<
     cloneResultMinMax.forEach((result: number[], index) => {
       result.forEach((currentResult: number, innerIndex: number) => {
         data.push({
-          name: names[index],
+          name: availableNames[index],
           value:
             innerIndex === 0
               ? zeroPoint - currentResult
               : currentResult - zeroPoint,
           category: innerIndex === 0 ? 0 : 1,
-          percentile: currentPercentiles[index][innerIndex],
+          percentile: currentPercentiles[index]
+            ? currentPercentiles[index][innerIndex]
+            : 0,
         });
       });
     });
@@ -144,7 +146,7 @@ export const SensitiveAnalysisChartComponent: FC<
     if (d3Container.current) {
       draw();
     }
-  }, [draw, currentPercentiles, availableNames]);
+  }, [draw, availableNames]);
 
   return (
     <div className="chart">

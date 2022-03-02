@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useEffect, useState } from 'react';
+import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   MenuContextGroup,
@@ -103,27 +103,6 @@ export const SensitiveAnalysisComponent: FC<Props> = ({ sidebarRow }) => {
       return;
     }
 
-    const menuContextGroup: MenuContextGroup[] = sensitiveAnalysisData.map(
-      (sensitiveAnalysisElement, index) => {
-        const children: MenuContextItem[] =
-          sensitiveAnalysisElement.names.map((name: string) => {
-            return {
-              name,
-              code: `${sensitiveAnalysisData[index].title}__${name}`,
-              switch: true,
-            };
-          }) || [];
-
-        return { id: index, title: sensitiveAnalysisElement.title, children };
-      },
-    );
-
-    menuContextGroup[menuContextGroup.length - 1].children.push(
-      statisticMenuItem,
-    );
-
-    setMenuItems(menuContextGroup);
-
     const availableTabsItems: Tab[] = [];
 
     sensitiveAnalysisData.forEach(
@@ -138,6 +117,35 @@ export const SensitiveAnalysisComponent: FC<Props> = ({ sidebarRow }) => {
 
     setActiveTab(availableTabsItems[0]);
   }, [sensitiveAnalysisData]);
+
+  /** Смотрим за изменением активного таба и устанавливаем значения конкретных итемов */
+  useEffect(() => {
+    if (!sensitiveAnalysisData) {
+      return;
+    }
+
+    const sensitiveAnalysisElement = sensitiveAnalysisData[activeTab?.idx || 0];
+    const children: MenuContextItem[] =
+      sensitiveAnalysisElement.names.map((name: string) => {
+        return {
+          name,
+          code: `${sensitiveAnalysisElement.title}__${name}`,
+          switch: true,
+        };
+      }) || [];
+
+    const menuContextGroup: MenuContextGroup[] = [
+      {
+        id: 0,
+        title: sensitiveAnalysisElement.title,
+        children,
+      },
+    ];
+
+    menuContextGroup[0].children.push(statisticMenuItem);
+
+    setMenuItems(menuContextGroup);
+  }, [activeTab, sensitiveAnalysisData]);
 
   // На изменение свичей
   const handleChange = (item: MenuContextItem) => {
@@ -167,11 +175,15 @@ export const SensitiveAnalysisComponent: FC<Props> = ({ sidebarRow }) => {
     setMenuItems(updatedMenuItems);
   };
 
+  const isShowMixFluid = useMemo(() => {
+    return sensitiveAnalysisData && sensitiveAnalysisData.length > 1;
+  }, [sensitiveAnalysisData]);
+
   const handleClick = (item: MenuContextItem) => {
     console.info('DEV: handle click', item);
   };
 
-  const getAvailableNames = (data: MenuContextGroup[]): string[][] => {
+  const getAvailableNames = (data: MenuContextGroup[]): string[] => {
     const result: string[][] = [];
 
     data.forEach((menuContextGroup) => {
@@ -185,11 +197,11 @@ export const SensitiveAnalysisComponent: FC<Props> = ({ sidebarRow }) => {
       return result.push(names);
     });
 
-    return result;
+    return result[0];
   };
 
   const chart = sensitiveAnalysisData?.length
-    ? sensitiveAnalysisData.map((sensitiveAnalysisItem, index) => {
+    ? sensitiveAnalysisData.map((sensitiveAnalysisItem) => {
         return activeTab?.title === sensitiveAnalysisItem.title ? (
           <div key={sensitiveAnalysisItem.title}>
             <SensitiveAnalysisChartComponent
@@ -197,7 +209,7 @@ export const SensitiveAnalysisComponent: FC<Props> = ({ sidebarRow }) => {
               resultMinMax={sensitiveAnalysisItem.resultMinMax}
               names={sensitiveAnalysisItem.names}
               zeroPoint={sensitiveAnalysisItem.zeroPoint}
-              availableNames={getAvailableNames(menuItems)[index]}
+              availableNames={getAvailableNames(menuItems)}
               title=""
             />
           </div>
@@ -229,10 +241,11 @@ export const SensitiveAnalysisComponent: FC<Props> = ({ sidebarRow }) => {
             groupItems={menuItems}
             title="Анализ чувствительности"
             onChange={handleChange}
+            loading={isLoading}
             onClick={handleClick}
           />
 
-          {menuItems.length > 1 ? (
+          {isShowMixFluid ? (
             <div className={cn('Tabs')}>
               <ChoiceGroup
                 value={activeTab}
@@ -260,15 +273,9 @@ export const SensitiveAnalysisComponent: FC<Props> = ({ sidebarRow }) => {
         </div>
 
         <div className={cn('Content')}>
-          {menuItems.length > 1 ? (
-            <div className={cn('TabTitle')}>
-              <Text size="xs" weight="bold">
-                {activeTab?.title || 'Нет данных'}
-              </Text>
-            </div>
-          ) : null}
           {/* График */}
           {isLoading ? <Loader className={cn('Loader')} /> : chart}
+
           {/* Статистика */}
           {isShowStatistic ? statistic : null}
         </div>

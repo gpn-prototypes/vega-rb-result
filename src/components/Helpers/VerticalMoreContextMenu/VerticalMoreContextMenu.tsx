@@ -18,6 +18,7 @@ interface VerticalContextMenu {
   title: string;
   menuItems?: MenuContextItem[];
   groupItems?: MenuContextGroup[];
+  loading?: boolean;
   onChange: (item: MenuContextItem) => void;
   onClick: (item: MenuContextItem) => void;
 }
@@ -25,6 +26,7 @@ interface VerticalContextMenu {
 export const VerticalMoreContextMenu: FC<VerticalContextMenu> = ({
   menuItems,
   groupItems,
+  loading,
   title,
   onChange,
   onClick,
@@ -71,6 +73,7 @@ export const VerticalMoreContextMenu: FC<VerticalContextMenu> = ({
           view="clear"
           onClick={openDropdown}
           onlyIcon
+          loading={loading || false}
           iconLeft={IconMoreVertical}
         />
       </div>
