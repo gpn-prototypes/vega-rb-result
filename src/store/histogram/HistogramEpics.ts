@@ -45,17 +45,30 @@ function toggleActiveTableCellClass(
   newState: RootState,
   oldState: RootState,
 ): void {
-  const cell: HTMLElement | null = document.querySelector(
-    `[data-name="${tableActiveRowSelector(newState)?.title}"]`,
-  )!.parentElement!.parentElement;
+  /** TODO: Оптимизировать, делал вечером) */
+  const currentActiveCell = tableActiveRowSelector(newState);
+
+  if (!currentActiveCell) {
+    return;
+  }
+
+  const currentActiveCellElement: HTMLElement | null = document.querySelector(
+    `[data-name="${currentActiveCell.title}"]`,
+  );
+  const cell: HTMLElement | null = currentActiveCellElement
+    ? currentActiveCellElement!.parentElement!.parentElement
+    : null;
 
   if (cell) {
     const previousActiveCell = tableActiveRowSelector(oldState);
 
     if (previousActiveCell) {
-      const previousCell: HTMLElement | null = document.querySelector(
+      const previousCellElement: HTMLElement | null = document.querySelector(
         `[data-name="${tableActiveRowSelector(oldState)?.title}"]`,
-      )!.parentElement!.parentElement;
+      );
+      const previousCell: HTMLElement | null = previousCellElement
+        ? previousCellElement!.parentElement!.parentElement
+        : null;
 
       if (previousCell && previousCell.classList.contains('TableCell_active')) {
         previousCell.classList.remove('TableCell_active');
