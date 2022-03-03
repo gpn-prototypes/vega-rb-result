@@ -21,7 +21,7 @@ interface ContextMenuDropdownProps {
   position: Position;
   getDisabled?: (item: MenuContextItem) => boolean;
   onClick?: (item: MenuContextItem) => void;
-  onChange: (item: MenuContextItem) => void;
+  onChange?: (item: MenuContextItem) => void;
 }
 
 export const ContextMenuDropdown: FC<ContextMenuDropdownProps> = ({

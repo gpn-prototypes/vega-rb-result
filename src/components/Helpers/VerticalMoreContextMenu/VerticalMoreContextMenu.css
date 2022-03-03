@@ -6,6 +6,7 @@
     align-items: center;
 
     &_block {
+      margin-top: -4px;
       margin-right: var(--space-xs);
     }
   }

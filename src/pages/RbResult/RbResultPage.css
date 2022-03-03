@@ -7,6 +7,57 @@
   display: flex;
   flex-direction: column;
   flex: 1;
+
+  &__Content {
+    overflow-x: auto;
+  }
+
+  &__TableContent {
+    min-width: 1210px;
+  }
+
+  &__Header {
+    margin: var(--space-s) var(--space-m);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &__TabsWrapper {
+    width: 450px;
+  }
+
+  &__Settings {
+    display: flex;
+    align-items: center;
+    margin-left: var(--space-m);
+  }
+
+  &__SettingElement {
+    margin-left: var(--space-m);
+    cursor: pointer;
+  }
+
+  &__Table {
+    height: calc(100vh - 510px);
+    border-bottom: 1px solid var(--color-bg-border);
+
+    &_full {
+      height: calc(100vh - 100px);
+      box-shadow: inherit;
+    }
+  }
+
+  &__Graphs {
+    padding-top: var(--space-l);
+    padding-left: var(--size-text-m);
+    display: flex;
+    min-width: 1210px;
+
+    &_hide {
+      display: none;
+    }
+  }
 }
 
 .Header {
@@ -14,10 +65,6 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-}
-
-.content {
-  overflow-x: auto;
 }
 
 .ButtonStructure {
@@ -34,61 +81,6 @@
   max-width: 400px;
   height: 100%;
   max-height: calc(100vh - 100px);
-}
-
-.result {
-  &__graphs {
-    padding-top: var(--space-l);
-    padding-left: var(--size-text-m);
-    display: flex;
-    min-width: 1210px;
-
-    &_hide {
-      display: none;
-    }
-  }
-
-  &__table-content {
-    min-width: 1210px;
-  }
-
-  &__analysis {
-    margin-right: var(--space-2xl);
-  }
-
-  &__sidebar {
-    margin-top: var(--space-3xl);
-    padding: var(--space-l);
-    min-width: 736px;
-  }
-
-  &__icons {
-    display: flex;
-    align-items: center;
-    margin-left: var(--space-m);
-  }
-
-  &__icon {
-    margin-left: var(--space-m);
-    cursor: pointer;
-  }
-
-  &__top {
-    margin: var(--space-s) var(--space-m);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  &__table {
-    height: 425px;
-    border-bottom: 1px solid var(--color-bg-border);
-
-    &_full {
-      height: calc(100vh - 100px);
-      box-shadow: inherit;
-    }
-  }
 }
 
 /* TODO: Удалить, это дубли vega-ui, нужно убрать везде vega-ui тогда можно будет удалить */

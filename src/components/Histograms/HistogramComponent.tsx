@@ -67,7 +67,11 @@ export const HistogramComponent: React.FC<Props> = ({ grid }) => {
   );
 
   const histogramsBlock = useMemo(() => {
-    return (
+    return isLoading ? (
+      <div className={cn('Loader')}>
+        <Loader />
+      </div>
+    ) : (
       <div className={cn('Content')}>
         {histograms?.map((histogram: Histogram, index: number) => {
           return (
@@ -85,34 +89,41 @@ export const HistogramComponent: React.FC<Props> = ({ grid }) => {
         })}
       </div>
     );
-  }, [histograms, numberOfRows]);
+  }, [histograms, numberOfRows, isLoading]);
 
   const histogramsWrapper = useMemo(() => {
-    return histograms?.length ? (
+    return !histograms?.length && isLoading === false ? (
+      <Text>Данные не найдены</Text>
+    ) : (
       <div>
         <div className={cn('Header')}>
           <VerticalMoreContextMenu
             menuItems={menuItems}
-            title="Гистограмма запасов"
+            title="Гистограмма"
             onChange={handleChange}
             onClick={() => {}}
           />
 
           <div className={cn('ActiveRow')}>
             <Text view="ghost" size="s">
-              Выбранный элемент:
+              Выбранный объект:
             </Text>
 
-            <Text size="s"> {activeRow?.title.split(',').join(', ')}</Text>
+            <Text size="s">&nbsp;{activeRow?.title.split(',').join(', ')}</Text>
           </div>
         </div>
 
         {histogramsBlock}
       </div>
-    ) : (
-      <Text>Данные не найдены</Text>
     );
-  }, [histograms, histogramsBlock, menuItems, activeRow, handleChange]);
+  }, [
+    histograms,
+    histogramsBlock,
+    menuItems,
+    activeRow,
+    isLoading,
+    handleChange,
+  ]);
 
   const statistic = isShowStatistic && (
     <HistogramStatisticsComponent
@@ -123,14 +134,10 @@ export const HistogramComponent: React.FC<Props> = ({ grid }) => {
 
   return (
     <div className={cn()}>
-      {isLoading ? (
-        <Loader className={cn('Loader')} />
-      ) : (
-        <div data-testid="histogram-wrapper">
-          {histogramsWrapper}
-          {statistic}
-        </div>
-      )}
+      <div data-testid="histogram-wrapper">
+        {histogramsWrapper}
+        {statistic}
+      </div>
     </div>
   );
 };

@@ -235,7 +235,7 @@ export const SensitiveAnalysisComponent: FC<Props> = ({ sidebarRow }) => {
 
   return (
     <div className={cn()}>
-      <Sidebar.Content>
+      <Sidebar.Content className={cn('Sidebar')}>
         <div className={cn('Title')}>
           <VerticalMoreContextMenu
             groupItems={menuItems}
@@ -269,6 +269,7 @@ export const SensitiveAnalysisComponent: FC<Props> = ({ sidebarRow }) => {
             form="default"
             label="Закрыть"
             size="s"
+            data-testid="sensitive-analysis-close"
           />
         </div>
 

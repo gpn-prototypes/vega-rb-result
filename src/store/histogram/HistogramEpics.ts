@@ -11,13 +11,16 @@ import { from, of } from 'rxjs';
 import {
   distinctUntilChanged,
   ignoreElements,
+  pairwise,
   switchMap,
   tap,
+  withLatestFrom,
 } from 'rxjs/operators';
 
 import { LoaderAction } from '../loader/loaderActions';
 import { TableActions } from '../table/tableActions';
-import { EpicDependencies, RootState } from '../types';
+import { tableActiveRowSelector } from '../table/TableSelectors';
+import { RootState, StoreDependencies } from '../types';
 
 import { HistogramActions } from './HistogramActions';
 
@@ -30,17 +33,55 @@ export const getDomainEntityNames = (
     : [String((grid.rows[0][grid.columns[0].accessor] as any)?.value)];
 };
 
+/**
+ * Делаем через DOM, ибо не хочется всю структуру таблицы обновлять, ради одного класса
+ * Находим в DOM текущую ячейку и ячейку из пред. состояния
+ * Убираем класс у пред. ячейки и добавляем новой
+ *
+ * Хотел вынести в отдельный epic. Но pairwise работает не корректно,
+ * когда несколько action на разные эпики и выдает не корректные old/new state
+ */
+function toggleActiveTableCellClass(
+  newState: RootState,
+  oldState: RootState,
+): void {
+  const cell: HTMLElement | null = document.querySelector(
+    `[data-name="${tableActiveRowSelector(newState)?.title}"]`,
+  )!.parentElement!.parentElement;
+
+  if (cell) {
+    const previousActiveCell = tableActiveRowSelector(oldState);
+
+    if (previousActiveCell) {
+      const previousCell: HTMLElement | null = document.querySelector(
+        `[data-name="${tableActiveRowSelector(oldState)?.title}"]`,
+      )!.parentElement!.parentElement;
+
+      if (previousCell && previousCell.classList.contains('TableCell_active')) {
+        previousCell.classList.remove('TableCell_active');
+      }
+    }
+
+    cell.classList.add('TableCell_active');
+  }
+}
+
 const loadHistogramEpic: Epic<
   AnyAction,
   AnyAction,
   RootState,
-  EpicDependencies
-> = (action$, state$, { dispatch }) =>
-  action$.pipe(
+  StoreDependencies
+> = (action$, state$, { dispatch }) => {
+  const statePairs$ = state$.pipe(pairwise());
+
+  return action$.pipe(
     ofAction(TableActions.setActiveRow, HistogramActions.setNumberOfRows),
+    withLatestFrom(statePairs$),
     tap(() => dispatch(LoaderAction.setLoading('histogram'))),
     distinctUntilChanged(),
-    switchMap(({ payload }) => {
+    switchMap(([{ payload }, [oldState, newState]]) => {
+      toggleActiveTableCellClass(newState, oldState);
+
       if (payload === undefined || typeof payload === 'object') {
         return from(
           loadHistogramData(
@@ -66,12 +107,13 @@ const loadHistogramEpic: Epic<
     tap(() => dispatch(LoaderAction.setLoaded('histogram'))),
     ignoreElements(),
   );
+};
 
 const loadHistogramStatisticEpic: Epic<
   AnyAction,
   AnyAction,
   RootState,
-  EpicDependencies
+  StoreDependencies
 > = (action$, state$, { dispatch }) =>
   action$.pipe(
     ofAction(HistogramActions.loadStatistic, TableActions.setActiveRow),

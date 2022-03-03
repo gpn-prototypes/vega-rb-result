@@ -385,7 +385,7 @@ export const TableResultRb: React.FC<Props> = ({
   };
 
   return (
-    <div className="table">
+    <div className="table-wrapper">
       <Table
         rows={filteredRows as any}
         columns={filteredColumns}

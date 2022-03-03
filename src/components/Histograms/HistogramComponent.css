@@ -12,12 +12,13 @@
   }
 
   &__Loader {
-    margin-top: var(--space-m);
+    margin-top: var(--space-3xl);
     min-height: 244px;
   }
 
   &__Header {
     display: flex;
+    align-items: center;
   }
 
   &__ActiveRow {
