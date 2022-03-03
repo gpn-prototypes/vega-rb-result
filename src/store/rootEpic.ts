@@ -5,10 +5,13 @@ import { HistogramEpics } from '@app/store/histogram/HistogramEpics';
 import projectDuck from '@app/store/projectDuck';
 import { combineEpics } from 'redux-observable';
 
+import { WebsocketEpics } from './websocket/websocketEpics';
+
 export default combineEpics(
   ...Object.values(alertDuck.epics),
   ...projectDuck.epics,
   ...errorsDuck.epics,
+  ...WebsocketEpics,
   ...FileEpics,
   ...HistogramEpics,
 );

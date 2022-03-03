@@ -9,28 +9,15 @@ import { block } from 'bem-cn';
 
 import { ModalContentProps, ModalMode } from '../ModalContentType';
 
+import {
+  DownloadData,
+  DownloadNameEnum,
+  DownloadTypeEnum,
+} from './InitialModeContentTypes';
+
 import './InitialModeContent.css';
 
 export const cn = block('InitialModeContent');
-
-enum DownloadTypeEnum {
-  statistics = 'statistics',
-  samples = 'samples',
-  plots = 'plots',
-}
-
-enum DownloadNameEnum {
-  statistics = 'Статистика',
-  samples = 'Сэмплы',
-  plots = 'Изображения',
-}
-
-type DownloadData = {
-  name: DownloadNameEnum;
-  type: DownloadTypeEnum;
-  size: string;
-  disabled?: boolean;
-};
 
 export const InitialModeContent: React.FC<ModalContentProps> = ({
   handleCloseContent,
@@ -51,18 +38,18 @@ export const InitialModeContent: React.FC<ModalContentProps> = ({
 
   const downloadDataTypes: DownloadData[] = [
     {
-      name: DownloadNameEnum.statistics,
-      type: DownloadTypeEnum.statistics,
+      name: DownloadNameEnum.Statistics,
+      type: DownloadTypeEnum.Statistics,
       size: 'Небольшой',
     },
     {
-      name: DownloadNameEnum.samples,
-      type: DownloadTypeEnum.samples,
+      name: DownloadNameEnum.Samples,
+      type: DownloadTypeEnum.Samples,
       size: 'Средний',
     },
     {
-      name: DownloadNameEnum.plots,
-      type: DownloadTypeEnum.plots,
+      name: DownloadNameEnum.Plots,
+      type: DownloadTypeEnum.Plots,
       size: 'Большой',
     },
   ];
@@ -80,9 +67,9 @@ export const InitialModeContent: React.FC<ModalContentProps> = ({
     try {
       dispatch(
         FileAction.fetchResultFile({
-          statistics: checkedState[DownloadTypeEnum.statistics],
-          samples: checkedState[DownloadTypeEnum.samples],
-          plots: checkedState[DownloadTypeEnum.plots],
+          statistics: checkedState[DownloadTypeEnum.Statistics],
+          samples: checkedState[DownloadTypeEnum.Samples],
+          plots: checkedState[DownloadTypeEnum.Plots],
         }),
       );
     } catch (error) {
@@ -91,7 +78,7 @@ export const InitialModeContent: React.FC<ModalContentProps> = ({
   };
 
   const handleStartDownload = (): void => {
-    const withImages: boolean = checkedState[DownloadTypeEnum.plots];
+    const withImages: boolean = checkedState[DownloadTypeEnum.Plots];
 
     downloadResult();
     setFileWithImg(withImages);
@@ -148,7 +135,7 @@ export const InitialModeContent: React.FC<ModalContentProps> = ({
             </div>
           ))}
         </div>
-        {checkedState[DownloadTypeEnum.plots] && (
+        {checkedState[DownloadTypeEnum.Plots] && (
           <Text view="alert" size="xs" data-testid="long-time-export-warning">
             Генерация файла займёт больше времени
           </Text>

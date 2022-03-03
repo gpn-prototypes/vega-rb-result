@@ -1,6 +1,7 @@
 import alertDuck from '@app/store/alertDuck';
 import competitiveAccessDuck from '@app/store/competitiveAccessDuck';
 import errorsDuck from '@app/store/errorsDuck';
+import { FileReducers } from '@app/store/file/fileReducers';
 import { GeneralReducers } from '@app/store/general/generalReducers';
 import { HistogramReducers } from '@app/store/histogram/HistogramReducers';
 import { LoaderReducers } from '@app/store/loader/loaderReducers';
@@ -11,6 +12,7 @@ import { SettingsReducers } from '@app/store/settings/settingsReducers';
 import { TableReducers } from '@app/store/table/tableReducers';
 import treeDuck from '@app/store/treeDuck';
 import { RootState } from '@app/store/types';
+import { WebsocketReducers } from '@app/store/websocket/websocketReducers';
 import { combineReducers } from 'redux';
 
 export default combineReducers<RootState>({
@@ -24,6 +26,8 @@ export default combineReducers<RootState>({
   sensitiveAnalysis: sensitiveAnalysisDuck.reducer,
   settings: SettingsReducers,
   notify: NotifyReducers,
+  websocket: WebsocketReducers,
   general: GeneralReducers,
   loader: LoaderReducers,
+  file: FileReducers,
 });

@@ -22,6 +22,7 @@ export namespace SensitiveAnalysisChart {
     name: string;
     value: number;
     category: number;
+    percentile: number;
   }
 
   export interface Options {
@@ -184,43 +185,14 @@ export namespace SensitiveAnalysisChart {
       return (innerX) => format(Math.abs(innerX));
     };
 
-    const getPercentileByValue = (inputValue: number): string => {
-      const negativesData = data.filter(
-        (currentData) => currentData.category === 0,
-      );
-      const positivesData = data.filter(
-        (currentData) => currentData.category === 1,
+    const getPercentileByName = (name: string, isPositive = false): string => {
+      const currentElement = data.filter(
+        (currentData) => currentData.name === name,
       );
 
-      const valueIndex = (
-        inputValue < 0 ? negativesData : positivesData
-      ).findIndex((currentData) => {
-        return inputValue < 0
-          ? currentData.value === inputValue * -1
-          : currentData.value === inputValue;
-      });
-
-      if (!currentPercentiles[valueIndex]) {
-        return '';
-      }
-
-      return currentPercentiles[valueIndex][inputValue < 0 ? 0 : 1].toFixed(3);
-
-      // const value =
-      //   inputValue < 0 ? inputValue * -1 + zeroPoint : inputValue + zeroPoint;
-
-      // resultMinMax.forEach((result: number[], index: number) => {
-      //   if (result.includes(value)) {
-      //     firstIndex = index;
-
-      //     secondIndex = result.findIndex(
-      //       (innerResult: number) =>
-      //         innerResult.toFixed(5) === value.toFixed(5),
-      //     );
-      //   }
-      // });
-
-      // return currentPercentiles[firstIndex][secondIndex].toFixed(3);
+      return currentElement[isPositive ? 1 : 0].percentile
+        .toFixed(3)
+        .toString();
     };
 
     const getPositiveTickByNegativeValue = (negativeValue: number): number => {
@@ -239,19 +211,6 @@ export namespace SensitiveAnalysisChart {
 
       return currentTick;
     };
-
-    // const getAxisTextByXScale = (value: number) => {
-    //   if (value === 0) {
-    //     return zeroPoint.toFixed(3);
-    //   }
-
-    //   return resultMinMax
-    //     .flat(1)
-    //     .reduce((prev, curr) => {
-    //       return Math.abs(curr - value) < Math.abs(prev - value) ? curr : prev;
-    //     })
-    //     .toFixed(3);
-    // };
 
     /** Добавление оси X, а так же добавление полосок */
     const xAxis = (g) =>
@@ -307,7 +266,7 @@ export namespace SensitiveAnalysisChart {
             .text('')
             .append('text')
             .attr('class', 'chart__text chart__text_white')
-            .text(([, value]) => getPercentileByValue(value)),
+            .text(([name]) => getPercentileByName(name)),
         )
         /** Установка позиции zero point */
         .call((innerG) =>
@@ -335,8 +294,8 @@ export namespace SensitiveAnalysisChart {
             .text('')
             .append('text')
             .attr('class', 'chart__text chart__text_start chart__text_white')
-            .text(([, min]) => {
-              return getPercentileByValue(getPositiveTickByNegativeValue(min));
+            .text(([name]) => {
+              return getPercentileByName(name, true);
             }),
         )
         .call((innerG) => innerG.select('.domain').attr('display', 'none'));

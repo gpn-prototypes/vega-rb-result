@@ -1,24 +1,35 @@
 import projectService from '@app/services/ProjectService';
-import { applyMiddleware, CombinedState, createStore, Store } from 'redux';
+import { createBrowserHistory } from 'history';
+import {
+  applyMiddleware,
+  CombinedState,
+  createStore,
+  Dispatch,
+  Store,
+} from 'redux';
 import * as logger from 'redux-logger';
 import { createEpicMiddleware } from 'redux-observable';
 import { AnyAction } from 'typescript-fsa';
 
 import rootReducer from './reducers';
 import rootEpic from './rootEpic';
-import { EpicDependencies, RootState } from './types';
+import { RootState, StoreDependencies } from './types';
 
 const configureStore = (): Store<CombinedState<RootState>, AnyAction> => {
+  const history = createBrowserHistory();
+
   const epicMiddleware = createEpicMiddleware<
     AnyAction,
     AnyAction,
     RootState,
-    EpicDependencies
+    StoreDependencies
   >({
     dependencies: {
       projectService,
 
-      get dispatch() {
+      history,
+
+      get dispatch(): Dispatch<AnyAction> {
         // eslint-disable-next-line @typescript-eslint/no-use-before-define
         return store.dispatch;
       },

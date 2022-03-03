@@ -10,7 +10,7 @@ import { catchError, mergeMap } from 'rxjs/operators';
 import actionCreatorFactory, { AnyAction } from 'typescript-fsa';
 import { reducerWithInitialState } from 'typescript-fsa-reducers';
 
-import { ProjectState, RootState } from './types';
+import { ProjectState, RootState, StoreDependencies } from './types';
 
 const factory = actionCreatorFactory('project');
 
@@ -34,7 +34,12 @@ const reducer = reducerWithInitialState<ProjectState>(initialState)
     name: payload,
   }));
 
-const fetchParamsEpic: Epic<AnyAction, AnyAction, RootState> = (action$) =>
+const fetchParamsEpic: Epic<
+  AnyAction,
+  AnyAction,
+  RootState,
+  StoreDependencies
+> = (action$) =>
   action$.pipe(
     ofAction(actions.fetchParams.started),
     mergeMap((action) =>

@@ -43,3 +43,50 @@ export const CALCULATION_PROJECT = gql`
   }
   ${ResourceBaseDiffFragment}
 `;
+
+export const GENERATE_CALCULATION_RESULT_ARCHIVE = gql`
+  mutation generateCalculationResultArchive(
+    $version: Int!
+    $plots: Boolean
+    $samples: Boolean
+    $statistics: Boolean
+  ) {
+    project(version: $version) {
+      ... on UpdateProjectInnerDiff {
+        ...ResourceBaseDiffFragment
+        __typename
+      }
+      ... on Error {
+        code
+        message
+        details
+        payload
+      }
+      ... on ProjectMutation {
+        resourceBase {
+          generateCalculationResultArchive(
+            samples: $samples
+            statistics: $statistics
+            plots: $plots
+          ) {
+            ... on ProcessId {
+              processId
+              __typename
+            }
+            ... on CommonError {
+              code
+              __typename
+            }
+            __typename
+          }
+          __typename
+        }
+        __typename
+      }
+      __typename
+    }
+    version
+    __typename
+  }
+  ${ResourceBaseDiffFragment}
+`;

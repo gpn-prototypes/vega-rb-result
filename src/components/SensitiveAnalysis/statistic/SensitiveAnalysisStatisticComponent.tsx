@@ -16,8 +16,10 @@ const getMappedColumn = (
   header: SensitiveAnalysisStatisticHeaders,
   isLeft = true,
 ): TableColumn<TableRow> => {
+  const title = header.name.toLowerCase();
+
   const column: TableColumn<TableRow> = {
-    title: header.name,
+    title: title.charAt(0).toUpperCase() + title.slice(1),
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     accessor: header.code as any,
     align: isLeft ? 'left' : 'right',
@@ -56,8 +58,10 @@ export const SensitiveAnalysisStatisticComponent: FC<Props> = ({
   const columns: TableColumn<TableRow>[] = statistic?.headers.map(
     (header: SensitiveAnalysisStatisticHeaders) => {
       if (header?.children && header?.children?.length > 0) {
+        const title = header.name.toLowerCase();
+
         return {
-          title: header.name,
+          title: title.charAt(0).toUpperCase() + title.slice(1),
           columns: header.children.map(
             (childrenHeader: SensitiveAnalysisStatisticHeaders) =>
               getMappedColumn(childrenHeader, false),

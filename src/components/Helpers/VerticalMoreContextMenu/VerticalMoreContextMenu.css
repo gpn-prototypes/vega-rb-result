@@ -3,11 +3,11 @@
 
   &__Title {
     display: flex;
-    font-size: 18px;
-    font-weight: 400;
-    line-height: 21px;
-    cursor: pointer;
-    color: var(--color-typo-primary);
+    align-items: center;
+
+    &_block {
+      margin-right: var(--space-xs);
+    }
   }
 
   &__More {

@@ -47,6 +47,7 @@ const RbResultPage: React.FC = () => {
     dispatch(sensitiveAnalysisDuck.actions.resetState());
     dispatch(treeDuck.actions.resetState());
   }, [dispatch]);
+
   const setFluidType = useCallback(
     (type: EFluidType) => dispatch(TableActions.setFluidType(type)),
     [dispatch],
