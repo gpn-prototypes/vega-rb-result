@@ -1,198 +1,118 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { VerticalMoreContextMenu } from '@app/components/Helpers/VerticalMoreContextMenu/VerticalMoreContextMenu';
 import { Histogram } from '@app/generated/graphql';
 import { MenuContextItem } from '@app/interfaces/ContextMenuInterface';
-import { loadHistogramData } from '@app/services/histogramService';
-import histogramDuck from '@app/store/histogramDuck';
+import { HistogramActions } from '@app/store/histogram/HistogramActions';
+import { getDomainEntityNames } from '@app/store/histogram/HistogramEpics';
 import { RootState } from '@app/store/types';
 import { GridActiveRow, GridCollection } from '@app/types/typesTable';
 import { Loader } from '@consta/uikit/Loader';
 import { Text } from '@consta/uikit/Text';
 import { useMount } from '@gpn-prototypes/vega-ui';
+import { block } from 'bem-cn';
 
 import ChartComponent from './chart/Chart';
 import { HistogramStatisticsComponent } from './statistic/HistogramStatisticsComponent';
 
 import './HistogramComponent.css';
 
+const cn = block('Histogram');
+
 interface Props {
   grid: GridCollection;
 }
 
-const DEFAULT_NUMBER_OF_ROWS = 50;
-
-const payloadMenuItems: MenuContextItem[] = [
-  {
-    name: 'Кол-во столбцов в гистограмме',
-    code: 'numberOfRows',
-    choice: {
-      value: DEFAULT_NUMBER_OF_ROWS,
-      values: [25, DEFAULT_NUMBER_OF_ROWS, 100],
-    },
-  },
-  {
-    name: 'Показывать статистику',
-    code: 'stat',
-    switch: false,
-    border: true,
-  },
-];
-
-const getDomainEntityNames = (
-  row: GridActiveRow | undefined,
-  grid: GridCollection,
-): string[] => {
-  return row !== undefined
-    ? row.title.split(',')
-    : [String((grid.rows[0][grid.columns[0].accessor] as any)?.value)];
-};
-
 export const HistogramComponent: React.FC<Props> = ({ grid }) => {
+  /** State */
   const dispatch = useDispatch();
-  const resetHistogramState = useCallback(
-    () => dispatch(histogramDuck.actions.resetState()),
-    [dispatch],
+  const numberOfRows = useSelector(
+    ({ histogram }: RootState) => histogram.numberOfRows,
   );
-  const setHistograms = useCallback(
-    (histograms: Histogram[]) =>
-      dispatch(histogramDuck.actions.setHistograms(histograms)),
-    [dispatch],
+  const isShowStatistic = useSelector(
+    ({ histogram }: RootState) => histogram.isShowStatistic,
   );
-
-  const histogramsPayload: Histogram[] = useSelector(
-    ({ histograms }: RootState) => histograms.payload,
+  const menuItems = useSelector(
+    ({ histogram }: RootState) => histogram.menuItems,
+  );
+  const histograms = useSelector(
+    ({ histogram }: RootState) => histogram.histograms,
   );
   const activeRow: GridActiveRow | undefined = useSelector(
     ({ table }: RootState) => table.activeRow,
   );
-
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [previousNumberOfRows, setPreviousNumberOfRows] = useState<number>(
-    DEFAULT_NUMBER_OF_ROWS,
+  const isLoading: boolean = useSelector(
+    ({ loader }: RootState) => loader.loading.histogram,
   );
-  const [isShowStatistic, setIsShowStatistic] = useState<boolean>(false);
-  const [numberOfRows, setNumberOfRows] = useState<number>(
-    DEFAULT_NUMBER_OF_ROWS,
-  );
-  const [previousActiveRow, setPreviousActiveRow] = useState<
-    GridActiveRow | undefined
-  >(undefined);
-  const [menuItems, setMenuItems] =
-    useState<MenuContextItem[]>(payloadMenuItems);
 
-  /** Запрашиваем данные в самом начале, берем самый первый элемент */
+  /** Callback */
+  const resetHistogramState = useCallback(
+    () => dispatch(HistogramActions.resetState()),
+    [dispatch],
+  );
+
   useMount(() => {
-    loadHistogramData(
-      setHistograms,
-      getDomainEntityNames(undefined, grid),
-      numberOfRows,
-    ).finally(() => setIsLoading(false));
-
     return resetHistogramState;
   });
 
-  const loadData = useCallback(
-    (innerActiveRow: GridActiveRow | undefined) => {
-      if (
-        innerActiveRow?.title === previousActiveRow?.title &&
-        numberOfRows === previousNumberOfRows
-      ) {
-        return;
+  const handleChange = useCallback(
+    (item: MenuContextItem) => {
+      dispatch(HistogramActions.updateMenuItem(item));
+
+      if (item.code === 'numberOfRows') {
+        dispatch(HistogramActions.setNumberOfRows(item.choice?.value));
       }
-
-      setIsLoading(true);
-
-      loadHistogramData(
-        setHistograms,
-        getDomainEntityNames(innerActiveRow, grid),
-        numberOfRows,
-      ).finally(() => {
-        setIsLoading(false);
-
-        setPreviousActiveRow(innerActiveRow);
-        setPreviousNumberOfRows(numberOfRows);
-      });
     },
-    [
-      numberOfRows,
-      previousNumberOfRows,
-      previousActiveRow,
-      grid,
-      setHistograms,
-      setIsLoading,
-      setPreviousNumberOfRows,
-      setPreviousActiveRow,
-    ],
+    [dispatch],
   );
 
-  /** Отлавливаем выбор ячейки, выбор ячейки происходит по клику на таблице и по клику по ноде в дереве */
-  useEffect(() => {
-    loadData(activeRow);
-  }, [activeRow, loadData]);
-
-  const handleChange = (item: MenuContextItem) => {
-    if (item.code === 'stat') {
-      const updatedMenuItems = menuItems.map((menuItem: MenuContextItem) => {
-        const newItem = { ...menuItem };
-
-        if (menuItem.code === 'stat') {
-          newItem.switch = !item.switch;
-
-          setIsShowStatistic(newItem.switch);
-        }
-
-        return newItem;
-      });
-
-      setMenuItems(updatedMenuItems);
-    }
-
-    if (item.code === 'numberOfRows') {
-      setNumberOfRows(item.choice?.value || DEFAULT_NUMBER_OF_ROWS);
-
-      loadData(activeRow);
-    }
-  };
-
-  const handleClick = (item: MenuContextItem) => {
-    console.info('DEV: handle click', item);
-  };
-
-  const histograms = (
-    <div className="histogram__content">
-      {histogramsPayload?.map((histogram: Histogram, index: number) => {
-        return (
-          <ChartComponent
-            title={histogram.title}
-            subtitle={histogram.subtitle}
-            percentiles={histogram.percentiles}
-            sample={histogram.sample}
-            numberOfIterationBin={histogram.numberOfIterationBin}
-            cdf={histogram.cdf}
-            numberOfRows={numberOfRows}
-            id={index.toString()}
-          />
-        );
-      })}
-    </div>
-  );
-
-  const topContent = histogramsPayload?.length ? (
-    <div>
-      <div>
-        <VerticalMoreContextMenu
-          menuItems={menuItems}
-          title="Гистограмма запасов"
-          onChange={handleChange}
-          onClick={handleClick}
-        />
+  const histogramsBlock = useMemo(() => {
+    return (
+      <div className={cn('Content')}>
+        {histograms?.map((histogram: Histogram, index: number) => {
+          return (
+            <ChartComponent
+              title={histogram.title}
+              subtitle={histogram.subtitle}
+              percentiles={histogram.percentiles}
+              sample={histogram.sample}
+              numberOfIterationBin={histogram.numberOfIterationBin}
+              cdf={histogram.cdf}
+              numberOfRows={numberOfRows}
+              id={index.toString()}
+            />
+          );
+        })}
       </div>
-      {histograms}
-    </div>
-  ) : (
-    <Text>Данные не найдены</Text>
-  );
+    );
+  }, [histograms, numberOfRows]);
+
+  const histogramsWrapper = useMemo(() => {
+    return histograms?.length ? (
+      <div>
+        <div className={cn('Header')}>
+          <VerticalMoreContextMenu
+            menuItems={menuItems}
+            title="Гистограмма запасов"
+            onChange={handleChange}
+            onClick={() => {}}
+          />
+
+          <div className={cn('ActiveRow')}>
+            <Text view="ghost" size="s">
+              Выбранный элемент:
+            </Text>
+
+            <Text size="s"> {activeRow?.title.split(',').join(', ')}</Text>
+          </div>
+        </div>
+
+        {histogramsBlock}
+      </div>
+    ) : (
+      <Text>Данные не найдены</Text>
+    );
+  }, [histograms, histogramsBlock, menuItems, activeRow, handleChange]);
 
   const statistic = isShowStatistic && (
     <HistogramStatisticsComponent
@@ -202,12 +122,12 @@ export const HistogramComponent: React.FC<Props> = ({ grid }) => {
   );
 
   return (
-    <div className="histogram">
+    <div className={cn()}>
       {isLoading ? (
-        <Loader className="histogram__loader" />
+        <Loader className={cn('Loader')} />
       ) : (
         <div>
-          {topContent}
+          {histogramsWrapper}
           {statistic}
         </div>
       )}

@@ -15,7 +15,7 @@ import {
 import projectService from '@app/services/ProjectService';
 import competitiveAccessDuck from '@app/store/competitiveAccessDuck';
 import { GeneralActions } from '@app/store/general/generalActions';
-import histogramDuck from '@app/store/histogramDuck';
+import { HistogramActions } from '@app/store/histogram/HistogramActions';
 import { NotifyActions } from '@app/store/notify/notifyActions';
 import projectDuck from '@app/store/projectDuck';
 import sensitiveAnalysisDuck from '@app/store/sensitiveAnalysisDuck';
@@ -43,7 +43,7 @@ const RbResultPage: React.FC = () => {
     dispatch(TableActions.resetState());
     dispatch(GeneralActions.resetState());
     dispatch(SettingsActions.resetState());
-    dispatch(histogramDuck.actions.resetState());
+    dispatch(HistogramActions.resetState());
     dispatch(sensitiveAnalysisDuck.actions.resetState());
     dispatch(treeDuck.actions.resetState());
   }, [dispatch]);

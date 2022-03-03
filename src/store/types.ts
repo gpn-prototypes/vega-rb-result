@@ -4,10 +4,10 @@ import { IProjectService } from '@app/services/types';
 import { GridCollection } from '@app/types/typesTable';
 import { AnyAction } from 'redux';
 
+import { HistogramStore } from './histogram/HistogramActions';
 import { LoaderStore } from './loader/loaderActions';
 import { NotifyStore } from './notify/notifyActions';
 import { SettingStore } from './settings/settingsActions';
-import { HistogramStore } from './histogramDuck';
 import { SensitiveAnalysisStore } from './sensitiveAnalysisDuck';
 
 export interface CompetitiveAccess {
@@ -52,7 +52,7 @@ export interface RootState {
   tree: TreeState;
   competitiveAccess: CompetitiveAccess;
   errors: ErrorsState;
-  histograms: HistogramStore;
+  histogram: HistogramStore;
   sensitiveAnalysis: SensitiveAnalysisStore;
   settings: SettingStore;
   notify: NotifyStore;

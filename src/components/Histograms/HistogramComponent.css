@@ -1,9 +1,9 @@
-.histogram {
+.Histogram {
   width: 100%;
   min-width: 782px;
   min-height: 200px;
 
-  &__content {
+  &__Content {
     margin-top: var(--space-m);
     display: grid;
     min-height: 244px;
@@ -11,8 +11,17 @@
     grid-template-columns: 545px 545px;
   }
 
-  &__loader {
+  &__Loader {
     margin-top: var(--space-m);
     min-height: 244px;
+  }
+
+  &__Header {
+    display: flex;
+  }
+
+  &__ActiveRow {
+    margin-left: var(--space-4xl);
+    display: flex;
   }
 }
