@@ -15,7 +15,7 @@ import {
 import projectService from '@app/services/ProjectService';
 import competitiveAccessDuck from '@app/store/competitiveAccessDuck';
 import { GeneralActions } from '@app/store/general/generalActions';
-import histogramDuck from '@app/store/histogramDuck';
+import { HistogramActions } from '@app/store/histogram/HistogramActions';
 import { NotifyActions } from '@app/store/notify/notifyActions';
 import projectDuck from '@app/store/projectDuck';
 import sensitiveAnalysisDuck from '@app/store/sensitiveAnalysisDuck';
@@ -33,8 +33,11 @@ import { cnMixCard } from '@consta/uikit/MixCard';
 import { Sidebar } from '@consta/uikit/Sidebar';
 import { Text } from '@consta/uikit/Text';
 import { SplitPanes, useInterval, useMount } from '@gpn-prototypes/vega-ui';
+import { block } from 'bem-cn';
 
 import './RbResultPage.css';
+
+const cn = block('RbResultPage');
 
 const RbResultPage: React.FC = () => {
   const dispatch = useDispatch();
@@ -43,7 +46,7 @@ const RbResultPage: React.FC = () => {
     dispatch(TableActions.resetState());
     dispatch(GeneralActions.resetState());
     dispatch(SettingsActions.resetState());
-    dispatch(histogramDuck.actions.resetState());
+    dispatch(HistogramActions.resetState());
     dispatch(sensitiveAnalysisDuck.actions.resetState());
     dispatch(treeDuck.actions.resetState());
   }, [dispatch]);
@@ -137,6 +140,7 @@ const RbResultPage: React.FC = () => {
     );
   }
 
+  /** TODO: Разнести на мелкие компоненты */
   return (
     <div>
       {!data ? (
@@ -162,23 +166,27 @@ const RbResultPage: React.FC = () => {
               )}
             </SplitPanes.Pane>
             <SplitPanes.Pane aria-label="table">
-              <div className="content">
+              <div className={cn('Content')}>
                 <div>
-                  <div className="result__table-content">
-                    <div className="result__top">
-                      <ChoiceGroup
-                        value={fluidType}
-                        items={FLUID_TYPES}
-                        name="FluidTypesChoiceGroup"
-                        className="FluidTypesChoiceGroup"
-                        size="s"
-                        multiple={false}
-                        getLabel={(item) => item}
-                        onChange={({ value }) => handleChangeFluidType(value)}
-                      />
+                  <div className={cn('TableContent')}>
+                    <div className={cn('Header')}>
+                      <div className={cn('TabsWrapper')}>
+                        <ChoiceGroup
+                          value={fluidType}
+                          items={FLUID_TYPES}
+                          name="FluidTypesChoiceGroup"
+                          className="FluidTypesChoiceGroup"
+                          size="s"
+                          view="ghost"
+                          width="full"
+                          multiple={false}
+                          getLabel={(item) => item}
+                          onChange={({ value }) => handleChangeFluidType(value)}
+                        />
+                      </div>
 
-                      <div className="result__icons">
-                        <span className="result__icon">
+                      <div className={cn('Settings')}>
+                        <span className={cn('SettingElement')}>
                           <Checkbox
                             view="primary"
                             checked={openSensitiveAnalysis}
@@ -193,14 +201,17 @@ const RbResultPage: React.FC = () => {
                           />
                         </span>
 
-                        <span ref={settingsRef} className="result__icon">
+                        <span
+                          ref={settingsRef}
+                          className={cn('SettingElement')}
+                        >
                           <IconDownload
                             onClick={() => setOpenedModal(true)}
                             size="m"
                           />
                         </span>
 
-                        <span className="result__icon">
+                        <span className={cn('SettingElement')}>
                           {showHistogram ? (
                             <IconExpand
                               onClick={() =>
@@ -219,20 +230,13 @@ const RbResultPage: React.FC = () => {
                         </span>
                       </div>
                     </div>
-                    <div
-                      className={`result__table ${
-                        showHistogram ? '' : 'result__table_full'
-                      }`}
-                    >
+
+                    <div className={cn('Table', { full: !showHistogram })}>
                       <Table />
                     </div>
                   </div>
 
-                  <div
-                    className={`result__graphs ${
-                      !showHistogram ? 'result__graphs_hide' : ''
-                    }`}
-                  >
+                  <div className={cn('Graphs', { hide: !showHistogram })}>
                     {data && data?.columns?.length > 0 && (
                       <div>
                         <HistogramComponent grid={data} />
@@ -247,7 +251,7 @@ const RbResultPage: React.FC = () => {
                         dispatch(TableActions.resetSidebarRow())
                       }
                       hasOverlay
-                      className="result__sidebar"
+                      className={cn('Sidebar')}
                     >
                       {sidebarRow && (
                         <SensitiveAnalysisComponent sidebarRow={sidebarRow} />

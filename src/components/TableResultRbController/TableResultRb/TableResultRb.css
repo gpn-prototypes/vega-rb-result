@@ -1,4 +1,4 @@
-.table {
+.table-wrapper {
   height: 100%;
 
   .TableCell {
@@ -10,6 +10,10 @@
 
   .TableCell_isControl {
     min-width: 120px !important;
+  }
+
+  .TableCell_active {
+    background-color: var(--color-bg-ghost);
   }
 
   .TableCell_isHeader {

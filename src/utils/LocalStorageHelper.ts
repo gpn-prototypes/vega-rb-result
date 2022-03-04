@@ -14,9 +14,25 @@ export namespace LocalStorageHelper {
     localStorage.setItem(key, value);
   }
 
-  /** Получение parsed данных по ключу */
+  /**
+   * Получение parsed данных по ключу
+   * @deprecated
+   *
+   * Используем getPureParsed, ибо этот метод не всегда корректно возвращает нужный тип
+   */
   export function getParsed<T>(key: LocalStorageKey): T {
     return JSON.parse(localStorage.getItem(key) || '{}');
+  }
+
+  /** Получение parsed данных по ключу */
+  export function getPureParsed<T>(key: LocalStorageKey): T | undefined {
+    const localStorageItem = localStorage.getItem(key);
+
+    if (!localStorageItem) {
+      return undefined;
+    }
+
+    return JSON.parse(localStorageItem);
   }
 
   /** Установка parsed данных по ключу */

@@ -1,30 +1,31 @@
 import { Histogram, HistogramStatistic } from '@app/generated/graphql';
 import projectService from '@app/services/ProjectService';
-import { Action } from 'redux';
 
 export async function loadHistogramData(
-  setHistograms: (histograms: Histogram[]) => Action,
   domainEntityNames: string[],
   bins: number,
-): Promise<void> {
+): Promise<Histogram[]> {
   const data = await projectService.getHistogramData(domainEntityNames, bins);
 
   if (data) {
-    setHistograms(data.getHistograms.histograms);
+    return data.getHistograms.histograms;
   }
+
+  return [];
 }
 
 export async function loadHistogramStatisticData(
-  setStatistics: (histograms: HistogramStatistic[]) => Action,
   domainEntityNames: string[],
   bins: number,
-): Promise<void> {
+): Promise<HistogramStatistic[]> {
   const statistics = await projectService.getHistogramStatisticsData(
     domainEntityNames,
     bins,
   );
 
   if (statistics) {
-    setStatistics(statistics);
+    return statistics;
   }
+
+  return [];
 }

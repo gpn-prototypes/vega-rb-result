@@ -19,8 +19,8 @@ interface VerticalContextMenu {
   menuItems?: MenuContextItem[];
   groupItems?: MenuContextGroup[];
   loading?: boolean;
-  onChange: (item: MenuContextItem) => void;
-  onClick: (item: MenuContextItem) => void;
+  onChange?: (item: MenuContextItem) => void;
+  onClick?: (item: MenuContextItem) => void;
 }
 
 export const VerticalMoreContextMenu: FC<VerticalContextMenu> = ({

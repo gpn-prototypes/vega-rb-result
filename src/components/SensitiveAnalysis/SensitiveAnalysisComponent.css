@@ -49,9 +49,16 @@
 
   &__Statistic {
     margin-top: var(--space-s);
+    min-height: 200px;
   }
 
   &:first-of-type {
     padding-bottom: var(--space-m) !important;
   }
+}
+
+.Sidebar-Window {
+  margin-top: var(--space-3xl);
+  padding: var(--space-l);
+  min-width: 738px;
 }

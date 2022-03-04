@@ -5,11 +5,11 @@ import { History } from 'history';
 import { AnyAction, Dispatch } from 'redux';
 
 import { FileStore } from './file/fileActions';
+import { HistogramStore } from './histogram/HistogramActions';
 import { LoaderStore } from './loader/loaderActions';
 import { NotifyStore } from './notify/notifyActions';
 import { SettingStore } from './settings/settingsActions';
 import { WebsocketStore } from './websocket/websocketActions';
-import { HistogramStore } from './histogramDuck';
 import { SensitiveAnalysisStore } from './sensitiveAnalysisDuck';
 
 export interface CompetitiveAccess {
@@ -54,7 +54,7 @@ export interface RootState {
   tree: TreeState;
   competitiveAccess: CompetitiveAccess;
   errors: ErrorsState;
-  histograms: HistogramStore;
+  histogram: HistogramStore;
   sensitiveAnalysis: SensitiveAnalysisStore;
   settings: SettingStore;
   notify: NotifyStore;

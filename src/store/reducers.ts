@@ -1,20 +1,19 @@
 import alertDuck from '@app/store/alertDuck';
+import competitiveAccessDuck from '@app/store/competitiveAccessDuck';
 import errorsDuck from '@app/store/errorsDuck';
-import histogramDuck from '@app/store/histogramDuck';
+import { FileReducers } from '@app/store/file/fileReducers';
+import { GeneralReducers } from '@app/store/general/generalReducers';
+import { HistogramReducers } from '@app/store/histogram/HistogramReducers';
+import { LoaderReducers } from '@app/store/loader/loaderReducers';
+import { NotifyReducers } from '@app/store/notify/notifyReducers';
 import projectDuck from '@app/store/projectDuck';
+import sensitiveAnalysisDuck from '@app/store/sensitiveAnalysisDuck';
+import { SettingsReducers } from '@app/store/settings/settingsReducers';
 import { TableReducers } from '@app/store/table/tableReducers';
 import treeDuck from '@app/store/treeDuck';
+import { RootState } from '@app/store/types';
+import { WebsocketReducers } from '@app/store/websocket/websocketReducers';
 import { combineReducers } from 'redux';
-
-import { FileReducers } from './file/fileReducers';
-import { GeneralReducers } from './general/generalReducers';
-import { LoaderReducers } from './loader/loaderReducers';
-import { NotifyReducers } from './notify/notifyReducers';
-import { SettingsReducers } from './settings/settingsReducers';
-import { WebsocketReducers } from './websocket/websocketReducers';
-import competitiveAccessDuck from './competitiveAccessDuck';
-import sensitiveAnalysisDuck from './sensitiveAnalysisDuck';
-import { RootState } from './types';
 
 export default combineReducers<RootState>({
   alert: alertDuck.reducer,
@@ -23,7 +22,7 @@ export default combineReducers<RootState>({
   project: projectDuck.reducer,
   table: TableReducers,
   tree: treeDuck.reducer,
-  histograms: histogramDuck.reducer,
+  histogram: HistogramReducers,
   sensitiveAnalysis: sensitiveAnalysisDuck.reducer,
   settings: SettingsReducers,
   notify: NotifyReducers,

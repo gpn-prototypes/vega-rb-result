@@ -2,7 +2,7 @@ import actionCreatorFactory from 'typescript-fsa';
 
 const factory = actionCreatorFactory('loader');
 
-export type LoadingType = 'file';
+export type LoadingType = 'file' | 'histogram' | 'histogram-statistic';
 
 export type LoadingState = {
   key: LoadingType;
