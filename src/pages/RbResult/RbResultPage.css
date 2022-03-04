@@ -12,10 +12,6 @@
     overflow-x: auto;
   }
 
-  &__TableContent {
-    min-width: 1210px;
-  }
-
   &__Header {
     margin: var(--space-s) var(--space-m);
     display: flex;
@@ -39,7 +35,7 @@
   }
 
   &__Table {
-    height: calc(100vh - 510px);
+    height: calc(100vh - 519px);
     border-bottom: 1px solid var(--color-bg-border);
 
     &_full {
@@ -50,9 +46,10 @@
 
   &__Graphs {
     padding-top: var(--space-l);
-    padding-left: var(--size-text-m);
+    padding-left: var(--space-m);
+    padding-right: var(--space-m);
     display: flex;
-    min-width: 1210px;
+    overflow-x: auto;
 
     &_hide {
       display: none;

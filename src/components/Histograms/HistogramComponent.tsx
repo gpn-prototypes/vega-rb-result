@@ -24,7 +24,7 @@ interface Props {
 }
 
 export const HistogramComponent: React.FC<Props> = ({ grid }) => {
-  /** State */
+  /** Store */
   const dispatch = useDispatch();
   const numberOfRows = useSelector(
     ({ histogram }: RootState) => histogram.numberOfRows,

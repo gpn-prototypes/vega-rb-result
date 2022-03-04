@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   HistogramStatistic,
@@ -9,7 +9,6 @@ import { RootState } from '@app/store/types';
 import { MathHelper } from '@app/utils/MathHelper';
 import { Loader } from '@consta/uikit/Loader';
 import { Text } from '@consta/uikit/Text';
-import { useMount } from '@gpn-prototypes/vega-ui';
 import { block } from 'bem-cn';
 
 import './HistogramStatisticsComponent.css';
@@ -22,7 +21,7 @@ interface Props {
 }
 
 export const HistogramStatisticsComponent: React.FC<Props> = () => {
-  /** State */
+  /** Store */
   const dispatch = useDispatch();
   const statistics: HistogramStatistic[] = useSelector(
     ({ histogram }: RootState) => histogram.statistics,
@@ -36,7 +35,7 @@ export const HistogramStatisticsComponent: React.FC<Props> = () => {
   }, [dispatch]);
 
   /** Обновляем данные при первой загрузке */
-  useMount(() => loadStatistics());
+  useEffect(() => loadStatistics(), [loadStatistics]);
 
   const getRows = (
     innerStatistic: HistogramStatistic,
