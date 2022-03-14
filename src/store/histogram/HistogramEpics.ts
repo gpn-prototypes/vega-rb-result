@@ -10,6 +10,7 @@ import { Epic } from 'redux-observable';
 import { from, of } from 'rxjs';
 import {
   distinctUntilChanged,
+  filter,
   ignoreElements,
   pairwise,
   switchMap,
@@ -90,6 +91,7 @@ const loadHistogramEpic: Epic<
   return action$.pipe(
     ofAction(TableActions.setActiveRow, HistogramActions.setNumberOfRows),
     withLatestFrom(statePairs$),
+    filter(() => state$.value.settings.showHistogram),
     tap(() => dispatch(LoaderAction.setLoading('histogram'))),
     distinctUntilChanged(),
     switchMap(([{ payload }, [oldState, newState]]) => {

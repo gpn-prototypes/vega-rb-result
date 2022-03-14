@@ -1,8 +1,9 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { TableResultRb } from '@app/components/TableResultRbController/TableResultRb/TableResultRb';
 import { loadTableData } from '@app/services/loadTableData';
 import { GeneralActions } from '@app/store/general/generalActions';
+import { LoaderAction } from '@app/store/loader/loaderActions';
 import { TableActions } from '@app/store/table/tableActions';
 import { RootState } from '@app/store/types';
 import { GridCollection } from '@app/types/typesTable';
@@ -19,10 +20,12 @@ export const Table: React.FC = () => {
     () => dispatch(TableActions.resetState()),
     [dispatch],
   );
+
   const setEntitiesCount = useCallback(
     (count: number) => dispatch(TableActions.setEntitiesCount(count)),
     [dispatch],
   );
+
   const setTable = useCallback(
     (table: GridCollection) => dispatch(TableActions.initState(table)),
     [dispatch],
@@ -31,16 +34,18 @@ export const Table: React.FC = () => {
   const reduxTableData = useSelector(({ table }: RootState) => table);
   const filterData = useSelector(({ tree }: RootState) => tree.filter);
 
-  const [isLoading, setIsLoading] = useState(true);
+  const isLoading = useSelector(
+    ({ loader }: RootState) => loader.loading.table,
+  );
 
+  // TODO: Вынести загрузку таблицы в эпик
   useMount(() => {
-    setIsLoading(true);
+    dispatch(LoaderAction.setLoading('table'));
 
     const load = async () => {
       try {
         await loadTableData(setTable, setEntitiesCount);
-
-        setIsLoading(false);
+        dispatch(LoaderAction.setLoaded('table'));
       } catch (e) {
         setNotFound(true);
       }
