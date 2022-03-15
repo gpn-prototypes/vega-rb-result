@@ -2,6 +2,7 @@ import React, {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from 'react';
@@ -47,6 +48,19 @@ const RbResultPage: React.FC = () => {
   const { history } = useContext(ProjectContext);
 
   const dispatch = useDispatch();
+
+  const histogramIsLoading: boolean = useSelector(
+    ({ loader }: RootState) => loader.loading.histogram,
+  );
+
+  const tableIsLoading: boolean = useSelector(
+    ({ loader }: RootState) => loader.loading.table,
+  );
+
+  const isTabsDisabled = useMemo(
+    () => tableIsLoading || histogramIsLoading,
+    [tableIsLoading, histogramIsLoading],
+  );
 
   const setFluidType = useCallback(
     (type: EFluidType) => dispatch(TableActions.setFluidType(type)),
@@ -186,6 +200,7 @@ const RbResultPage: React.FC = () => {
                           multiple={false}
                           getLabel={(item) => item}
                           onChange={({ value }) => handleChangeFluidType(value)}
+                          disabled={isTabsDisabled}
                         />
                       </div>
 
