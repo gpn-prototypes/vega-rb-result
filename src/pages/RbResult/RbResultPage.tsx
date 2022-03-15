@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { DownloadResultModal } from '@app/components/DownloadResultModal/DownloadResultModal';
 import { HistogramComponent } from '@app/components/Histograms/HistogramComponent';
@@ -50,6 +56,19 @@ const RbResultPage: React.FC = () => {
     dispatch(sensitiveAnalysisDuck.actions.resetState());
     dispatch(treeDuck.actions.resetState());
   }, [dispatch]);
+
+  const histogramIsLoading: boolean = useSelector(
+    ({ loader }: RootState) => loader.loading.histogram,
+  );
+
+  const tableIsLoading: boolean = useSelector(
+    ({ loader }: RootState) => loader.loading.table,
+  );
+
+  const tabsAreDisabled = useMemo(
+    () => tableIsLoading || histogramIsLoading,
+    [tableIsLoading, histogramIsLoading],
+  );
 
   const setFluidType = useCallback(
     (type: EFluidType) => dispatch(TableActions.setFluidType(type)),
@@ -182,6 +201,7 @@ const RbResultPage: React.FC = () => {
                           multiple={false}
                           getLabel={(item) => item}
                           onChange={({ value }) => handleChangeFluidType(value)}
+                          disabled={tabsAreDisabled}
                         />
                       </div>
 

@@ -8,8 +8,18 @@ import {
 } from './loaderActions';
 
 export const loaderStoreInitialState: LoaderStore = {
-  loaded: {} as LoadingKeyValue,
-  loading: {} as LoadingKeyValue,
+  loaded: {
+    'file': false,
+    'histogram': false,
+    'histogram-statistic': false,
+    'table': false,
+  },
+  loading: {
+    'file': false,
+    'histogram': false,
+    'histogram-statistic': false,
+    'table': true,
+  },
 };
 
 export const LoaderReducers = reducerWithInitialState<LoaderStore>(
