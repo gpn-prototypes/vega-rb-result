@@ -2,7 +2,12 @@ import { ofAction } from '@app/operators/ofAction';
 import { Location } from 'history';
 import { AnyAction } from 'redux';
 import { Epic } from 'redux-observable';
-import { distinctUntilChanged, ignoreElements, tap } from 'rxjs/operators';
+import {
+  distinctUntilChanged,
+  filter,
+  ignoreElements,
+  tap,
+} from 'rxjs/operators';
 import { Action } from 'typescript-fsa';
 
 import { GeneralActions } from '../general/generalActions';
@@ -26,7 +31,10 @@ function isSamePath(
   return previousPath === nextPath;
 }
 
-/** Отлавливаем изменение роута и чистим стору */
+/**
+ * Отлавливаем выход из результатов расчета
+ * И делаем ресет сторы
+ */
 const handleChangeLocationEpic: Epic<
   AnyAction,
   AnyAction,
@@ -36,6 +44,7 @@ const handleChangeLocationEpic: Epic<
   return action$.pipe(
     ofAction(HistoryActions.handleChange),
     distinctUntilChanged(isSamePath),
+    filter(({ payload }) => payload.pathname.indexOf('/rb-result') === -1),
     tap(() => {
       dispatch(NotifyActions.resetState());
       dispatch(GeneralActions.resetState());

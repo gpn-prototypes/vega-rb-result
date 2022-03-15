@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { TableResultRb } from '@app/components/TableResultRbController/TableResultRb/TableResultRb';
 import { TableActions } from '@app/store/table/tableActions';
@@ -19,12 +19,16 @@ export const Table: React.FC = () => {
     dispatch(TableActions.initLoadTable());
   });
 
-  return isLoading || !reduxTableData || !reduxTableData.actualColumns ? (
+  const isLoadingState = useMemo(() => {
+    return isLoading || !reduxTableData || !reduxTableData.actualColumns;
+  }, [isLoading, reduxTableData]);
+
+  return isLoadingState ? (
     <Loader />
   ) : (
     <TableResultRb
       columns={reduxTableData.columns}
-      actualColumns={reduxTableData.actualColumns}
+      actualColumns={reduxTableData.actualColumns || []}
       rows={reduxTableData.rows}
       filter={filterData}
     />

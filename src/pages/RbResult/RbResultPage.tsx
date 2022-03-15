@@ -101,11 +101,13 @@ const RbResultPage: React.FC = () => {
 
   /** Подписываемся на изменение роута глобального */
   useMount(() => {
-    const unlisten = history?.listen((location) => {
+    /**
+     * Не отписываемся, ибо у нас нет unmount как такого.
+     * Смена микрофронтов не отменяет подписок
+     */
+    history?.listen((location) => {
       dispatch(HistoryActions.handleChange(location));
     });
-
-    return unlisten;
   });
 
   useEffect(() => {

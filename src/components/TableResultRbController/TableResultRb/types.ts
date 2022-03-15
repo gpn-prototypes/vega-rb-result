@@ -1,6 +1,6 @@
 import { RbDomainEntityIcons, Visible } from '@app/generated/graphql';
 import { OrderType } from '@consta/uikit/__internal__/src/components/Table/helpers';
-import { TableControl } from '@consta/uikit/Table';
+import { onCellClick, TableControl } from '@consta/uikit/Table';
 
 export type RowEntity = Record<string, Row> & {
   geoFluidTypes?: string[];
@@ -34,6 +34,7 @@ export interface Column {
   width?: number;
   hidden?: boolean;
   order?: OrderType;
+  onCellClick?: onCellClick;
   getComparisonValue?: (row: Row) => string;
   control?: ({ column }: TableControl<any>) => React.ReactNode;
   columnAccessorGroup?: string[];
