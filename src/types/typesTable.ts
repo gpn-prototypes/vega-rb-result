@@ -104,10 +104,11 @@ export interface GridCollection {
   actualColumns?: Column[];
   rows: RowEntity[];
   version: number;
+  decimalFixed: DecimalFixed;
+  notFound: boolean;
   activeRow?: GridActiveRow | undefined;
   sidebarRow?: GridActiveRow | undefined;
   fluidType?: EFluidType;
-  decimalFixed?: DecimalFixed;
   hiddenColumns?: HiddenColumns;
   entitiesCount?: number;
 }

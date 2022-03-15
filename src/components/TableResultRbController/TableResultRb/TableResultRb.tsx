@@ -126,7 +126,7 @@ export const TableResultRb: React.FC<Props> = ({
   const setDecimalFixed = useCallback(
     ({ type, columnCode }: TableSetDecimalFixedActionPayload) =>
       dispatch(
-        TableActions.setDecimalFixed({
+        TableActions.initUpdateDecimalFixed({
           type,
           columnCode,
         }),

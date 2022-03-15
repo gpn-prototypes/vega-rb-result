@@ -31,7 +31,6 @@ export interface Column {
   visible?: Visible;
   geoType?: string;
   isRisk?: boolean;
-  decimal?: number;
   width?: number;
   hidden?: boolean;
   order?: OrderType;

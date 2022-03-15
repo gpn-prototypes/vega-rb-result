@@ -10,6 +10,7 @@ import { Epic } from 'redux-observable';
 import { from, of } from 'rxjs';
 import {
   distinctUntilChanged,
+  filter,
   ignoreElements,
   pairwise,
   switchMap,
@@ -95,6 +96,13 @@ const loadHistogramEpic: Epic<
     switchMap(([{ payload }, [oldState, newState]]) => {
       toggleActiveTableCellClass(newState, oldState);
 
+      const oldActiveRowCode = oldState.table.activeRow?.code;
+      const newActiveRowCode = newState.table.activeRow?.code;
+
+      if (oldActiveRowCode === newActiveRowCode) {
+        return of(newState.histogram.histograms);
+      }
+
       if (payload === undefined || typeof payload === 'object') {
         return from(
           loadHistogramData(
@@ -131,11 +139,8 @@ const loadHistogramStatisticEpic: Epic<
   action$.pipe(
     ofAction(HistogramActions.loadStatistic, TableActions.setActiveRow),
     tap(() => dispatch(LoaderAction.setLoading('histogram-statistic'))),
+    filter(() => state$.value.histogram.isShowStatistic),
     switchMap(() => {
-      if (!state$.value.histogram.isShowStatistic) {
-        return of([]);
-      }
-
       return from(
         loadHistogramStatisticData(
           getDomainEntityNames(

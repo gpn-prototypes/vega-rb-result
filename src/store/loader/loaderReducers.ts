@@ -1,15 +1,22 @@
 import { reducerWithInitialState } from 'typescript-fsa-reducers';
 
-import {
-  LoaderAction,
-  LoaderStore,
-  LoadingKeyValue,
-  LoadingType,
-} from './loaderActions';
+import { LoaderAction, LoaderStore, LoadingType } from './loaderActions';
 
 export const loaderStoreInitialState: LoaderStore = {
-  loaded: {} as LoadingKeyValue,
-  loading: {} as LoadingKeyValue,
+  loaded: {
+    'file': false,
+    'histogram': false,
+    'histogram-statistic': false,
+    'decimal': false,
+    'table': false,
+  },
+  loading: {
+    'file': false,
+    'histogram': false,
+    'histogram-statistic': false,
+    'decimal': false,
+    'table': true,
+  },
 };
 
 export const LoaderReducers = reducerWithInitialState<LoaderStore>(
@@ -32,8 +39,5 @@ export const LoaderReducers = reducerWithInitialState<LoaderStore>(
     return cloneState;
   })
   .case(LoaderAction.resetStore, () => {
-    return {
-      loaded: {} as LoadingKeyValue,
-      loading: {} as LoadingKeyValue,
-    };
+    return loaderStoreInitialState;
   });

@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, useCallback, useMemo } from 'react';
 import { ContextMenuBaseItem } from '@app/components/Helpers/ContextMenuBaseItem/ContextMenuBaseItem';
 import { ItemWithChoice } from '@app/components/Helpers/ContextMenuItemWithChoice/ContextMenuItemWithChoice';
 import {
@@ -35,64 +35,91 @@ export const ContextMenuDropdown: FC<ContextMenuDropdownProps> = ({
   setIsOpenContextMenu,
 }) => {
   /** Обработка клика по контекстному меню */
-  const handleContextClick = (menuItem: MenuContextItem) => {
-    if (onClick) {
-      onClick(menuItem);
-    }
-    setIsOpenContextMenu(false);
-  };
+  const handleContextClick = useCallback(
+    (menuItem: MenuContextItem) => {
+      if (onClick) {
+        onClick(menuItem);
+      }
+      setIsOpenContextMenu(false);
+    },
+    [onClick, setIsOpenContextMenu],
+  );
 
-  const itemWithSwitch = (menuItem: MenuContextItem) => (
-    <ContextMenuBaseItem menuItem={menuItem} getDisabled={getDisabled}>
-      <Switch
-        size="m"
-        checked={menuItem.switch}
-        onChange={() => onChange && onChange(menuItem)}
-        key="Switch"
-        style={{ marginLeft: '12px' }} // className react-bem не работает с констой?!
+  const itemWithSwitch = useCallback(
+    (menuItem: MenuContextItem) => (
+      <ContextMenuBaseItem menuItem={menuItem} getDisabled={getDisabled}>
+        <Switch
+          size="m"
+          checked={menuItem.switch}
+          onChange={() => onChange && onChange(menuItem)}
+          key="Switch"
+          style={{ marginLeft: '12px' }} // className react-bem не работает с констой?!
+        />
+      </ContextMenuBaseItem>
+    ),
+    [getDisabled, onChange],
+  );
+
+  const simpleItem = useCallback(
+    (menuItem: MenuContextItem) => (
+      <ContextMenuBaseItem
+        menuItem={menuItem}
+        handleContextClick={handleContextClick}
+        getDisabled={getDisabled}
       />
-    </ContextMenuBaseItem>
+    ),
+    [handleContextClick, getDisabled],
   );
 
-  const simpleItem = (menuItem: MenuContextItem) => (
-    <ContextMenuBaseItem
-      menuItem={menuItem}
-      handleContextClick={handleContextClick}
-      getDisabled={getDisabled}
-    />
+  const renderMenuItems = useCallback(
+    (originMenuItems: MenuContextItem[]) => {
+      return originMenuItems.map((menuItem: MenuContextItem) => {
+        if (menuItem.switch !== undefined) {
+          return itemWithSwitch(menuItem);
+        }
+
+        if (menuItem.choice !== undefined) {
+          return (
+            <ItemWithChoice
+              menuItem={menuItem}
+              onChange={onChange}
+              getDisabled={getDisabled}
+              setIsOpenContextMenu={setIsOpenContextMenu}
+            />
+          );
+        }
+
+        return simpleItem(menuItem);
+      });
+    },
+    [itemWithSwitch, simpleItem, getDisabled, onChange, setIsOpenContextMenu],
   );
 
-  const renderMenuItems = (originMenuItems: MenuContextItem[]) => {
-    return originMenuItems.map((menuItem: MenuContextItem) => {
-      if (menuItem.switch !== undefined) {
-        return itemWithSwitch(menuItem);
-      }
-
-      if (menuItem.choice !== undefined) {
+  const renderGroupItems = useCallback(
+    (originGroupItems: MenuContextGroup[]) => {
+      return originGroupItems.map((groupItem: MenuContextGroup) => {
         return (
-          <ItemWithChoice
-            menuItem={menuItem}
-            onChange={onChange}
-            getDisabled={getDisabled}
-            setIsOpenContextMenu={setIsOpenContextMenu}
-          />
+          <>
+            <div className={cn('AnalysisTitle')}>{groupItem.title}</div>
+            {renderMenuItems(groupItem.children)}
+          </>
         );
-      }
+      });
+    },
+    [renderMenuItems],
+  );
 
-      return simpleItem(menuItem);
-    });
-  };
+  const renderContent = useMemo(() => {
+    if (groupItems?.length) {
+      return renderGroupItems(groupItems);
+    }
 
-  const renderGroupItems = (originGroupItems: MenuContextGroup[]) => {
-    return originGroupItems.map((groupItem: MenuContextGroup) => {
-      return (
-        <>
-          <div className={cn('AnalysisTitle')}>{groupItem.title}</div>
-          {renderMenuItems(groupItem.children)}
-        </>
-      );
-    });
-  };
+    if (menuItems?.length) {
+      return renderMenuItems(menuItems);
+    }
+
+    return null;
+  }, [groupItems, menuItems, renderGroupItems, renderMenuItems]);
 
   return (
     <Popover
@@ -102,8 +129,7 @@ export const ContextMenuDropdown: FC<ContextMenuDropdownProps> = ({
       className={cn()}
       position={position}
     >
-      {groupItems?.length ? renderGroupItems(groupItems) : null}
-      {menuItems?.length ? renderMenuItems(menuItems) : null}
+      {renderContent}
     </Popover>
   );
 };

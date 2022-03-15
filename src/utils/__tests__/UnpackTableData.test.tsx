@@ -1,4 +1,4 @@
-import { AttributesMock } from '../../__tests__/AttributesMock';
+import { AttributesMock, DecimalMock } from '../../__tests__/AttributesMock';
 import { DomainEntitiesMock } from '../../__tests__/DomainEntitiesMock';
 import { DomainObjectsMock } from '../../__tests__/DomainObjectsMock';
 import {
@@ -114,7 +114,7 @@ describe('UnpackTableData', () => {
         domainObjects: DomainObjectsMock,
       },
       1,
-      jest.fn(),
+      DecimalMock,
     );
 
     expect(isCorrectCompileColumns(columns)).toEqual(true);

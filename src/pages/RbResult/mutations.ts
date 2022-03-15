@@ -90,3 +90,32 @@ export const GENERATE_CALCULATION_RESULT_ARCHIVE = gql`
   }
   ${ResourceBaseDiffFragment}
 `;
+
+export const SET_DECIMAL = gql`
+  mutation UpdateDecimalAttrubute(
+    $version: Int!
+    $attributeCode: String!
+    $decimal_place: Int!
+  ) {
+    project(version: $version) {
+      ... on ProjectMutation {
+        resourceBase {
+          conception {
+            attribute {
+              updateDecimal(
+                code: $attributeCode
+                decimalPlace: $decimal_place
+              ) {
+                ... on NoneOrError {
+                  __typename
+                }
+              }
+            }
+          }
+        }
+      }
+      __typename
+    }
+    version
+  }
+`;

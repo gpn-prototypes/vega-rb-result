@@ -6,6 +6,7 @@ import { AnyAction, Dispatch } from 'redux';
 
 import { FileStore } from './file/fileActions';
 import { HistogramStore } from './histogram/HistogramActions';
+import { HistoryStore } from './history/HistoryActions';
 import { LoaderStore } from './loader/loaderActions';
 import { NotifyStore } from './notify/notifyActions';
 import { SettingStore } from './settings/settingsActions';
@@ -62,6 +63,7 @@ export interface RootState {
   general: GeneralStore;
   loader: LoaderStore;
   file: FileStore;
+  history: HistoryStore;
 }
 
 export type TypedColumnsList = {

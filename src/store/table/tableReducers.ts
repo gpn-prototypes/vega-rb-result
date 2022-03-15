@@ -14,18 +14,10 @@ import { LocalStorageHelper } from '@app/utils/LocalStorageHelper';
 import { MathHelper } from '@app/utils/MathHelper';
 import { reducerWithInitialState } from 'typescript-fsa-reducers';
 
-import {
-  TableActions,
-  TableSetDecimalFixedActionPayload,
-} from './tableActions';
-
-const decimalFromLocalStorage: DecimalFixed | null =
-  LocalStorageHelper.getParsed<DecimalFixed>(LocalStorageKey.DecimalFixed);
+import { TableActions } from './tableActions';
 
 const hiddenColumnsFromLocalStorage: HiddenColumns | null =
   LocalStorageHelper.getParsed<HiddenColumns>(LocalStorageKey.HiddenColumns);
-
-export const DEFAULT_DECIMAL_FIXED = 3;
 
 export const getHiddenColumns = (): HiddenColumns => {
   return Object.keys(hiddenColumnsFromLocalStorage).length !== 0
@@ -44,28 +36,15 @@ export const tableInitialState: GridCollection = {
   activeRow: undefined,
   sidebarRow: undefined,
   fluidType: EFluidType.ALL,
-  decimalFixed: decimalFromLocalStorage !== null ? decimalFromLocalStorage : {},
+  decimalFixed: {} as DecimalFixed,
   hiddenColumns: getHiddenColumns(),
   entitiesCount: 0,
-};
-
-export const getDecimalByColumns = (columns: Column[]): DecimalFixed => {
-  const decimalFixed: DecimalFixed = {};
-
-  columns
-    .filter((column: Column) => column.decimal !== undefined)
-    .forEach((column: Column) => {
-      decimalFixed[column.accessor] =
-        column.decimal !== undefined ? column.decimal : DEFAULT_DECIMAL_FIXED;
-    });
-
-  return decimalFixed;
+  notFound: false,
 };
 
 export const getDecimalRows = (
   rows: RowEntity[],
-  columns: Column[],
-  decimalFixed: DecimalFixed = tableInitialState.decimalFixed || {},
+  decimalFixed: DecimalFixed,
 ): RowEntity[] => {
   const resultRows = [...rows].map((row: RowEntity) => {
     const decimalRow = {};
@@ -79,13 +58,7 @@ export const getDecimalRows = (
         return;
       }
 
-      const decimalFromStorage =
-        decimalFixed[rowKey] < 0 ? 0 : decimalFixed[rowKey];
-
-      const decimal =
-        decimalFixed[rowKey] || decimalFixed[rowKey] === 0
-          ? decimalFromStorage
-          : getDecimalByColumns(columns)[rowKey];
+      const decimal = decimalFixed[rowKey];
 
       // eslint-disable-next-line no-restricted-globals
       decimalRow[rowKey].formattedValue = isNaN(Number(value))
@@ -100,11 +73,11 @@ export const getDecimalRows = (
 };
 
 export const getActualColumns = (
-  state: GridCollection,
+  columns: Column[],
   payload: HiddenColumns = hiddenColumnsFromLocalStorage,
 ): Column[] => {
   const findColumnByAccessor = (accessor: string): Column | undefined => {
-    const found = state.columns.find(
+    const found = columns.find(
       (column: Column) => column.accessor === accessor,
     );
 
@@ -115,7 +88,7 @@ export const getActualColumns = (
     return found;
   };
 
-  let actualColumns = [...state.columns];
+  let actualColumns = [...columns];
 
   Object.keys(payload).forEach((key: string) => {
     if (payload[key] === true) {
@@ -137,14 +110,14 @@ export const TableReducers = reducerWithInitialState<GridCollection>(
   .case(
     TableActions.initState,
     (state: GridCollection, payload: GridCollection) => {
-      const initialHidenColumns = getHiddenColumns();
-
       return {
         ...state,
         rows: payload.rows,
         columns: payload.columns,
-        actualColumns: getActualColumns(payload, initialHidenColumns),
+        actualColumns: payload.actualColumns,
         version: payload.version,
+        decimalFixed: payload.decimalFixed,
+        notFound: payload.notFound,
       };
     },
   )
@@ -178,30 +151,28 @@ export const TableReducers = reducerWithInitialState<GridCollection>(
     sidebarRow: undefined,
   }))
   .case(
+    TableActions.setNotFound,
+    (state: GridCollection, notFound: boolean) => ({
+      ...state,
+      ...{
+        notFound,
+      },
+    }),
+  )
+  .case(TableActions.updateDecimal, (state: GridCollection) => {
+    const { decimalFixed } = state;
+
+    return {
+      ...state,
+      rows: getDecimalRows(state.rows, decimalFixed),
+    };
+  })
+  .case(
     TableActions.setDecimalFixed,
-    (state: GridCollection, payload: TableSetDecimalFixedActionPayload) => {
-      const decimalFixed = LocalStorageHelper.getParsed<DecimalFixed>(
-        LocalStorageKey.DecimalFixed,
-      );
-
-      /** Получаем из localstorage, либо из данных таблицы */
-      const value =
-        decimalFixed[payload.columnCode] !== undefined
-          ? decimalFixed[payload.columnCode]
-          : getDecimalByColumns(state.columns)[payload.columnCode];
-
-      decimalFixed[payload.columnCode] =
-        payload.type === 'plus' ? value + 1 : value - 1;
-
-      LocalStorageHelper.setParsed<DecimalFixed>(
-        LocalStorageKey.DecimalFixed,
-        decimalFixed,
-      );
-
+    (state: GridCollection, decimalFixed: DecimalFixed) => {
       return {
         ...state,
-        decimalFixed,
-        rows: getDecimalRows(state.rows, state.columns, decimalFixed),
+        ...{ decimalFixed },
       };
     },
   )
@@ -215,7 +186,7 @@ export const TableReducers = reducerWithInitialState<GridCollection>(
 
       return {
         ...state,
-        actualColumns: getActualColumns(state, payload),
+        actualColumns: getActualColumns(state.columns, payload),
         hiddenColumns: payload,
       };
     },

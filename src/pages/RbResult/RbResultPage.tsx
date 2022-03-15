@@ -1,8 +1,15 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { DownloadResultModal } from '@app/components/DownloadResultModal/DownloadResultModal';
 import { HistogramComponent } from '@app/components/Histograms/HistogramComponent';
 import NotifyComponent from '@app/components/Notify/Notify';
+import { ProjectContext } from '@app/components/Providers';
 import { SensitiveAnalysisComponent } from '@app/components/SensitiveAnalysis/SensitiveAnalysisComponent';
 import { TableErrorAlert } from '@app/components/TableErrorAlert';
 import Table from '@app/components/TableResultRbController';
@@ -14,14 +21,10 @@ import {
 } from '@app/constants/GeneralConstants';
 import projectService from '@app/services/ProjectService';
 import competitiveAccessDuck from '@app/store/competitiveAccessDuck';
-import { GeneralActions } from '@app/store/general/generalActions';
-import { HistogramActions } from '@app/store/histogram/HistogramActions';
-import { NotifyActions } from '@app/store/notify/notifyActions';
+import { HistoryActions } from '@app/store/history/HistoryActions';
 import projectDuck from '@app/store/projectDuck';
-import sensitiveAnalysisDuck from '@app/store/sensitiveAnalysisDuck';
 import { SettingsActions } from '@app/store/settings/settingsActions';
 import { TableActions } from '@app/store/table/tableActions';
-import treeDuck from '@app/store/treeDuck';
 import { RootState } from '@app/store/types';
 import { GridActiveRow, GridCollection } from '@app/types/typesTable';
 import { Checkbox } from '@consta/uikit/Checkbox';
@@ -40,16 +43,10 @@ import './RbResultPage.css';
 const cn = block('RbResultPage');
 
 const RbResultPage: React.FC = () => {
+  /** Context */
+  const { history } = useContext(ProjectContext);
+
   const dispatch = useDispatch();
-  const resetState = useCallback(() => {
-    dispatch(NotifyActions.resetState());
-    dispatch(TableActions.resetState());
-    dispatch(GeneralActions.resetState());
-    dispatch(SettingsActions.resetState());
-    dispatch(HistogramActions.resetState());
-    dispatch(sensitiveAnalysisDuck.actions.resetState());
-    dispatch(treeDuck.actions.resetState());
-  }, [dispatch]);
 
   const setFluidType = useCallback(
     (type: EFluidType) => dispatch(TableActions.setFluidType(type)),
@@ -76,7 +73,7 @@ const RbResultPage: React.FC = () => {
     ({ table }: RootState) => table.sidebarRow,
   );
   const isNotFound: boolean = useSelector(
-    ({ general }: RootState) => general.notFound,
+    ({ table }: RootState) => table.notFound,
   );
 
   const isRecentlyEdited = useSelector(
@@ -102,8 +99,13 @@ const RbResultPage: React.FC = () => {
     setFluidType(type);
   };
 
+  /** Подписываемся на изменение роута глобального */
   useMount(() => {
-    return resetState;
+    const unlisten = history?.listen((location) => {
+      dispatch(HistoryActions.handleChange(location));
+    });
+
+    return unlisten;
   });
 
   useEffect(() => {

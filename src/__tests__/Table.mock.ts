@@ -1,6 +1,8 @@
 import { RbDomainEntityIcons } from '@app/generated/graphql';
 import { GridCollection } from '@app/types/typesTable';
 
+import { DecimalMock } from './AttributesMock';
+
 export const TableMock: GridCollection = {
   columns: [
     {
@@ -55,4 +57,6 @@ export const TableMock: GridCollection = {
     },
   ],
   version: 1,
+  notFound: false,
+  decimalFixed: DecimalMock,
 };

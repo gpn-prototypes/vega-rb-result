@@ -2969,7 +2969,6 @@ export type ResultAttribute = {
   name: Scalars['String'];
   shortName: Scalars['String'];
   units: Scalars['String'];
-  decimal: Scalars['Int'];
   geoType: Scalars['String'];
   viewType: Scalars['String'];
   visible: Visible;

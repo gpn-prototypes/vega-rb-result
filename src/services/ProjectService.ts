@@ -6,6 +6,7 @@ import {
 import { FetchPolicy } from '@apollo/client/core/watchQueryOptions';
 import { GET_RECENTLY_EDITED } from '@app/components/CompetitiveAccess/queries';
 import {
+  GET_DECIMAL,
   GET_HISTOGRAM_RESULT_RB,
   GET_HISTOGRAM_STATISTICS_RESULT_RB,
   GET_PROJECT_NAME,
@@ -24,7 +25,11 @@ import {
   SensitivityAnalysisStatisticStructure,
   SensitivityAnalysisStructure,
 } from '@app/generated/graphql';
-import { GENERATE_CALCULATION_RESULT_ARCHIVE } from '@app/pages/RbResult/mutations';
+import { ProjectDecimal } from '@app/interfaces/DecimalInterface';
+import {
+  GENERATE_CALCULATION_RESULT_ARCHIVE,
+  SET_DECIMAL,
+} from '@app/pages/RbResult/mutations';
 import {
   CalculationResponse,
   IProjectService,
@@ -225,6 +230,41 @@ class ProjectService implements IProjectService {
       ['project', 'resourceBase', 'result', 'histograms'],
       responseData,
     );
+  }
+
+  async getDecimalData(): Promise<ProjectDecimal[]> {
+    const { data: responseData } = await this.client
+      .watchQuery<Query>({
+        query: GET_DECIMAL,
+        context: {
+          uri: getGraphqlUri(this.projectId),
+        },
+        fetchPolicy: 'no-cache',
+      })
+      .result();
+
+    return getOr(
+      None<ProjectDecimal[]>(),
+      ['project', 'resourceBase', 'decimals', 'projectDecimals'],
+      responseData,
+    );
+  }
+
+  async setDecimalData(attributeCode: string, decimal: number): Promise<void> {
+    await this.client
+      .watchQuery<Query>({
+        query: SET_DECIMAL,
+        context: {
+          uri: getGraphqlUri(this.projectId),
+        },
+        variables: {
+          version: this.version,
+          attributeCode,
+          decimal_place: decimal,
+        },
+        fetchPolicy: 'no-cache',
+      })
+      .result();
   }
 
   async getHistogramStatisticsData(

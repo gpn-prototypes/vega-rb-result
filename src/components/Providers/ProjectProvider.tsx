@@ -1,13 +1,16 @@
 import React, { useMemo } from 'react';
 import { CurrentProject, Identity, Project } from '@app/types';
+import { History } from 'history';
 
 interface IProps {
   currentProject: CurrentProject;
   identity: Identity;
+  history: History<unknown>;
 }
 
 interface ProjectContextProps {
   project: Project;
+  history?: History<unknown>;
   identity?: Identity;
 }
 
@@ -22,13 +25,15 @@ const ProjectProvider: React.FC<IProps> = ({
   currentProject,
   identity,
   children,
+  history,
 }) => {
   const providerValue = useMemo(() => {
     return {
       project: currentProject.get(),
       identity,
+      history,
     };
-  }, [currentProject, identity]);
+  }, [currentProject, identity, history]);
 
   return (
     <ProjectContext.Provider value={providerValue}>

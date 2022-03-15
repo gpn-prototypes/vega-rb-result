@@ -4,6 +4,7 @@ import errorsDuck from '@app/store/errorsDuck';
 import { FileReducers } from '@app/store/file/fileReducers';
 import { GeneralReducers } from '@app/store/general/generalReducers';
 import { HistogramReducers } from '@app/store/histogram/HistogramReducers';
+import { HistoryReducers } from '@app/store/history/HistoryReducers';
 import { LoaderReducers } from '@app/store/loader/loaderReducers';
 import { NotifyReducers } from '@app/store/notify/notifyReducers';
 import projectDuck from '@app/store/projectDuck';
@@ -30,4 +31,5 @@ export default combineReducers<RootState>({
   general: GeneralReducers,
   loader: LoaderReducers,
   file: FileReducers,
+  history: HistoryReducers,
 });
