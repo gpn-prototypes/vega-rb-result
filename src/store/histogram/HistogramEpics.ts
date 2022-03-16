@@ -100,7 +100,12 @@ const loadHistogramEpic: Epic<
       const oldActiveRowCode = oldState.table.activeRow?.code;
       const newActiveRowCode = newState.table.activeRow?.code;
 
-      if (oldActiveRowCode === newActiveRowCode) {
+      if (
+        oldActiveRowCode !== null &&
+        newActiveRowCode !== null &&
+        oldActiveRowCode === newActiveRowCode &&
+        newState.histogram.histograms.length > 0
+      ) {
         return of(newState.histogram.histograms);
       }
 

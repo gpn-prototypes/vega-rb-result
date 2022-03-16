@@ -8,13 +8,10 @@ import {
   TableSetDecimalFixedActionPayload,
 } from '@app/store/table/tableActions';
 import { RootState, TreeFilter } from '@app/store/types';
-import {
-  DecimalFixed,
-  GridActiveRow,
-  HiddenColumns,
-} from '@app/types/typesTable';
+import { GridActiveRow } from '@app/types/typesTable';
 import { IconAdd } from '@consta/uikit/IconAdd';
 import { IconRemove } from '@consta/uikit/IconRemove';
+import { Loader } from '@consta/uikit/Loader';
 import { Position } from '@consta/uikit/Popover';
 import { Table } from '@consta/uikit/Table';
 import cn from 'classnames';
@@ -22,13 +19,6 @@ import cn from 'classnames';
 import { Column, RowEntity } from './types';
 
 import './TableResultRb.css';
-
-interface Props {
-  rows: RowEntity[];
-  columns: Column[];
-  actualColumns: Column[];
-  filter: TreeFilter;
-}
 
 const removeAllActiveClassByDataName = () => {
   document.querySelectorAll('._active').forEach((element: Element) => {
@@ -106,12 +96,7 @@ const isHasAnyValuesInFilteredRows = (
   );
 };
 
-export const TableResultRb: React.FC<Props> = ({
-  rows,
-  columns,
-  actualColumns,
-  filter,
-}) => {
+export const TableResultRb: React.FC = () => {
   const dispatch = useDispatch();
   const setActiveRow = useCallback(
     ({ code, title }: GridActiveRow) =>
@@ -134,6 +119,27 @@ export const TableResultRb: React.FC<Props> = ({
     [dispatch],
   );
 
+  const {
+    activeRow,
+    entitiesCount,
+    fluidType,
+    decimalFixed,
+    actualColumns,
+    hiddenColumns,
+    columns,
+    rows,
+  } = useSelector(({ table }: RootState) => table);
+  const openSensitiveAnalysis: boolean = useSelector(
+    ({ settings }: RootState) => settings.openSensitiveAnalysis,
+  );
+  const showHistogram: boolean = useSelector(
+    ({ settings }: RootState) => settings.showHistogram,
+  );
+  const isLoading: boolean = useSelector(
+    ({ loader }: RootState) => loader.loading.table,
+  );
+  const filter: TreeFilter = useSelector(({ tree }: RootState) => tree.filter);
+
   const rowRef = useRef(null);
   const [filteredRows, setFilteredRows] = useState<RowEntity[]>(rows);
   const [filteredColumns, setFilteredColumns] = useState<Column[]>(columns);
@@ -141,27 +147,10 @@ export const TableResultRb: React.FC<Props> = ({
   const [currentColumnCode, setCurrentColumnCode] = useState<string>('');
   const [position, setPosition] = useState<Position>({ x: 0, y: 0 });
 
-  const activeRow: GridActiveRow | undefined = useSelector(
-    ({ table }: RootState) => table.activeRow,
-  );
-  const entitiesCount: number = useSelector(
-    ({ table }: RootState) => table.entitiesCount || 0,
-  );
-  const fluidType: EFluidType | undefined = useSelector(
-    ({ table }: RootState) => table.fluidType,
-  );
-  const decimalFixed: DecimalFixed | undefined = useSelector(
-    ({ table }: RootState) => table.decimalFixed,
-  );
-  const openSensitiveAnalysis: boolean = useSelector(
-    ({ settings }: RootState) => settings.openSensitiveAnalysis,
-  );
-  const showHistogram: boolean = useSelector(
-    ({ settings }: RootState) => settings.showHistogram,
-  );
-  const hiddenColumns: HiddenColumns | undefined = useSelector(
-    ({ table }: RootState) => table.hiddenColumns,
-  );
+  /** Инициализация загрузки таблицы */
+  useEffect(() => {
+    dispatch(TableActions.initLoadTable());
+  }, [dispatch]);
 
   /**
    * Сортировка данных по клику на элемент древа
@@ -394,11 +383,13 @@ export const TableResultRb: React.FC<Props> = ({
     });
   };
 
-  return (
+  return isLoading ? (
+    <Loader />
+  ) : (
     <div className="table-wrapper">
       <Table
         rows={filteredRows as any}
-        columns={filteredColumns}
+        columns={filteredColumns as any}
         verticalAlign="center"
         activeRow={{ id: undefined, onChange: handleClickRow }}
         size="s"

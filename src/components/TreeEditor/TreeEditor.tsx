@@ -11,10 +11,6 @@ import {
   getNodeListFromTableData,
   searchInTree,
 } from '../../utils/TableHelpers';
-import {
-  Column,
-  RowEntity,
-} from '../TableResultRbController/TableResultRb/types';
 
 import { TargetData } from './types';
 
@@ -27,14 +23,12 @@ const icons = {
 };
 
 interface StructureTreeEditorProps {
-  columns: Column[];
-  rows: RowEntity[];
   isOpen: boolean;
 }
 
 export default React.forwardRef<HTMLDivElement, StructureTreeEditorProps>(
   function TreeEditor(
-    { rows, columns, isOpen }: PropsWithChildren<StructureTreeEditorProps>,
+    { isOpen }: PropsWithChildren<StructureTreeEditorProps>,
     ref,
   ): React.ReactElement {
     const dispatch = useDispatch();
@@ -54,6 +48,7 @@ export default React.forwardRef<HTMLDivElement, StructureTreeEditorProps>(
     );
 
     const projectName = useSelector(({ project }: RootState) => project.name);
+    const { columns, rows } = useSelector(({ table }: RootState) => table);
 
     const tree = useMemo(
       () => getNodeListFromTableData({ rows, columns }, projectName),

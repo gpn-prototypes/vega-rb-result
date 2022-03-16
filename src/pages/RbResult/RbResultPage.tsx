@@ -13,7 +13,7 @@ import NotifyComponent from '@app/components/Notify/Notify';
 import { ProjectContext } from '@app/components/Providers';
 import { SensitiveAnalysisComponent } from '@app/components/SensitiveAnalysis/SensitiveAnalysisComponent';
 import { TableErrorAlert } from '@app/components/TableErrorAlert';
-import Table from '@app/components/TableResultRbController';
+import { TableResultRb } from '@app/components/TableResultRbController/TableResultRb/TableResultRb';
 import TreeEditor from '@app/components/TreeEditor';
 import { EFluidType } from '@app/constants/Enums';
 import {
@@ -27,7 +27,7 @@ import projectDuck from '@app/store/projectDuck';
 import { SettingsActions } from '@app/store/settings/settingsActions';
 import { TableActions } from '@app/store/table/tableActions';
 import { RootState } from '@app/store/types';
-import { GridActiveRow, GridCollection } from '@app/types/typesTable';
+import { GridActiveRow } from '@app/types/typesTable';
 import { Checkbox } from '@consta/uikit/Checkbox';
 import { ChoiceGroup } from '@consta/uikit/ChoiceGroup';
 import { IconCollapse } from '@consta/uikit/IconCollapse';
@@ -82,7 +82,6 @@ const RbResultPage: React.FC = () => {
   const [isShownTree, setIsShownTree] = useState(true);
   const [openedModal, setOpenedModal] = useState<boolean>(false);
 
-  const data: GridCollection = useSelector(({ table }: RootState) => table);
   const sidebarRow: GridActiveRow | undefined = useSelector(
     ({ table }: RootState) => table.sidebarRow,
   );
@@ -115,13 +114,11 @@ const RbResultPage: React.FC = () => {
 
   /** Подписываемся на изменение роута глобального */
   useMount(() => {
-    /**
-     * Не отписываемся, ибо у нас нет unmount как такого.
-     * Смена микрофронтов не отменяет подписок
-     */
-    history?.listen((location) => {
+    const unlisten = history?.listen((location) => {
       dispatch(HistoryActions.handleChange(location));
     });
+
+    return unlisten;
   });
 
   useEffect(() => {
@@ -161,135 +158,111 @@ const RbResultPage: React.FC = () => {
   /** TODO: Разнести на мелкие компоненты */
   return (
     <div>
-      {!data ? (
-        <Text view="primary" size="2xl">
-          Необходимо запустить расчет
-        </Text>
-      ) : (
-        <div>
-          <SplitPanes split="vertical" onResize={handleResize}>
-            <SplitPanes.Pane
-              aria-label="tree"
-              initialSize="180px"
-              min="24px"
-              max="240px"
-            >
-              {data.columns && (
-                <TreeEditor
-                  rows={data.rows}
-                  columns={data.columns}
-                  isOpen={isShownTree}
-                  ref={treeEditorRef}
-                />
-              )}
-            </SplitPanes.Pane>
-            <SplitPanes.Pane aria-label="table">
-              <div className={cn('Content')}>
-                <div>
-                  <div className={cn('TableContent')}>
-                    <div className={cn('Header')}>
-                      <div className={cn('TabsWrapper')}>
-                        <ChoiceGroup
-                          value={fluidType}
-                          items={FLUID_TYPES}
-                          name="FluidTypesChoiceGroup"
-                          className="FluidTypesChoiceGroup"
-                          size="s"
-                          view="ghost"
-                          width="full"
-                          multiple={false}
-                          getLabel={(item) => item}
-                          onChange={({ value }) => handleChangeFluidType(value)}
-                          disabled={isTabsDisabled}
+      <div>
+        <SplitPanes split="vertical" onResize={handleResize}>
+          <SplitPanes.Pane
+            aria-label="tree"
+            initialSize="180px"
+            min="24px"
+            max="240px"
+          >
+            <TreeEditor isOpen={isShownTree} ref={treeEditorRef} />
+          </SplitPanes.Pane>
+          <SplitPanes.Pane aria-label="table">
+            <div className={cn('Content')}>
+              <div>
+                <div className={cn('TableContent')}>
+                  <div className={cn('Header')}>
+                    <div className={cn('TabsWrapper')}>
+                      <ChoiceGroup
+                        value={fluidType}
+                        items={FLUID_TYPES}
+                        name="FluidTypesChoiceGroup"
+                        className="FluidTypesChoiceGroup"
+                        size="s"
+                        view="ghost"
+                        width="full"
+                        multiple={false}
+                        getLabel={(item) => item}
+                        onChange={({ value }) => handleChangeFluidType(value)}
+                        disabled={isTabsDisabled}
+                      />
+                    </div>
+
+                    <div className={cn('Settings')}>
+                      <span className={cn('SettingElement')}>
+                        <Checkbox
+                          view="primary"
+                          checked={openSensitiveAnalysis}
+                          onChange={({ checked }) =>
+                            dispatch(
+                              SettingsActions.setOpenSensitiveAnalysis(checked),
+                            )
+                          }
+                          label="Открывать анализ чувствительности"
                         />
-                      </div>
+                      </span>
 
-                      <div className={cn('Settings')}>
-                        <span className={cn('SettingElement')}>
-                          <Checkbox
-                            view="primary"
-                            checked={openSensitiveAnalysis}
-                            onChange={({ checked }) =>
-                              dispatch(
-                                SettingsActions.setOpenSensitiveAnalysis(
-                                  checked,
-                                ),
-                              )
+                      <span ref={settingsRef} className={cn('SettingElement')}>
+                        <IconDownload
+                          onClick={() => setOpenedModal(true)}
+                          size="m"
+                        />
+                      </span>
+
+                      <span className={cn('SettingElement')}>
+                        {showHistogram ? (
+                          <IconExpand
+                            onClick={() =>
+                              dispatch(SettingsActions.setShowHistogram(false))
                             }
-                            label="Открывать анализ чувствительности"
                           />
-                        </span>
-
-                        <span
-                          ref={settingsRef}
-                          className={cn('SettingElement')}
-                        >
-                          <IconDownload
-                            onClick={() => setOpenedModal(true)}
-                            size="m"
+                        ) : (
+                          <IconCollapse
+                            onClick={() =>
+                              dispatch(SettingsActions.setShowHistogram(true))
+                            }
                           />
-                        </span>
-
-                        <span className={cn('SettingElement')}>
-                          {showHistogram ? (
-                            <IconExpand
-                              onClick={() =>
-                                dispatch(
-                                  SettingsActions.setShowHistogram(false),
-                                )
-                              }
-                            />
-                          ) : (
-                            <IconCollapse
-                              onClick={() =>
-                                dispatch(SettingsActions.setShowHistogram(true))
-                              }
-                            />
-                          )}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className={cn('Table', { full: !showHistogram })}>
-                      <Table />
+                        )}
+                      </span>
                     </div>
                   </div>
 
-                  <div className={cn('Graphs', { hide: !showHistogram })}>
-                    {data && data?.columns?.length > 0 && (
-                      <div>
-                        <HistogramComponent grid={data} />
-                      </div>
-                    )}
+                  <div className={cn('Table', { full: !showHistogram })}>
+                    <TableResultRb />
                   </div>
-
-                  {openSensitiveAnalysis && (
-                    <Sidebar
-                      isOpen={sidebarRow !== undefined}
-                      onClickOutside={() =>
-                        dispatch(TableActions.resetSidebarRow())
-                      }
-                      hasOverlay
-                      className={cn('Sidebar')}
-                    >
-                      {sidebarRow && (
-                        <SensitiveAnalysisComponent sidebarRow={sidebarRow} />
-                      )}
-                    </Sidebar>
-                  )}
                 </div>
+
+                <div className={cn('Graphs', { hide: !showHistogram })}>
+                  <HistogramComponent />
+                </div>
+
+                {openSensitiveAnalysis && (
+                  <Sidebar
+                    isOpen={sidebarRow !== undefined}
+                    onClickOutside={() =>
+                      dispatch(TableActions.resetSidebarRow())
+                    }
+                    hasOverlay
+                    className={cn('Sidebar')}
+                  >
+                    {sidebarRow && (
+                      <SensitiveAnalysisComponent sidebarRow={sidebarRow} />
+                    )}
+                  </Sidebar>
+                )}
               </div>
-            </SplitPanes.Pane>
-          </SplitPanes>
+            </div>
+          </SplitPanes.Pane>
+        </SplitPanes>
 
-          {openedModal && (
-            <DownloadResultModal handleClose={() => setOpenedModal(false)} />
-          )}
+        {openedModal && (
+          <DownloadResultModal handleClose={() => setOpenedModal(false)} />
+        )}
 
-          <NotifyComponent />
-          <TableErrorAlert />
-        </div>
-      )}
+        <NotifyComponent />
+        <TableErrorAlert />
+      </div>
     </div>
   );
 };

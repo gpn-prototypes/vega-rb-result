@@ -6,7 +6,7 @@ import { MenuContextItem } from '@app/interfaces/ContextMenuInterface';
 import { HistogramActions } from '@app/store/histogram/HistogramActions';
 import { getDomainEntityNames } from '@app/store/histogram/HistogramEpics';
 import { RootState } from '@app/store/types';
-import { GridActiveRow, GridCollection } from '@app/types/typesTable';
+import { GridActiveRow } from '@app/types/typesTable';
 import { Loader } from '@consta/uikit/Loader';
 import { Text } from '@consta/uikit/Text';
 import { block } from 'bem-cn';
@@ -18,13 +18,11 @@ import './HistogramComponent.css';
 
 const cn = block('Histogram');
 
-interface Props {
-  grid: GridCollection;
-}
-
-export const HistogramComponent: React.FC<Props> = ({ grid }) => {
+export const HistogramComponent: React.FC = () => {
   /** Store */
   const dispatch = useDispatch();
+
+  const grid = useSelector(({ table }: RootState) => table);
   const numberOfRows = useSelector(
     ({ histogram }: RootState) => histogram.numberOfRows,
   );
