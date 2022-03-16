@@ -288,6 +288,7 @@ export const GET_TABLE_RESULT_RB = gql`
                 shortName
                 units
                 geoType
+                decimal
                 visible {
                   calc
                   table

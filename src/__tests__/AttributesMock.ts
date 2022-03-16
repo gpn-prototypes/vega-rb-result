@@ -39,6 +39,7 @@ export const AttributesMock: ResultAttribute[] = [
     shortName: 'Категория',
     units: '',
     viewType: '',
+    decimal: 3,
     visible: {
       calc: true,
       table: true,
@@ -52,6 +53,7 @@ export const AttributesMock: ResultAttribute[] = [
     shortName: 'Флюид',
     units: '',
     viewType: '',
+    decimal: 3,
     visible: {
       calc: true,
       table: true,
@@ -65,6 +67,7 @@ export const AttributesMock: ResultAttribute[] = [
     shortName: 'Процентиль',
     units: '',
     viewType: 'attribute',
+    decimal: 3,
     visible: {
       calc: true,
       table: true,
@@ -78,6 +81,7 @@ export const AttributesMock: ResultAttribute[] = [
     shortName: 'F, тыс. м²',
     units: '',
     viewType: 'attribute',
+    decimal: 3,
     visible: {
       calc: true,
       table: true,
@@ -91,6 +95,7 @@ export const AttributesMock: ResultAttribute[] = [
     shortName: 'H эфф.нн, м',
     units: '',
     viewType: 'attribute',
+    decimal: 3,
     visible: {
       calc: true,
       table: true,
@@ -104,6 +109,7 @@ export const AttributesMock: ResultAttribute[] = [
     shortName: 'V г./V общ., д. ед.',
     units: '',
     viewType: 'attribute',
+    decimal: 3,
     visible: {
       calc: true,
       table: true,
@@ -117,6 +123,7 @@ export const AttributesMock: ResultAttribute[] = [
     shortName: 'Кᴴп, д. ед.',
     units: '',
     viewType: 'attribute',
+    decimal: 3,
     visible: {
       calc: true,
       table: true,
@@ -130,6 +137,7 @@ export const AttributesMock: ResultAttribute[] = [
     shortName: 'Кн, д. ед.',
     units: '',
     viewType: 'attribute',
+    decimal: 3,
     visible: {
       calc: true,
       table: true,
@@ -143,6 +151,7 @@ export const AttributesMock: ResultAttribute[] = [
     shortName: 'Плотность, г/см³',
     units: '',
     viewType: 'attribute',
+    decimal: 3,
     visible: {
       calc: true,
       table: true,
@@ -156,6 +165,7 @@ export const AttributesMock: ResultAttribute[] = [
     shortName: 'Пересч. коэф., д. ед.',
     units: '',
     viewType: 'attribute',
+    decimal: 3,
     visible: {
       calc: true,
       table: true,
@@ -169,6 +179,7 @@ export const AttributesMock: ResultAttribute[] = [
     shortName: 'К⸢п, д. ед.',
     units: '',
     viewType: 'attribute',
+    decimal: 3,
     visible: {
       calc: true,
       table: true,
@@ -182,6 +193,7 @@ export const AttributesMock: ResultAttribute[] = [
     shortName: 'Кг, д. ед.',
     units: '',
     viewType: 'attribute',
+    decimal: 3,
     visible: {
       calc: true,
       table: true,
@@ -195,6 +207,7 @@ export const AttributesMock: ResultAttribute[] = [
     shortName: 'Кp, МПа',
     units: '',
     viewType: 'attribute',
+    decimal: 3,
     visible: {
       calc: true,
       table: true,
@@ -208,6 +221,7 @@ export const AttributesMock: ResultAttribute[] = [
     shortName: 'Кt',
     units: '',
     viewType: 'attribute',
+    decimal: 3,
     visible: {
       calc: true,
       table: true,
@@ -221,6 +235,7 @@ export const AttributesMock: ResultAttribute[] = [
     shortName: 'НГЗ/НГР нефти, тыс. т',
     units: 'тыс. т',
     viewType: '',
+    decimal: 3,
     visible: {
       calc: true,
       table: true,
@@ -234,6 +249,7 @@ export const AttributesMock: ResultAttribute[] = [
     shortName: 'Gcos',
     units: '',
     viewType: 'risk',
+    decimal: 3,
     visible: {
       calc: true,
       table: true,
@@ -247,6 +263,7 @@ export const AttributesMock: ResultAttribute[] = [
     shortName: 'Мат. порода',
     units: '',
     viewType: 'risk',
+    decimal: 3,
     visible: {
       calc: true,
       table: true,
@@ -260,6 +277,7 @@ export const AttributesMock: ResultAttribute[] = [
     shortName: 'Миграция',
     units: '',
     viewType: 'risk',
+    decimal: 3,
     visible: {
       calc: true,
       table: true,
@@ -273,6 +291,7 @@ export const AttributesMock: ResultAttribute[] = [
     shortName: 'Коллектор',
     units: '',
     viewType: 'risk',
+    decimal: 3,
     visible: {
       calc: true,
       table: true,
@@ -286,6 +305,7 @@ export const AttributesMock: ResultAttribute[] = [
     shortName: 'Ловушка',
     units: '',
     viewType: 'risk',
+    decimal: 3,
     visible: {
       calc: true,
       table: true,
@@ -299,6 +319,7 @@ export const AttributesMock: ResultAttribute[] = [
     shortName: 'Покрышка/сохранность',
     units: '',
     viewType: 'risk',
+    decimal: 3,
     visible: {
       calc: true,
       table: true,
@@ -312,6 +333,7 @@ export const AttributesMock: ResultAttribute[] = [
     shortName: 'НГЗ/НГР газа, млн. м³',
     units: 'тыс. т',
     viewType: '',
+    decimal: 3,
     visible: {
       calc: true,
       table: true,
@@ -325,6 +347,7 @@ export const AttributesMock: ResultAttribute[] = [
     shortName: 'НГЗ/НГР нефти с учётом GCoS, тыс. т',
     units: 'тыс. т',
     viewType: '',
+    decimal: 3,
     visible: {
       calc: true,
       table: true,
@@ -338,6 +361,7 @@ export const AttributesMock: ResultAttribute[] = [
     shortName: 'НГЗ/НГР газа с учётом GCoS, млн. м³',
     units: 'тыс. т',
     viewType: '',
+    decimal: 3,
     visible: {
       calc: true,
       table: true,
@@ -351,6 +375,7 @@ export const AttributesMock: ResultAttribute[] = [
     shortName: 'НГЗ/НГР нефти в случае ГУ, тыс. т',
     units: 'тыс. т',
     viewType: '',
+    decimal: 3,
     visible: {
       calc: true,
       table: true,
@@ -364,6 +389,7 @@ export const AttributesMock: ResultAttribute[] = [
     shortName: 'НГЗ/НГР газа в случае ГУ, млн. м³',
     units: 'тыс. т',
     viewType: '',
+    decimal: 3,
     visible: {
       calc: true,
       table: true,

@@ -1,10 +1,9 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { TableResultRb } from '@app/components/TableResultRbController/TableResultRb/TableResultRb';
 import { TableActions } from '@app/store/table/tableActions';
 import { RootState } from '@app/store/types';
 import { Loader } from '@consta/uikit/Loader';
-import { useMount } from '@gpn-prototypes/vega-ui';
 
 export const Table: React.FC = () => {
   const dispatch = useDispatch();
@@ -15,9 +14,9 @@ export const Table: React.FC = () => {
     ({ loader }: RootState) => loader.loading.table,
   );
 
-  useMount(() => {
+  useEffect(() => {
     dispatch(TableActions.initLoadTable());
-  });
+  }, [dispatch]);
 
   const isLoadingState = useMemo(() => {
     return isLoading || !reduxTableData || !reduxTableData.actualColumns;

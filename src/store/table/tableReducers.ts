@@ -28,6 +28,14 @@ export const getHiddenColumns = (): HiddenColumns => {
       };
 };
 
+export const getDecimalByColumns = (
+  columns: Column[],
+  accessor: string,
+): number | undefined => {
+  return columns.find((column: Column) => column.accessor === accessor)
+    ?.decimal;
+};
+
 export const tableInitialState: GridCollection = {
   columns: [],
   actualColumns: [],
@@ -44,6 +52,7 @@ export const tableInitialState: GridCollection = {
 
 export const getDecimalRows = (
   rows: RowEntity[],
+  columns: Column[],
   decimalFixed: DecimalFixed,
 ): RowEntity[] => {
   const resultRows = [...rows].map((row: RowEntity) => {
@@ -58,12 +67,16 @@ export const getDecimalRows = (
         return;
       }
 
-      const decimal = decimalFixed[rowKey];
+      const decimal =
+        decimalFixed[rowKey] === undefined
+          ? getDecimalByColumns(columns, rowKey)
+          : decimalFixed[rowKey];
 
-      // eslint-disable-next-line no-restricted-globals
-      decimalRow[rowKey].formattedValue = isNaN(Number(value))
-        ? value
-        : MathHelper.getNormalizerFixed(decimal, Number(value));
+      decimalRow[rowKey].formattedValue =
+        // eslint-disable-next-line no-restricted-globals
+        decimal === undefined || isNaN(Number(value))
+          ? value
+          : MathHelper.getNormalizerFixed(decimal, Number(value));
     });
 
     return decimalRow as RowEntity;
@@ -164,7 +177,7 @@ export const TableReducers = reducerWithInitialState<GridCollection>(
 
     return {
       ...state,
-      rows: getDecimalRows(state.rows, decimalFixed),
+      rows: getDecimalRows(state.rows, state.columns, decimalFixed),
     };
   })
   .case(

@@ -64,6 +64,7 @@ export const prepareColumns = ({
     mergeCells,
     visible,
     geoType,
+    decimal,
     isRisk,
     control,
     columnAccessorGroup,
@@ -76,6 +77,7 @@ export const prepareColumns = ({
       isResizable: true,
       visible,
       geoType,
+      decimal,
       isRisk,
       control,
       columnAccessorGroup,
@@ -189,6 +191,7 @@ export const prepareColumns = ({
       geoType: attribute?.geoType,
       control: getColumnControl(attribute),
       columnAccessorGroup: getColumnAccessorGroup(attribute),
+      decimal: attribute?.decimal || 3,
       renderCell: (row: RowEntity) => {
         /** Заполняем коды и названия с учетом родителей, нужно для отправки данных в отображение гистограм */
         const codeWithParents = domainEntities
@@ -324,6 +327,7 @@ export function unpackTableData(
   const columns: Column[] = prepareColumns(projectStructure);
   const rows: RowEntity[] = getDecimalRows(
     prepareRows(projectStructure),
+    columns,
     decimalFixed,
   );
   const initialHiddenColumns = getHiddenColumns();

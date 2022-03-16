@@ -2970,6 +2970,7 @@ export type ResultAttribute = {
   shortName: Scalars['String'];
   units: Scalars['String'];
   geoType: Scalars['String'];
+  decimal: Scalars['Int'];
   viewType: Scalars['String'];
   visible: Visible;
 };
