@@ -8,13 +8,17 @@ import { ShellToolkit } from '@app/types';
 import { ProjectProvider } from './ProjectProvider';
 
 export const Providers: React.FC<ShellToolkit> = (props) => {
-  const { graphqlClient, identity, currentProject, children } = props;
+  const { graphqlClient, identity, currentProject, children, history } = props;
 
   return (
     <Provider store={store}>
       <ApolloProvider client={graphqlClient}>
         <BrowserRouter>
-          <ProjectProvider currentProject={currentProject} identity={identity}>
+          <ProjectProvider
+            currentProject={currentProject}
+            identity={identity}
+            history={history}
+          >
             {children}
           </ProjectProvider>
         </BrowserRouter>

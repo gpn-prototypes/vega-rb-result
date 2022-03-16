@@ -126,7 +126,7 @@ export const TableResultRb: React.FC<Props> = ({
   const setDecimalFixed = useCallback(
     ({ type, columnCode }: TableSetDecimalFixedActionPayload) =>
       dispatch(
-        TableActions.setDecimalFixed({
+        TableActions.initUpdateDecimalFixed({
           type,
           columnCode,
         }),
@@ -170,6 +170,10 @@ export const TableResultRb: React.FC<Props> = ({
   useEffect(() => {
     let filteredRowsData = rows;
     let filteredColumnsData = actualColumns;
+
+    if (!filteredColumnsData || filteredColumnsData.length === 0) {
+      return;
+    }
 
     if (filter?.columnKeys?.length > 0 && filter?.rowsIdx?.length > 0) {
       filteredColumnsData = filteredColumnsData.filter(
@@ -300,7 +304,7 @@ export const TableResultRb: React.FC<Props> = ({
     setTimeout(() => {
       document
         .querySelectorAll('.TableCell_isHeader')
-        .forEach((element: Element) => {
+        .forEach((element: Element, index: number) => {
           const rightSelector = element.querySelector(
             '.TableCell-Wrapper_horizontalAlign_right',
           );
@@ -312,13 +316,19 @@ export const TableResultRb: React.FC<Props> = ({
             return;
           }
 
+          const columnCode = columns[index].accessor;
+
+          if (!decimalFixed[columnCode] && decimalFixed[columnCode] !== 0) {
+            return;
+          }
+
           const htmlElement = element as HTMLElement;
 
           htmlElement.oncontextmenu = (event) =>
             onContextMenuClick(event, element);
         });
     });
-  }, [onContextMenuClick, hiddenColumns]);
+  }, [onContextMenuClick, hiddenColumns, columns, decimalFixed]);
 
   const handleClickRow = ({
     e,

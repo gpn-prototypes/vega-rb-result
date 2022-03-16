@@ -10,11 +10,4 @@ export const generalInitialState: GeneralStore = {
 
 export const GeneralReducers = reducerWithInitialState<GeneralStore>(
   generalInitialState,
-)
-  .case(GeneralActions.setNotFound, (state: GeneralStore, payload: boolean) => {
-    return {
-      ...state,
-      notFound: payload,
-    };
-  })
-  .case(GeneralActions.resetState, () => generalInitialState);
+).case(GeneralActions.resetState, () => generalInitialState);

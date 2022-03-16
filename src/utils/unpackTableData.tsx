@@ -1,7 +1,5 @@
 import React from 'react';
 import { ColumnExpanderComponent } from '@app/components/Expander/ColumnExpanderComponent';
-import { LocalStorageKey } from '@app/constants/LocalStorageKeyConstants';
-import { Action } from 'redux';
 
 import {
   Column,
@@ -17,13 +15,12 @@ import {
   ResultProjectStructure,
 } from '../generated/graphql';
 import {
-  DEFAULT_DECIMAL_FIXED,
-  getDecimalByColumns,
+  getActualColumns,
   getDecimalRows,
+  getHiddenColumns,
 } from '../store/table/tableReducers';
 import { DecimalFixed, GridCollection } from '../types/typesTable';
 
-import { LocalStorageHelper } from './LocalStorageHelper';
 import { getNumberWithSpaces } from './StringHelper';
 
 const isHasParentAll = (parents: Parent[]): boolean => {
@@ -67,7 +64,6 @@ export const prepareColumns = ({
     mergeCells,
     visible,
     geoType,
-    decimal,
     isRisk,
     control,
     columnAccessorGroup,
@@ -80,7 +76,6 @@ export const prepareColumns = ({
       isResizable: true,
       visible,
       geoType,
-      decimal,
       isRisk,
       control,
       columnAccessorGroup,
@@ -185,23 +180,6 @@ export const prepareColumns = ({
     return undefined;
   };
 
-  /** Берем значение из localstorage. Если его нет, то берем из бекенда */
-  const getDecimalValue = (attribute: ResultAttribute): number => {
-    const decimalFromLocalStorage: DecimalFixed | null =
-      LocalStorageHelper.getParsed<DecimalFixed>(LocalStorageKey.DecimalFixed);
-
-    if (
-      decimalFromLocalStorage &&
-      decimalFromLocalStorage[attribute.code] !== undefined
-    ) {
-      return decimalFromLocalStorage[attribute.code];
-    }
-
-    return attribute?.decimal !== undefined
-      ? attribute?.decimal
-      : DEFAULT_DECIMAL_FIXED;
-  };
-
   const preparedAttributes = attributes.map((attribute: ResultAttribute) => {
     const column: Column = getPreparedColumn({
       title: [attribute.shortName, attribute.units].filter(Boolean).join(', '),
@@ -211,7 +189,6 @@ export const prepareColumns = ({
       geoType: attribute?.geoType,
       control: getColumnControl(attribute),
       columnAccessorGroup: getColumnAccessorGroup(attribute),
-      decimal: getDecimalValue(attribute),
       renderCell: (row: RowEntity) => {
         /** Заполняем коды и названия с учетом родителей, нужно для отправки данных в отображение гистограм */
         const codeWithParents = domainEntities
@@ -342,20 +319,21 @@ export const prepareRows = ({
 export function unpackTableData(
   projectStructure: ResultProjectStructure,
   version: number,
-  setEntitiesCount: (count: number) => Action,
+  decimalFixed: DecimalFixed,
 ): GridCollection {
   const columns: Column[] = prepareColumns(projectStructure);
   const rows: RowEntity[] = getDecimalRows(
     prepareRows(projectStructure),
-    columns,
-    getDecimalByColumns(columns),
+    decimalFixed,
   );
-
-  setEntitiesCount(projectStructure.domainEntities.length);
+  const initialHiddenColumns = getHiddenColumns();
 
   return {
     columns,
     rows,
     version,
+    actualColumns: getActualColumns(columns, initialHiddenColumns),
+    decimalFixed,
+    notFound: false,
   };
 }

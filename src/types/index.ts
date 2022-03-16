@@ -1,5 +1,6 @@
 import { ApolloClient, NormalizedCacheObject } from '@apollo/client';
 import { DomainObject, RbDomainEntityIcons } from '@app/generated/graphql';
+import type { History } from 'history';
 
 type ProjectVID = string;
 
@@ -20,6 +21,7 @@ export interface ShellToolkit {
   graphqlClient: ApolloClient<NormalizedCacheObject>;
   identity: Identity;
   currentProject: CurrentProject;
+  history: History<unknown>;
 }
 
 interface Structure {

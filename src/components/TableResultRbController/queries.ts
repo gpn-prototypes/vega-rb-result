@@ -288,7 +288,6 @@ export const GET_TABLE_RESULT_RB = gql`
                 shortName
                 units
                 geoType
-                decimal
                 visible {
                   calc
                   table
@@ -313,6 +312,25 @@ export const GET_TABLE_RESULT_RB = gql`
           }
         }
       }
+    }
+  }
+`;
+
+export const GET_DECIMAL = gql`
+  query GetRBDecimals {
+    project {
+      resourceBase {
+        decimals {
+          projectDecimals {
+            code
+            decimalPlace
+            __typename
+          }
+          __typename
+        }
+        __typename
+      }
+      __typename
     }
   }
 `;

@@ -1,9 +1,39 @@
+import { DecimalFixed } from '@app/types/typesTable';
+
 import { ResultAttribute } from '../generated/graphql';
+
+export const DecimalMock: DecimalFixed = {
+  GEO_CATEGORY: 0,
+  GEO_TYPE: 0,
+  PERCENTILE: 0,
+  OIL_POOL_AREA: 3,
+  OIL_POOL_NET_THICKNESS: 3,
+  GAS_VOLUME_TO_ENTIRE_RESERVOIR: 3,
+  OIL_FORMATION_POROSITY_RATIO: 3,
+  FORMATION_OIL_SATURATION_FACTOR: 3,
+  DENSITY: 3,
+  CONVERSION_FACTOR: 3,
+  GAS_FORMATION_POROSITY_RATIO: 3,
+  GAS_SATURATION_COEFFICIENT: 3,
+  CORRECTION_FOR_PRESSURE: 3,
+  CORRECTION_FOR_TEMPERATURE: 3,
+  ngzngr_oil: 0,
+  GCOS: 2,
+  PARENT_MATERIAL: 2,
+  MIGRATION: 2,
+  COLLECTOR: 2,
+  PETROLEUM_TRAP: 2,
+  SEAL_SAFETY: 2,
+  ngzngr_gas: 0,
+  ngzngr_GCoS_oil: 0,
+  ngzngr_GCoS_gas: 0,
+  ngzngr_filtered_oil: 0,
+  ngzngr_filtered_gas: 0,
+};
 
 export const AttributesMock: ResultAttribute[] = [
   {
     code: 'GEO_CATEGORY',
-    decimal: 0,
     geoType: '',
     name: 'Категория',
     shortName: 'Категория',
@@ -17,7 +47,6 @@ export const AttributesMock: ResultAttribute[] = [
   },
   {
     code: 'GEO_TYPE',
-    decimal: 0,
     geoType: '',
     name: 'Флюид',
     shortName: 'Флюид',
@@ -31,7 +60,6 @@ export const AttributesMock: ResultAttribute[] = [
   },
   {
     code: 'PERCENTILE',
-    decimal: 0,
     geoType: '',
     name: 'Процентиль',
     shortName: 'Процентиль',
@@ -45,7 +73,6 @@ export const AttributesMock: ResultAttribute[] = [
   },
   {
     code: 'OIL_POOL_AREA',
-    decimal: 3,
     geoType: 'MIXTURE',
     name: 'F, тыс. м²',
     shortName: 'F, тыс. м²',
@@ -59,7 +86,6 @@ export const AttributesMock: ResultAttribute[] = [
   },
   {
     code: 'OIL_POOL_NET_THICKNESS',
-    decimal: 3,
     geoType: 'MIXTURE',
     name: 'H эфф.нн, м',
     shortName: 'H эфф.нн, м',
@@ -73,7 +99,6 @@ export const AttributesMock: ResultAttribute[] = [
   },
   {
     code: 'GAS_VOLUME_TO_ENTIRE_RESERVOIR',
-    decimal: 3,
     geoType: 'MIXTURE',
     name: 'V г./V общ., д. ед.',
     shortName: 'V г./V общ., д. ед.',
@@ -87,7 +112,6 @@ export const AttributesMock: ResultAttribute[] = [
   },
   {
     code: 'OIL_FORMATION_POROSITY_RATIO',
-    decimal: 3,
     geoType: 'OIL',
     name: 'Кᴴп, д. ед.',
     shortName: 'Кᴴп, д. ед.',
@@ -101,7 +125,6 @@ export const AttributesMock: ResultAttribute[] = [
   },
   {
     code: 'FORMATION_OIL_SATURATION_FACTOR',
-    decimal: 3,
     geoType: 'OIL',
     name: 'Кн, д. ед.',
     shortName: 'Кн, д. ед.',
@@ -115,7 +138,6 @@ export const AttributesMock: ResultAttribute[] = [
   },
   {
     code: 'DENSITY',
-    decimal: 3,
     geoType: 'OIL',
     name: 'Плотность, г/см³',
     shortName: 'Плотность, г/см³',
@@ -129,7 +151,6 @@ export const AttributesMock: ResultAttribute[] = [
   },
   {
     code: 'CONVERSION_FACTOR',
-    decimal: 3,
     geoType: 'OIL',
     name: 'Пересч. коэф., д. ед.',
     shortName: 'Пересч. коэф., д. ед.',
@@ -143,7 +164,6 @@ export const AttributesMock: ResultAttribute[] = [
   },
   {
     code: 'GAS_FORMATION_POROSITY_RATIO',
-    decimal: 3,
     geoType: 'GAS',
     name: 'К⸢п, д. ед.',
     shortName: 'К⸢п, д. ед.',
@@ -157,7 +177,6 @@ export const AttributesMock: ResultAttribute[] = [
   },
   {
     code: 'GAS_SATURATION_COEFFICIENT',
-    decimal: 3,
     geoType: 'GAS',
     name: 'Кг, д. ед.',
     shortName: 'Кг, д. ед.',
@@ -171,7 +190,6 @@ export const AttributesMock: ResultAttribute[] = [
   },
   {
     code: 'CORRECTION_FOR_PRESSURE',
-    decimal: 3,
     geoType: 'GAS',
     name: 'Кp, МПа',
     shortName: 'Кp, МПа',
@@ -185,7 +203,6 @@ export const AttributesMock: ResultAttribute[] = [
   },
   {
     code: 'CORRECTION_FOR_TEMPERATURE',
-    decimal: 3,
     geoType: 'GAS',
     name: 'Кt',
     shortName: 'Кt',
@@ -199,7 +216,6 @@ export const AttributesMock: ResultAttribute[] = [
   },
   {
     code: 'ngzngr_oil',
-    decimal: 0,
     geoType: 'OIL',
     name: 'НГЗ/НГР нефти, тыс. т',
     shortName: 'НГЗ/НГР нефти, тыс. т',
@@ -213,7 +229,6 @@ export const AttributesMock: ResultAttribute[] = [
   },
   {
     code: 'GCOS',
-    decimal: 2,
     geoType: '',
     name: 'Gcos',
     shortName: 'Gcos',
@@ -227,7 +242,6 @@ export const AttributesMock: ResultAttribute[] = [
   },
   {
     code: 'PARENT_MATERIAL',
-    decimal: 2,
     geoType: '',
     name: 'Мат. порода',
     shortName: 'Мат. порода',
@@ -241,7 +255,6 @@ export const AttributesMock: ResultAttribute[] = [
   },
   {
     code: 'MIGRATION',
-    decimal: 2,
     geoType: '',
     name: 'Миграция',
     shortName: 'Миграция',
@@ -255,7 +268,6 @@ export const AttributesMock: ResultAttribute[] = [
   },
   {
     code: 'COLLECTOR',
-    decimal: 2,
     geoType: '',
     name: 'Коллектор',
     shortName: 'Коллектор',
@@ -269,7 +281,6 @@ export const AttributesMock: ResultAttribute[] = [
   },
   {
     code: 'PETROLEUM_TRAP',
-    decimal: 2,
     geoType: '',
     name: 'Ловушка',
     shortName: 'Ловушка',
@@ -283,7 +294,6 @@ export const AttributesMock: ResultAttribute[] = [
   },
   {
     code: 'SEAL_SAFETY',
-    decimal: 2,
     geoType: '',
     name: 'Покрышка/сохранность',
     shortName: 'Покрышка/сохранность',
@@ -297,7 +307,6 @@ export const AttributesMock: ResultAttribute[] = [
   },
   {
     code: 'ngzngr_gas',
-    decimal: 0,
     geoType: 'GAS',
     name: 'НГЗ/НГР газа, млн. м³',
     shortName: 'НГЗ/НГР газа, млн. м³',
@@ -311,7 +320,6 @@ export const AttributesMock: ResultAttribute[] = [
   },
   {
     code: 'ngzngr_GCoS_oil',
-    decimal: 0,
     geoType: 'OIL',
     name: 'НГЗ/НГР нефти с учётом GCoS, тыс. т',
     shortName: 'НГЗ/НГР нефти с учётом GCoS, тыс. т',
@@ -325,7 +333,6 @@ export const AttributesMock: ResultAttribute[] = [
   },
   {
     code: 'ngzngr_GCoS_gas',
-    decimal: 0,
     geoType: 'GAS',
     name: 'НГЗ/НГР газа с учётом GCoS, млн. м³',
     shortName: 'НГЗ/НГР газа с учётом GCoS, млн. м³',
@@ -339,7 +346,6 @@ export const AttributesMock: ResultAttribute[] = [
   },
   {
     code: 'ngzngr_filtered_oil',
-    decimal: 0,
     geoType: 'OIL',
     name: 'НГЗ/НГР нефти в случае ГУ, тыс. т',
     shortName: 'НГЗ/НГР нефти в случае ГУ, тыс. т',
@@ -353,7 +359,6 @@ export const AttributesMock: ResultAttribute[] = [
   },
   {
     code: 'ngzngr_filtered_gas',
-    decimal: 0,
     geoType: 'GAS',
     name: 'НГЗ/НГР газа в случае ГУ, млн. м³',
     shortName: 'НГЗ/НГР газа в случае ГУ, млн. м³',

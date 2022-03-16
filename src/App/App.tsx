@@ -7,6 +7,7 @@ import projectService from '@app/services/ProjectService';
 import { CurrentProject, Identity, ShellToolkit } from '@app/types';
 import { presetGpnDark, Theme } from '@consta/uikit/Theme';
 import { useMount } from '@gpn-prototypes/vega-ui';
+import type { History } from 'history';
 
 import './App.css';
 
@@ -14,14 +15,15 @@ const getInitProps = async ({
   currentProject,
   graphqlClient,
   identity,
+  history,
 }: Partial<ShellToolkit>): Promise<Required<ShellToolkit>> =>
   new Promise<ShellToolkit>((resolve) => {
-    if (currentProject && graphqlClient && identity)
-      resolve({ currentProject, identity, graphqlClient });
+    if (currentProject && graphqlClient && identity && history)
+      resolve({ currentProject, identity, graphqlClient, history });
   });
 
 const App: React.FC<Partial<ShellToolkit>> = (props) => {
-  const { graphqlClient, identity, currentProject } = props;
+  const { graphqlClient, identity, currentProject, history } = props;
   const [isLoading, setIsLoading] = useState(true);
 
   useMount(() => {
@@ -50,6 +52,7 @@ const App: React.FC<Partial<ShellToolkit>> = (props) => {
             currentProject={currentProject as CurrentProject}
             graphqlClient={graphqlClient as ApolloClient<NormalizedCacheObject>}
             identity={identity as Identity}
+            history={history as History<unknown>}
           >
             <div className="rb-result-app">
               {!isLoading && <RbResultPage />}

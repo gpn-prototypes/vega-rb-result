@@ -22,7 +22,7 @@ export const ContextMenuBaseItem: FC<ContextMenuBaseItemProps> = ({
 }) => {
   return (
     <div
-      className={cn('Title', {
+      className={cn('Wrapper', {
         Border: menuItem.border,
         Column: column,
         Disabled: getDisabled && getDisabled(menuItem),
@@ -36,20 +36,8 @@ export const ContextMenuBaseItem: FC<ContextMenuBaseItemProps> = ({
       role="button"
       tabIndex={0}
     >
-      <div
-        className={cn('Title', {
-          Left: true,
-        })}
-      >
-        {menuItem.icon && (
-          <div
-            className={cn('Title', {
-              Icon: true,
-            })}
-          >
-            {menuItem.icon()}
-          </div>
-        )}
+      <div className={cn('Content')}>
+        {menuItem.icon && <div className={cn('Title')}>{menuItem.icon()}</div>}
 
         <div>{menuItem.name}</div>
       </div>

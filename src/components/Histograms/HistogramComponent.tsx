@@ -9,7 +9,6 @@ import { RootState } from '@app/store/types';
 import { GridActiveRow, GridCollection } from '@app/types/typesTable';
 import { Loader } from '@consta/uikit/Loader';
 import { Text } from '@consta/uikit/Text';
-import { useMount } from '@gpn-prototypes/vega-ui';
 import { block } from 'bem-cn';
 
 import ChartComponent from './chart/Chart';
@@ -44,16 +43,6 @@ export const HistogramComponent: React.FC<Props> = ({ grid }) => {
   const isLoading: boolean = useSelector(
     ({ loader }: RootState) => loader.loading.histogram,
   );
-
-  /** Callback */
-  const resetHistogramState = useCallback(
-    () => dispatch(HistogramActions.resetState()),
-    [dispatch],
-  );
-
-  useMount(() => {
-    return resetHistogramState;
-  });
 
   const handleChange = useCallback(
     (item: MenuContextItem) => {

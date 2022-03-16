@@ -6,6 +6,7 @@ export type LoadingType =
   | 'file'
   | 'histogram'
   | 'histogram-statistic'
+  | 'decimal'
   | 'table';
 
 export type LoadingState = {

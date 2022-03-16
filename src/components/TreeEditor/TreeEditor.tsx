@@ -5,7 +5,7 @@ import { cnTreeEditor } from '@app/components/TreeEditor/cn-tree-editor';
 import treeFilterDuck from '@app/store/treeDuck';
 import { RootState, TreeFilter } from '@app/store/types';
 import { Text } from '@consta/uikit/Text';
-import { Tree, useMount } from '@gpn-prototypes/vega-ui';
+import { Tree } from '@gpn-prototypes/vega-ui';
 
 import {
   getNodeListFromTableData,
@@ -52,10 +52,6 @@ export default React.forwardRef<HTMLDivElement, StructureTreeEditorProps>(
         ),
       [dispatch],
     );
-
-    useMount(() => {
-      return resetState;
-    });
 
     const projectName = useSelector(({ project }: RootState) => project.name);
 
