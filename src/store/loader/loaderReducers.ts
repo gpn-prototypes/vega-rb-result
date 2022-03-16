@@ -12,7 +12,7 @@ export const loaderStoreInitialState: LoaderStore = Object.freeze({
   },
   loading: {
     'file': false,
-    'histogram': false,
+    'histogram': true,
     'histogram-statistic': false,
     'decimal': false,
     'table': true,
@@ -49,7 +49,7 @@ export const LoaderReducers = reducerWithInitialState<LoaderStore>(
       },
       loading: {
         'file': false,
-        'histogram': false,
+        'histogram': true,
         'histogram-statistic': false,
         'decimal': false,
         'table': true,
