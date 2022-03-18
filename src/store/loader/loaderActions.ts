@@ -24,4 +24,5 @@ export const LoaderAction = {
   setLoaded: factory<LoadingType>('SET_LOADED'),
   setLoading: factory<LoadingType>('SET_LOADING'),
   resetStore: factory('RESET_STORE'),
+  resetType: factory<LoadingType>('RESET_TYPE'),
 };

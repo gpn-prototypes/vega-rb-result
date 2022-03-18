@@ -57,7 +57,7 @@ export const DownloadResultModal: React.FC<Props> = ({ handleClose }) => {
   /** Effects */
   useEffect(() => {
     return () => {
-      dispatch(LoaderAction.resetStore());
+      dispatch(LoaderAction.resetType('file'));
     };
   }, [dispatch]);
 
@@ -89,6 +89,7 @@ export const DownloadResultModal: React.FC<Props> = ({ handleClose }) => {
       onClickOutside={handleClose}
       onEsc={handleClose}
       data-testid="export-file-modal"
+      className="download-result-modal"
     >
       <div className={cn('Content')}>
         <ContentComponent

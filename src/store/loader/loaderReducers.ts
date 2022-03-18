@@ -38,6 +38,14 @@ export const LoaderReducers = reducerWithInitialState<LoaderStore>(
 
     return cloneState;
   })
+  .case(LoaderAction.resetType, (state, type: LoadingType) => {
+    const cloneState = { ...state };
+
+    cloneState.loaded[type] = false;
+    cloneState.loading[type] = false;
+
+    return cloneState;
+  })
   .case(LoaderAction.resetStore, () => {
     return {
       loaded: {
