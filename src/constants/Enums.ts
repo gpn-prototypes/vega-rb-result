@@ -1,7 +1,7 @@
 export enum EFluidType {
   OIL = 'Нефть',
   GAS = 'Газ',
-  OIL_N_GAS = 'Нефть+Газ',
+  OIL_N_GAS = 'Нефть И/ИЛИ Газ',
   ALL = 'Все',
 }
 
