@@ -7,7 +7,7 @@ import {
 import { GridActiveRow, GridCollection } from '@app/types/typesTable';
 import { AnyAction } from 'redux';
 import { Epic } from 'redux-observable';
-import { from, of } from 'rxjs';
+import { from } from 'rxjs';
 import {
   distinctUntilChanged,
   filter,
@@ -97,17 +97,17 @@ const loadHistogramEpic: Epic<
     switchMap(([{ payload }, [oldState, newState]]) => {
       toggleActiveTableCellClass(newState, oldState);
 
-      const oldActiveRowCode = oldState.table.activeRow?.code;
-      const newActiveRowCode = newState.table.activeRow?.code;
+      // const oldActiveRowCode = oldState.table.activeRow?.code;
+      // const newActiveRowCode = newState.table.activeRow?.code;
 
-      if (
-        oldActiveRowCode !== null &&
-        newActiveRowCode !== null &&
-        oldActiveRowCode === newActiveRowCode &&
-        newState.histogram.histograms.length > 0
-      ) {
-        return of(newState.histogram.histograms);
-      }
+      // if (
+      //   oldActiveRowCode !== null &&
+      //   newActiveRowCode !== null &&
+      //   oldActiveRowCode === newActiveRowCode &&
+      //   newState.histogram.histograms.length > 0
+      // ) {
+      //   return of(newState.histogram.histograms);
+      // }
 
       if (payload === undefined || typeof payload === 'object') {
         return from(
