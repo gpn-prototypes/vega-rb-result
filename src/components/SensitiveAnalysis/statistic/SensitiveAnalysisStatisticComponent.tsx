@@ -16,10 +16,10 @@ const getMappedColumn = (
   header: SensitiveAnalysisStatisticHeaders,
   isLeft = true,
 ): TableColumn<TableRow> => {
-  const title = header.name.toLowerCase();
+  const title = header.name;
 
   const column: TableColumn<TableRow> = {
-    title: title.charAt(0).toUpperCase() + title.slice(1),
+    title,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     accessor: header.code as any,
     align: isLeft ? 'left' : 'right',
