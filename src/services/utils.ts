@@ -10,6 +10,14 @@ export const getBaseApiUrl = (): string => {
     : window.location.origin + process.env.BASE_API_URL;
 };
 
+export const isSecureBaseApiUrl = (): boolean => {
+  if (!process.env.HTTP_SCHEME) {
+    return false;
+  }
+
+  return process.env.HTTP_SCHEME === 'https';
+};
+
 export const getGraphqlUri = (projectId: string): string =>
   `${getBaseApiUrl()}/graphql/${projectId}`;
 

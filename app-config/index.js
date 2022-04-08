@@ -10,6 +10,7 @@ const getAppConfig = () => ({
   mode: process.env.NODE_ENV || 'development',
   analyze: process.env.ANALYZE || 0,
   baseApiUrl: process.env.BASE_API_URL,
+  httpScheme: process.env.HTTP_SCHEME,
   apiPath: process.env.API_PATH || '/',
   useApiProxy: process.env.USE_API_PROXY || false,
 });
