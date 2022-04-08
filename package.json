@@ -57,7 +57,7 @@
     "redux-observable": "^1.2.0",
     "redux-persist": "^6.0.0",
     "redux-thunk": "^2.3.0",
-    "single-spa-react": "^3.1.0",
+    "single-spa-react": "^4.6.1",
     "systemjs-webpack-interop": "^2.1.2",
     "typescript-fsa": "^3.0.0",
     "typescript-fsa-reducers": "^1.2.1"

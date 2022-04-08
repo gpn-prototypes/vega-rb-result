@@ -4277,6 +4277,11 @@ browserify-zlib@^0.2.0:
   dependencies:
     pako "~1.0.5"
 
+browserslist-config-single-spa@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/browserslist-config-single-spa/-/browserslist-config-single-spa-1.0.1.tgz#965f1f1606ba44671e649f410d8b8f735a327301"
+  integrity sha512-nqOxTbatv6FcdgBvUTuH4MuojMZwvskspz5Y4dmpVcKd0uaQY8KEl3iALWus16+AwPVe3BIerBNEgELyaHZcQg==
+
 browserslist@^4.14.5, browserslist@^4.17.5, browserslist@^4.19.1:
   version "4.20.2"
   resolved "https://registry.yarnpkg.com/browserslist/-/browserslist-4.20.2.tgz#567b41508757ecd904dab4d1c646c612cd3d4f88"
@@ -12678,10 +12683,12 @@ signedsource@^1.0.0:
   resolved "https://registry.yarnpkg.com/signedsource/-/signedsource-1.0.0.tgz#1ddace4981798f93bd833973803d80d52e93ad6a"
   integrity sha1-HdrOSYF5j5O9gzlzgD2A1S6TrWo=
 
-single-spa-react@^3.1.0:
-  version "3.2.0"
-  resolved "https://registry.yarnpkg.com/single-spa-react/-/single-spa-react-3.2.0.tgz#97bfcb03e418f7daa2b1bd05eab1c62632351d91"
-  integrity sha512-s8K7AuS26WvN9n81z1NBlnZIe/Hin423P8jYLuG/DCNTYo5JbJMS5+Cb/wQd4ikG6YqoedpV4cb7nAcxvlLyhg==
+single-spa-react@^4.6.1:
+  version "4.6.1"
+  resolved "https://registry.yarnpkg.com/single-spa-react/-/single-spa-react-4.6.1.tgz#1a1fe605c0ab56d3258d06fde787f1ddef7942f2"
+  integrity sha512-19Yr1f6u9ix/wTI+OVLzX/KJ258xCyfe1Zpw7NKoI02QWBLx5B9l9XmBx9gqVtkrgP5ARR0Wr3ztY7EN8V1DAA==
+  dependencies:
+    browserslist-config-single-spa "^1.0.1"
 
 sirv@^1.0.7:
   version "1.0.19"
