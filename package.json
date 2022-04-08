@@ -128,7 +128,7 @@
     "@graphql-codegen/typescript-react-apollo": "3.1.4",
     "commitizen": "^4.2.1",
     "cz-customizable": "^6.3.0",
-    "husky": "^4.3.0",
+    "husky": "^7.0.4",
     "lint-staged": "^10.4.0",
     "npm-run-all": "^4.1.5"
   }
