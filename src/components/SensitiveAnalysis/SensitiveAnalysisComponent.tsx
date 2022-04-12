@@ -250,7 +250,7 @@ export const SensitiveAnalysisComponent: FC<Props> = ({ sidebarRow }) => {
               <ChoiceGroup
                 value={activeTab}
                 items={tabItems}
-                name="SensitiveAnaLysisChoiceGroup"
+                name="SensitiveAnalysisChoiceGroup"
                 size="s"
                 view="ghost"
                 width="full"

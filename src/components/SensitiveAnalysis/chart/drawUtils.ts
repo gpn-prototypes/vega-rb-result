@@ -21,8 +21,12 @@ export namespace SensitiveAnalysisChart {
   export interface Payload {
     name: string;
     value: number;
-    category: number;
+    category: 0 | 1;
     percentile: number;
+    // color: 'orange' | 'blue';
+    // myValue: number;
+    // length: number;
+    // direction: 'left' | 'right';
   }
 
   export interface Options {
@@ -34,6 +38,18 @@ export namespace SensitiveAnalysisChart {
     colors: Record<number, string>;
   }
 
+  export const options: Options = {
+    format: '',
+    negative: '',
+    positive: '',
+    negatives: [0],
+    positives: [1],
+    colors: {
+      0: '#F38B00',
+      1: '#0AA5FF',
+    },
+  };
+
   export type Series = d3.Series<{ [key: string]: number }, string>[];
   export type Bias = [string, number];
 
@@ -42,17 +58,17 @@ export namespace SensitiveAnalysisChart {
     bias: Bias[];
     options: Options;
   } {
-    const options: Options = {
-      format: '',
-      negative: '',
-      positive: '',
-      negatives: [0],
-      positives: [1],
-      colors: {
-        0: '#F38B00',
-        1: '#0AA5FF',
-      },
-    };
+    // const options: Options = {
+    //   format: '',
+    //   negative: '',
+    //   positive: '',
+    //   negatives: [0],
+    //   positives: [1],
+    //   colors: {
+    //     0: '#F38B00',
+    //     1: '#0AA5FF',
+    //   },
+    // };
 
     const mappedNegatives = options.negatives.map((d: number) => [d, -1]);
     const mappedPositives = options.positives.map((d: number) => [d, +1]);
@@ -65,16 +81,13 @@ export namespace SensitiveAnalysisChart {
 
     const series: Series = d3
       .stack()
-      .keys(
-        [].concat(
-          options.negatives.slice().reverse() as any,
-          options.positives as any,
-        ),
-      )
-      .value(
-        ([, value]: any, category: any) =>
-          (signs.get(category) as any) * (value.get(category) || 0),
-      )
+      .keys([].concat([0] as any, [1] as any))
+      .value(([, value]: any, category: any) => {
+        console.log('value: ', value);
+        console.log('category: ', category);
+
+        return (signs.get(category) as any) * (value.get(category) || 0);
+      })
       .offset(d3.stackOffsetDiverging)(
       d3.rollups(
         data,
@@ -88,12 +101,13 @@ export namespace SensitiveAnalysisChart {
       ) as any,
     );
 
+    // TODO: посмотреть не ломаются ли биасы
     const bias = d3.rollups(
       data,
       (v) =>
         d3.sum(
           v,
-          (d: any) => d.value * Math.min(0, signs.get(d.category) as any),
+          (d: any) => d.value * Math.min(0, signs.get(d.category.color) as any),
         ),
       (d) => d.name,
     );
@@ -117,6 +131,7 @@ export namespace SensitiveAnalysisChart {
     const offset = 50;
     const sample = resultMinMax.flat(1);
 
+    // выравнивания
     const xScale = d3
       .scaleLinear()
       .domain(d3.extent(series.flat(2)) as any)
@@ -126,7 +141,7 @@ export namespace SensitiveAnalysisChart {
           SensitiveAnalysisChart.Margin.right -
           offset,
       ]);
-
+    // выравнивания лево-право
     const x1Scale = d3
       .scaleLinear()
       .domain([d3.min(sample) || 0, d3.max(sample) || 0])
@@ -134,7 +149,7 @@ export namespace SensitiveAnalysisChart {
         SensitiveAnalysisChart.Margin.left,
         SensitiveAnalysisChart.Width + SensitiveAnalysisChart.Margin.right,
       ]);
-
+    // выравнивания, высота баров, отступы графика
     const heightMultiplier = 68;
     const height =
       bias.length * heightMultiplier +
@@ -171,7 +186,6 @@ export namespace SensitiveAnalysisChart {
     currentPercentiles: number[][];
     bias: Bias[];
     series: Series;
-    zeroPoint: number;
     data: SensitiveAnalysisChart.Payload[];
   }): {
     xAxis;
@@ -179,11 +193,11 @@ export namespace SensitiveAnalysisChart {
     y2Axis;
     y3Axis;
   } {
-    const formatValue = () => {
-      const format = d3.format(options.format || '');
-
-      return (innerX) => format(Math.abs(innerX));
-    };
+    // const formatValue = () => {
+    //   const format = d3.format(options.format || '');
+    //
+    //   return (innerX) => format(Math.abs(innerX));
+    // };
 
     const getPercentileByName = (name: string, isPositive = false): string => {
       const currentElement = data.filter(
@@ -195,86 +209,90 @@ export namespace SensitiveAnalysisChart {
         .toString();
     };
 
+    // смещение цифр на барах
     const getPositiveTickByNegativeValue = (negativeValue: number): number => {
-      const findPositiveIndexByNegative = () => {
-        const negativeSeries = series[0];
+      // const findPositiveIndexByNegative = () => {
+      //   // const negativeSeries = series[0];
+      //
+      //   const index = 0;
+      //
+      //   return index;
+      // };
 
-        const index = negativeSeries.findIndex((innerSeries: any[]) => {
-          return innerSeries[0] === negativeValue;
-        });
+      // const rightBarSeries = series[1];
 
-        return index;
-      };
+      // const rightBarSeries = 0;
 
-      const rightBarSeries = series[1];
-      const currentTick = rightBarSeries[findPositiveIndexByNegative()][1];
+      // const currentTick = rightBarSeries[findPositiveIndexByNegative()][1];
 
-      return currentTick;
+      return 0;
     };
 
-    /** Добавление оси X, а так же добавление полосок */
-    const xAxis = (g) =>
-      g
-        .attr('transform', `translate(4,${SensitiveAnalysisChart.Margin.top})`)
-        .attr('class', 'chart__xAxis')
-        .call(
-          d3
-            .axisTop(x1Scale)
-            .ticks(3)
-            .tickFormat(formatValue())
-            .tickSizeOuter(0),
-        )
-        .call((innerG) => innerG.select('.domain').remove())
-        .call((innerG) =>
-          innerG
-            .selectAll('.tick')
-            .call((nestedG) => nestedG.selectAll('.tick line').remove())
-            .call((nestedG) => nestedG.selectAll('.tick text').remove())
-            .call((nestedG) =>
-              nestedG
-                .append('text')
-                .attr('class', 'chart__text chart__text_middle')
-                .attr('text-anchor', 'middle')
-                .text((x: number) => x),
-            )
-            // .data(resultMinMax.flat(1))
-            .append('line')
-            .attr('transform', () => `translate(0, 20)`)
-            .attr('y2', currentPercentiles.length * 66.6)
-            .attr('stroke-dasharray', 3)
-            .attr('stroke', 'rgba(246, 251, 253, 0.28)'),
-        );
+    /** Добавление оси X, а также добавление полосок */
+    const xAxis = (g) => null;
+    // g
+    //   .attr('transform', `translate(4,${SensitiveAnalysisChart.Margin.top})`)
+    //   .attr('class', 'chart__xAxis')
+    //   .call(
+    //     d3
+    //       .axisTop(x1Scale)
+    //       .ticks(3)
+    //       .tickFormat(formatValue())
+    //       .tickSizeOuter(0),
+    //   )
+    //   .call((innerG) => innerG.select('.domain').remove())
+    //   .call((innerG) =>
+    //     innerG
+    //       .selectAll('.tick')
+    //       .call((nestedG) => nestedG.selectAll('.tick line').remove())
+    //       .call((nestedG) => nestedG.selectAll('.tick text').remove())
+    //       // цифры сверху (2, 4, 6, 8)
+    //       // .call((nestedG) =>
+    //       //   nestedG
+    //       //     .append('text')
+    //       //     .attr('class', 'chart__text chart__text_middle')
+    //       //     .attr('text-anchor', 'middle')
+    //       //     .text((x: number) => x),
+    //       // )
+    //       // .data(resultMinMax.flat(1))
+    //       // пунктирные линии
+    //       // .append('line')
+    //       // .attr('transform', () => `translate(0, 20)`)
+    //       // .attr('y2', currentPercentiles.length * 66.6)
+    //       // .attr('stroke-dasharray', 3)
+    //       // .attr('stroke', 'rgba(246, 251, 253, 0.28)'),
+    //   );
 
     /** Заглушка, показываем в левой части "1,0" + установка "zero point" */
-    const yAxis = (g) =>
-      g
-        /** Установка zero point */
-        .attr('transform', `translate(0,0)`)
-        .attr('class', 'chart__yAxisLeft')
-        .call(d3.axisLeft(yScale).tickSizeOuter(0))
-        .call((innerG) =>
-          innerG
-            .selectAll('.tick')
-            .data(bias)
-            .attr(
-              'transform',
-              ([name, min]) =>
-                `translate(${xScale(min) - 5},${
-                  (yScale(name) || 0) + yScale.bandwidth() + 13
-                })`,
-            )
-            .text('')
-            .append('text')
-            .attr('class', 'chart__text chart__text_white')
-            .text(([name]) => getPercentileByName(name)),
-        )
-        /** Установка позиции zero point */
-        .call((innerG) =>
-          innerG
-            .select('.domain')
-            .attr('display', 'none')
-            .attr('transform', `translate(${xScale(0)},0)`),
-        );
+    const yAxis = (g) => null;
+    // g
+    //   /** Установка zero point */
+    //   .attr('transform', `translate(0,0)`)
+    //   .attr('class', 'chart__yAxisLeft')
+    //   .call(d3.axisLeft(yScale).tickSizeOuter(0))
+    //   .call((innerG) =>
+    //     innerG
+    //       .selectAll('.tick')
+    //       .data(bias)
+    //       .attr(
+    //         'transform',
+    //         ([name, min]) =>
+    //           `translate(${xScale(min) - 5},${
+    //             (yScale(name) || 0) + yScale.bandwidth() + 13
+    //           })`,
+    //       )
+    //       .text('')
+    //       .append('text')
+    //       .attr('class', 'chart__text chart__text_white')
+    //       .text(([name]) => getPercentileByName(name)),
+    //   )
+    //   /** Установка позиции zero point */
+    //   .call((innerG) =>
+    //     innerG
+    //       .select('.domain')
+    //       .attr('display', 'none')
+    //       .attr('transform', `translate(${xScale(0)},0)`),
+    //   );
 
     /** Заглушка, показываем в правой части "1,0" */
     const y2Axis = (g) =>
@@ -300,7 +318,7 @@ export namespace SensitiveAnalysisChart {
         )
         .call((innerG) => innerG.select('.domain').attr('display', 'none'));
 
-    /** Обозначение слева(названия) */
+    /** Обозначение слева(названия F, Kн) */
     const y3Axis = (g) =>
       g
         .attr('transform', `translate(0,0)`)
