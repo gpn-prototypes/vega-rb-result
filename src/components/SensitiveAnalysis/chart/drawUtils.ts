@@ -103,44 +103,55 @@ export namespace DrawUtils {
     //   .domain([d3.min(sample) || 0, d3.max(sample) || 0])
     //   .range([DrawUtils.Margin.left, DrawUtils.Width]);
 
+    const x2 = d3
+      .scaleLinear()
+      .domain([zp.toFixed(), zp.toFixed()])
+      .range([DrawUtils.Margin.left, DrawUtils.Width]);
+
     const y = d3
       .scaleBand()
       .domain(currentData.map(({ name }) => name))
       .rangeRound([DrawUtils.Margin.top, height - DrawUtils.Margin.bottom])
       .padding(53 / heightMultiplier);
 
-    // const xAxisMiddleZeroPoint = (g) => {
-    //   return g
-    //     .attr('transform', `translate(0,${DrawUtils.Margin.top})`)
-    //     .attr('class', 'chart__xAxis')
-    //     .call(
-    //       d3
-    //         .axisTop(x1)
-    //         .scale(x1)
-    //         .ticks(1)
-    //         .tickFormat(formatValue())
-    //         .tickSizeOuter(0),
-    //     )
-    //     .call((innerG) => innerG.select('.domain').remove())
-    //     .call((innerG) =>
-    //       innerG
-    //         .selectAll('.tick')
-    //         .call((nestedG) => nestedG.selectAll('.tick line').remove())
-    //         .call((nestedG) => nestedG.selectAll('.tick text').remove())
-    //         /** цифры сверху */
-    //         .call((nestedG) =>
-    //           nestedG
-    //             .append('text')
-    //             .attr('style', 'font-weight: bold')
-    //             .attr(
-    //               'class',
-    //               'chart__text chart__text_middle chart__text_white',
-    //             )
-    //             .attr('text-anchor', 'middle')
-    //             .text((t: number) => t),
-    //         ),
-    //     );
-    // };
+    const xAxisMiddleZeroPoint = (g) => {
+      return g
+        .attr('transform', `translate(0,${DrawUtils.Margin.top})`)
+        .attr('class', 'chart__xAxis')
+        .call(
+          d3
+            .axisTop(x2)
+            .scale(x2)
+            .ticks(1)
+            .tickFormat(formatValue())
+            .tickSizeOuter(0),
+        )
+        .call((innerG) => innerG.select('.domain').remove())
+        .call((innerG) =>
+          innerG
+            .selectAll('.tick')
+            .call((nestedG) => nestedG.selectAll('.tick line').remove())
+            .call((nestedG) => nestedG.selectAll('.tick text').remove())
+            /** цифры сверху */
+            .call((nestedG) =>
+              nestedG
+                .append('text')
+                .attr('style', 'font-weight: bold')
+                .attr(
+                  'class',
+                  'chart__text chart__text_middle chart__text_white',
+                )
+                .attr('text-anchor', 'middle')
+                .text((t: number) => t),
+            )
+            /** пунктирные линии */
+            .append('line')
+            .attr('transform', () => `translate(0, 20)`)
+            .attr('y2', availableNames.length * 66.6)
+            // .attr('stroke-dasharray', 3)
+            .attr('stroke', 'rgba(255, 255, 255, .28)'),
+        );
+    };
 
     const xAxis = (g) => {
       return g
@@ -213,7 +224,7 @@ export namespace DrawUtils {
 
     svg.append('g').call(yAxis);
     svg.append('g').call(xAxis);
-    // svg.append('g').call(xAxisMiddleZeroPoint);
+    svg.append('g').call(xAxisMiddleZeroPoint);
 
     let maxvalue;
 
@@ -331,25 +342,29 @@ export namespace DrawUtils {
           .attr('y', (d) => {
             return (y(d.name) as any) + y.bandwidth() / 2;
           })
-          .attr('dy', (d) => {
+          .attr('dy', (d, index) => {
             let baseTitlePlacementY = '.35em';
 
-            if (d.value > 0) {
-              if (d.category === 0) {
-                baseTitlePlacementY = '1.350em';
-              } else {
-                baseTitlePlacementY = '-1.350em';
-              }
-            } else if (d.value < 0) {
-              if (d.category === 1) {
-                baseTitlePlacementY = '-1.350em';
-              } else {
-                baseTitlePlacementY = '1.350em';
-              }
+            const prev = data[index - 1];
+            const next = data[index + 1];
+
+            if (
+              prev &&
+              d.name === prev.name &&
+              ((d.value > 0 && prev.value > 0) ||
+                (d.value < 0 && prev.value < 0))
+            ) {
+              baseTitlePlacementY = '24px';
+            } else if (
+              next &&
+              d.name === next.name &&
+              ((d.value > 0 && next.value > 0) ||
+                (d.value < 0 && next.value < 0))
+            ) {
+              baseTitlePlacementY = '-12px';
             }
 
             return baseTitlePlacementY;
-            // return '.35em';
           })
           .text((d) => {
             return d.percentile.toFixed(3);

@@ -72,7 +72,7 @@ export const SensitiveAnalysisChartComponent: FC<
 
     data[data.length - 2].value = 1.12222;
     // lol[lol.length - 1][0] = 8.2900450310638515;
-    // console.log(data);
+    console.log(data);
     // console.log(lol);
     const chart = DrawUtils.tornadoChart(
       data,
