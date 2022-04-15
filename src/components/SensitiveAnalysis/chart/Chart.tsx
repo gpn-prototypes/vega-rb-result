@@ -51,10 +51,7 @@ export const SensitiveAnalysisChartComponent: FC<
       availableNames.includes(names[index]),
     );
 
-    const lol: any = [];
-
     cloneResultMinMax.forEach((result: number[], index: number) => {
-      lol.push([result[0] - zeroPoint, result[1] - zeroPoint]);
       result.forEach((currentResult: number, innerIndex: number) => {
         data.push({
           name: availableNames[index],
@@ -63,20 +60,12 @@ export const SensitiveAnalysisChartComponent: FC<
           percentile: currentPercentiles[index]
             ? currentPercentiles[index][innerIndex]
             : 0,
-          // titlePlacement:
         });
       });
     });
 
-    // lol.
-
-    data[data.length - 2].value = 1.12222;
-    // lol[lol.length - 1][0] = 8.2900450310638515;
-    console.log(data);
-    // console.log(lol);
     const chart = DrawUtils.tornadoChart(
       data,
-      lol,
       zeroPoint,
       cloneResultMinMax,
       svg,
@@ -98,9 +87,6 @@ export const SensitiveAnalysisChartComponent: FC<
   useEffect(() => {
     if (d3Container.current) {
       draw();
-      const fg = document.querySelector("[data-testid='chart-bars-container']");
-
-      console.log(fg);
     }
   }, [draw, availableNames]);
 

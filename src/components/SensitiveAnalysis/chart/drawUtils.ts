@@ -39,20 +39,6 @@ export namespace DrawUtils {
     },
   };
 
-  // const groupByName = (data) => {
-  //   const result = data.reduce((acc, cur) => {
-  //     acc[cur.name] = acc[cur.name] || [];
-  //
-  //     acc[cur.name].push(cur);
-  //
-  //     return acc;
-  //   }, {});
-  //
-  //   return Object.values(result);
-  //
-  //   // [[value: 11, name: 'gfg'],[]]
-  // };
-
   const formatValue = () => {
     const format = d3.format(options.format || '');
 
@@ -65,58 +51,41 @@ export namespace DrawUtils {
 
   export function tornadoChart(
     currentData,
-    lol: number[][],
-    zp,
+    zeroPoint,
     resultMinMax: number[][],
     svg,
     availableNames: string[],
     currentHeight: number,
   ) {
-    const sample: number[] = resultMinMax.flat(1);
-
-    console.log(sample);
-
     const heightMultiplier = 68;
 
     const height =
-      availableNames.length * heightMultiplier +
-      DrawUtils.Margin.top +
-      DrawUtils.Margin.bottom;
-
-    // const x = d3
-    //   .scaleLinear()
-    //   .domain(currentData.map(({ value }) => value))
-    //   .range([DrawUtils.Margin.left, DrawUtils.Width]);
+      availableNames.length * heightMultiplier + Margin.top + Margin.bottom;
 
     const x = d3
       .scaleLinear()
       .domain([0, d3.max(currentData, (d: any) => d.value) as any])
-      .range([DrawUtils.Margin.left, DrawUtils.Width]);
+      .range([Margin.left, Width]);
 
     const x1 = d3
       .scaleLinear()
-      .domain([0, zp.toFixed() * 2])
-      .range([DrawUtils.Margin.left, DrawUtils.Width]);
-
-    // const x2 = d3
-    //   .scaleLinear()
-    //   .domain([d3.min(sample) || 0, d3.max(sample) || 0])
-    //   .range([DrawUtils.Margin.left, DrawUtils.Width]);
+      .domain([0, zeroPoint.toFixed() * 2])
+      .range([Margin.left, Width]);
 
     const x2 = d3
       .scaleLinear()
-      .domain([zp.toFixed(), zp.toFixed()])
-      .range([DrawUtils.Margin.left, DrawUtils.Width]);
+      .domain([zeroPoint.toFixed(), zeroPoint.toFixed()])
+      .range([Margin.left, Width]);
 
     const y = d3
       .scaleBand()
       .domain(currentData.map(({ name }) => name))
-      .rangeRound([DrawUtils.Margin.top, height - DrawUtils.Margin.bottom])
+      .rangeRound([Margin.top, height - Margin.bottom])
       .padding(53 / heightMultiplier);
 
     const xAxisMiddleZeroPoint = (g) => {
       return g
-        .attr('transform', `translate(0,${DrawUtils.Margin.top})`)
+        .attr('transform', `translate(0,${Margin.top})`)
         .attr('class', 'chart__xAxis')
         .call(
           d3
@@ -146,16 +115,15 @@ export namespace DrawUtils {
             )
             /** пунктирные линии */
             .append('line')
-            .attr('transform', () => `translate(0, 20)`)
+            .attr('transform', 'translate(0, 20)')
             .attr('y2', availableNames.length * 66.6)
-            // .attr('stroke-dasharray', 3)
             .attr('stroke', 'rgba(255, 255, 255, .28)'),
         );
     };
 
     const xAxis = (g) => {
       return g
-        .attr('transform', `translate(0,${DrawUtils.Margin.top})`)
+        .attr('transform', `translate(0,${Margin.top})`)
         .attr('class', 'chart__xAxis')
         .call(
           d3
@@ -181,7 +149,7 @@ export namespace DrawUtils {
             )
             /** пунктирные линии */
             .append('line')
-            .attr('transform', () => `translate(0, 20)`)
+            .attr('transform', 'translate(0, 20)')
             .attr('y2', availableNames.length * 66.6)
             .attr('stroke-dasharray', 3)
             .attr('stroke', 'rgba(246, 251, 253, 0.28)'),
@@ -213,14 +181,8 @@ export namespace DrawUtils {
     };
 
     svg
-      .attr(
-        'width',
-        DrawUtils.Width + DrawUtils.Margin.left + DrawUtils.Margin.right,
-      )
-      .attr(
-        'height',
-        currentHeight + DrawUtils.Margin.top + DrawUtils.Margin.bottom,
-      );
+      .attr('width', Width + Margin.left + Margin.right)
+      .attr('height', currentHeight + Margin.top + Margin.bottom);
 
     svg.append('g').call(yAxis);
     svg.append('g').call(xAxis);
@@ -276,7 +238,6 @@ export namespace DrawUtils {
           .attr('y', (d) => {
             return y(d.name);
           })
-          //   .attr('y', ({ data: [name] }: any) => yScale(name) || 0)
           .attr('rx', () => 2)
           .attr('width', (d) => {
             return Math.abs(x(d.value) - x(0));
@@ -301,36 +262,12 @@ export namespace DrawUtils {
           .attr('text-anchor', 'end')
           /** Цифры на барах */
           .attr('x', (d) => {
-            // const sortedD = groupByName(d);
-            // const arr = [
-            //   [-12, 33],
-            //   [-40, 20],
-            // ];
-
-            // const cloneD = { ...d };
-
-            // console.log(index);
-            // arr.push;
-
             let titlePlacementX = 0;
 
-            if (d.value > 0) {
+            if (d.value >= 0) {
               titlePlacementX =
                 Math.abs(x(d.value) - x(0)) + x(Math.min(0, d.value)) + 5;
-            }
-
-            // console.log(d);
-            // if (d.value < 0) {
-            //   titlePlacement = x(Math.min(0, d.value)) - 5;
-            // }
-
-            // if ((d[index][0] && lol[0][index][1]) > 0) {
-            //   console.log(index);
-            // }
-            //
-            // if (Math.abs(x(d.value) - x(0)) < 30 && d.value > 0)
-            //   titlePlacement = x(d.value) - 30;
-            else if (d.value < 0) {
+            } else {
               titlePlacementX = x(Math.min(0, d.value)) - 5;
             }
 
