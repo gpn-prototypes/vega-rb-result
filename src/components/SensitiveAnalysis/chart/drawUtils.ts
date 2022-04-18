@@ -1,13 +1,19 @@
+import { DrawHelper } from '@app/utils/DrawHelper';
 import * as d3 from 'd3';
 /* eslint-disable newline-per-chained-call */
+// TODO: d3 пока не дружит с ts
 
-export namespace DrawUtils {
+export namespace SensitiveAnalysisDrawUtils {
+  import getMaxValue = DrawHelper.getMaxValue;
+
   export interface Margin {
     top: number;
     right: number;
     bottom: number;
     left: number;
   }
+
+  type Category = 0 | 1;
 
   export const Margin: Margin = {
     top: 36,
@@ -19,10 +25,19 @@ export namespace DrawUtils {
   export const Width = 651 - Margin.right - Margin.left;
   export const Height = 400 - Margin.top - Margin.bottom;
 
+  type TornadoChart = (
+    currentData: Payload,
+    zeroPoint,
+    resultMinMax: number[][],
+    svg,
+    availableNames: string[],
+    currentHeight: number,
+  ) => any;
+
   export interface Payload {
     name: string;
     value: number;
-    category: 0 | 1;
+    category: Category;
     percentile: number;
   }
 
@@ -49,34 +64,39 @@ export namespace DrawUtils {
     return options.colors[key];
   };
 
+  /** вся логика графика */
   export function tornadoChart(
     currentData,
     zeroPoint,
-    resultMinMax: number[][],
+    resultMinMax,
     svg,
-    availableNames: string[],
-    currentHeight: number,
-  ) {
+    availableNames,
+    currentHeight,
+  ): TornadoChart {
     const heightMultiplier = 68;
 
     const height =
       availableNames.length * heightMultiplier + Margin.top + Margin.bottom;
 
+    // Параметры плоскости для баров
     const x = d3
       .scaleLinear()
       .domain([0, d3.max(currentData, (d: any) => d.value) as any])
       .range([Margin.left, Width]);
 
+    // Параметры плоскости для пунктирных линий
     const x1 = d3
       .scaleLinear()
       .domain([0, zeroPoint.toFixed() * 2])
       .range([Margin.left, Width]);
 
+    // Параметры плоскости для центральной линии zero point
     const x2 = d3
       .scaleLinear()
       .domain([zeroPoint.toFixed(), zeroPoint.toFixed()])
       .range([Margin.left, Width]);
 
+    // Параметры плоскости для наимнований
     const y = d3
       .scaleBand()
       .domain(currentData.map(({ name }) => name))
@@ -192,27 +212,8 @@ export namespace DrawUtils {
 
     function chart(selection) {
       selection.each((data) => {
-        maxvalue =
-          Math.abs(
-            d3.extent(data, (d: any) => {
-              return d.value;
-            })[0] as any,
-          ) >
-          Math.abs(
-            d3.extent(data, (d: any) => {
-              return d.value;
-            })[1] as any,
-          )
-            ? Math.abs(
-                d3.extent(data, (d: any) => {
-                  return d.value;
-                })[0] as any,
-              )
-            : Math.abs(
-                d3.extent(data, (d: any) => {
-                  return d.value;
-                })[1] as any,
-              );
+        maxvalue = getMaxValue(data);
+
         x.domain([maxvalue * -1, maxvalue]);
         y.domain(
           data.map((d) => {
@@ -220,12 +221,14 @@ export namespace DrawUtils {
           }),
         );
 
+        // определяем будущий бар и закидываем в него данные
         const bar = svg
           .append('g')
           .attr('data-testid', 'chart-bars-container')
           .selectAll('.bar')
           .data(data);
 
+        // рисуем сами бары и наполняем их аттрибутами
         bar
           .enter()
           .append('rect')
@@ -260,49 +263,16 @@ export namespace DrawUtils {
               }`,
           )
           .attr('text-anchor', 'end')
-          /** Цифры на барах */
-          .attr('x', (d) => {
-            let titlePlacementX = 0;
-
-            if (d.value >= 0) {
-              titlePlacementX =
-                Math.abs(x(d.value) - x(0)) + x(Math.min(0, d.value)) + 5;
-            } else {
-              titlePlacementX = x(Math.min(0, d.value)) - 5;
-            }
-
-            return titlePlacementX;
-          })
+          .attr('x', (d) => DrawHelper.getTitlePlacementX(d, x))
           .attr('data-testid', (d) => {
             return d.name;
           })
           .attr('y', (d) => {
             return (y(d.name) as any) + y.bandwidth() / 2;
           })
-          .attr('dy', (d, index) => {
-            let baseTitlePlacementY = '.35em';
-
-            const prev = data[index - 1];
-            const next = data[index + 1];
-
-            if (
-              prev &&
-              d.name === prev.name &&
-              ((d.value > 0 && prev.value > 0) ||
-                (d.value < 0 && prev.value < 0))
-            ) {
-              baseTitlePlacementY = '24px';
-            } else if (
-              next &&
-              d.name === next.name &&
-              ((d.value > 0 && next.value > 0) ||
-                (d.value < 0 && next.value < 0))
-            ) {
-              baseTitlePlacementY = '-12px';
-            }
-
-            return baseTitlePlacementY;
-          })
+          .attr('dy', (d, index) =>
+            DrawHelper.getTitlePlacementY(d, index, data),
+          )
           .text((d) => {
             return d.percentile.toFixed(3);
           });

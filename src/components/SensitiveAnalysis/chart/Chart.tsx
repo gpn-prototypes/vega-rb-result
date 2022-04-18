@@ -1,6 +1,6 @@
 /* eslint-disable no-param-reassign, newline-per-chained-call */
 import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
-import { DrawUtils } from '@app/components/SensitiveAnalysis/chart/drawUtils';
+import { SensitiveAnalysisDrawUtils } from '@app/components/SensitiveAnalysis/chart/drawUtils';
 import { SensitiveAnalysis } from '@app/interfaces/SensitiveAnalysisInterface';
 import * as d3 from 'd3';
 
@@ -43,7 +43,7 @@ export const SensitiveAnalysisChartComponent: FC<
     /** Чистим всё, для перерисовки графиков */
     svg.selectAll('*').remove();
 
-    const data: DrawUtils.Payload[] = [];
+    const data: SensitiveAnalysisDrawUtils.Payload[] = [];
 
     let cloneResultMinMax = [...resultMinMax];
 
@@ -64,7 +64,7 @@ export const SensitiveAnalysisChartComponent: FC<
       });
     });
 
-    const chart = DrawUtils.tornadoChart(
+    const chart = SensitiveAnalysisDrawUtils.tornadoChart(
       data,
       zeroPoint,
       cloneResultMinMax,
