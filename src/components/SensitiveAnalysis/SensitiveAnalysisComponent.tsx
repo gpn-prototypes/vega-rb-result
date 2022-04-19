@@ -221,7 +221,6 @@ export const SensitiveAnalysisComponent: FC<Props> = ({ sidebarRow }) => {
     <div className={cn()}>
       <div className={cn('Statistic')}>
         <Text>Статистика</Text>
-
         {isLoadingStatistic || !sensitiveAnalysisStatisticData ? (
           <Loader />
         ) : (

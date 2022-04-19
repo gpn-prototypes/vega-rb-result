@@ -7,6 +7,7 @@ import * as d3 from 'd3';
 import { cnChart } from './cn-chart';
 
 import './Chart.css';
+import TornadoChart = SensitiveAnalysisDrawUtils.TornadoChart;
 
 const PER_ELEMENT_HEIGHT = 66.6;
 
@@ -64,7 +65,7 @@ export const SensitiveAnalysisChartComponent: FC<
       });
     });
 
-    const chart = SensitiveAnalysisDrawUtils.tornadoChart(
+    const chart: TornadoChart = SensitiveAnalysisDrawUtils.tornadoChart(
       data,
       zeroPoint,
       cloneResultMinMax,

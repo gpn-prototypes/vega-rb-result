@@ -44,16 +44,36 @@ export namespace DrawHelper {
   export const getTitlePlacementX = (d, xScale) => {
     let titlePlacementX = 0;
 
-    if (d.value >= 0) {
+    if (d.value > 0) {
       titlePlacementX =
         Math.abs(xScale(d.value) - xScale(0)) +
         xScale(Math.min(0, d.value)) +
         5;
-    } else {
+    } else if (d.value === 0) {
+      if (d.category === 0) {
+        titlePlacementX = xScale(0) - 5;
+      } else {
+        titlePlacementX = xScale(0) + 5;
+      }
+    } else if (d.value < 0) {
       titlePlacementX = xScale(Math.min(0, d.value)) - 5;
     }
 
     return titlePlacementX;
+  };
+
+  export const getTextAnchor = (d, index: number, data) => {
+    const prev = data[index - 1];
+    const next = data[index + 1];
+
+    if (prev && d.value === prev.value && d.name === prev.name) {
+      return `text-anchor: start`;
+    }
+    if (next && d.value === next.value && d.name === next.name) {
+      return `text-anchor: end`;
+    }
+
+    return '';
   };
 
   /** расположение цифр на барах по Y */

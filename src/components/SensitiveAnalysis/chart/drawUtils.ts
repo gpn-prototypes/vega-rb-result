@@ -25,8 +25,8 @@ export namespace SensitiveAnalysisDrawUtils {
   export const Width = 651 - Margin.right - Margin.left;
   export const Height = 400 - Margin.top - Margin.bottom;
 
-  type TornadoChart = (
-    currentData: Payload,
+  export type TornadoChart = (
+    currentData: any,
     zeroPoint,
     resultMinMax: number[][],
     svg,
@@ -262,7 +262,6 @@ export namespace SensitiveAnalysisDrawUtils {
                 d.value > 0 && 'chart__text_start'
               }`,
           )
-          .attr('text-anchor', 'end')
           .attr('x', (d) => DrawHelper.getTitlePlacementX(d, x))
           .attr('data-testid', (d) => {
             return d.name;
@@ -273,6 +272,7 @@ export namespace SensitiveAnalysisDrawUtils {
           .attr('dy', (d, index) =>
             DrawHelper.getTitlePlacementY(d, index, data),
           )
+          .attr('style', (d, index) => DrawHelper.getTextAnchor(d, index, data))
           .text((d) => {
             return d.percentile.toFixed(3);
           });
