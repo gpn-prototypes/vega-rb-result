@@ -2,9 +2,8 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { RbErrorCodes } from '@app/generated/graphql';
 import useGetError from '@app/hooks/useGetError';
 import { ErrorWrapper } from '@app/types/typesTable';
-import { Item } from '@consta/uikit/__internal__/src/components/SnackBar/helper';
 import { IconAlert } from '@consta/uikit/IconAlert';
-import { SnackBar } from '@consta/uikit/SnackBar';
+import { SnackBar, SnackBarItemDefault } from '@consta/uikit/SnackBar';
 import { defaultTo, get } from 'lodash/fp';
 
 import { cnTableErrorAlert } from './cn-table-error-alert';
@@ -23,7 +22,7 @@ const errorMessages = {
 };
 
 export const TableErrorAlert: React.FC = () => {
-  const [items, setItems] = useState<Item[]>([]);
+  const [items, setItems] = useState<SnackBarItemDefault[]>([]);
   const [, errors] = useGetError();
   const tableRowErrors = useMemo(
     () =>
@@ -44,7 +43,7 @@ export const TableErrorAlert: React.FC = () => {
   );
 
   useEffect(() => {
-    const generateItem = (errorCode: RbErrorCodes): Item => ({
+    const generateItem = (errorCode: RbErrorCodes): SnackBarItemDefault => ({
       key: errorCode,
       message: defaultTo('', get([errorCode], errorMessages)),
       icon: IconAlert,
@@ -70,8 +69,8 @@ export const TableErrorAlert: React.FC = () => {
         ),
       );
 
-      const newTableRowErrors: Item[] = errorCodes.map((errorCode) =>
-        generateItem(errorCode),
+      const newTableRowErrors: SnackBarItemDefault[] = errorCodes.map(
+        (errorCode) => generateItem(errorCode),
       );
 
       setItems((prevState) => {

@@ -3,8 +3,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { LoaderAction } from '@app/store/loader/loaderActions';
 import { NotifyActions } from '@app/store/notify/notifyActions';
 import { RootState } from '@app/store/types';
-import { Item } from '@consta/uikit/__internal__/src/components/SnackBar/helper';
 import { Modal } from '@consta/uikit/Modal';
+import { SnackBarItemDefault } from '@consta/uikit/SnackBar';
 import { block } from 'bem-cn';
 
 import { CancelModeContent } from './CancelModeContent/CancelModeContent';
@@ -46,7 +46,7 @@ export const DownloadResultModal: React.FC<Props> = ({ handleClose }) => {
 
   /** Callbacks */
   const showNotification = useCallback(
-    (item: Item) => dispatch(NotifyActions.appendItem(item)),
+    (item: SnackBarItemDefault) => dispatch(NotifyActions.appendItem(item)),
     [dispatch],
   );
   const hideNotification = useCallback(

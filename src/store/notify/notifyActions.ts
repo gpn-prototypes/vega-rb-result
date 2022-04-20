@@ -1,16 +1,16 @@
-import { Item } from '@consta/uikit/__internal__/src/components/SnackBar/helper';
+import { SnackBarItemDefault } from '@consta/uikit/SnackBar';
 import actionCreatorFactory from 'typescript-fsa';
 
 const factory = actionCreatorFactory('settings');
 
 export interface NotifyStore {
-  items: Item[];
+  items: SnackBarItemDefault[];
 }
 
 export const NotifyActions = {
   resetState: factory('RESET_STATE'),
   removeItem: factory<string>('REMOVE_ITEM'),
-  appendItem: factory<Item>('APPEND_ITEM'),
-  appendItems: factory<Item[]>('APPEND_ITEMS'),
-  setItems: factory<Item[]>('SET_ITEMS'),
+  appendItem: factory<SnackBarItemDefault>('APPEND_ITEM'),
+  appendItems: factory<SnackBarItemDefault[]>('APPEND_ITEMS'),
+  setItems: factory<SnackBarItemDefault[]>('SET_ITEMS'),
 };
