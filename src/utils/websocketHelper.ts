@@ -1,4 +1,5 @@
 import projectService from '@app/services/ProjectService';
+import { isSecureBaseApiUrl } from '@app/services/utils';
 import {
   HandleMessagePayload,
   WebsocketAction,
@@ -28,8 +29,10 @@ export async function createWebsocket({
 }: InitWebsocketParams): Promise<WebSocket> {
   const token = await projectService.identity.getToken();
 
+  const protocol = isSecureBaseApiUrl() ? 'wss' : 'ws';
+
   const ws: WebSocket = new WebSocket(
-    `ws://${document.location.hostname}/processes/${projectId}/${id}?authorization=${token}`,
+    `${protocol}://${document.location.hostname}/processes/${projectId}/${id}?authorization=${token}`,
   );
 
   if (ws) {

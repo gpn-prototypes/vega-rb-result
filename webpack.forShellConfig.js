@@ -22,6 +22,7 @@ module.exports = (webpackConfigEnv) => {
   const envKeys = Object.keys(env).reduce((prev, next) => {
     // eslint-disable-next-line no-param-reassign
     prev[`process.env.${next}`] = JSON.stringify(env[next]);
+
     return prev;
   }, {});
 
@@ -75,6 +76,7 @@ module.exports = (webpackConfigEnv) => {
       }),
       new webpack.DefinePlugin({
         'process.env.BASE_API_URL': JSON.stringify(process.env.BASE_API_URL),
+        'process.env.HTTP_SCHEME': JSON.stringify(process.env.HTTP_SCHEME),
         ...envKeys,
       }),
     ],

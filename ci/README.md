@@ -8,9 +8,11 @@
 ## Что делать
 
 ### Управление запуском тестов/lint/...
+
 Файл build.sh - добавлены две переменные для передачи в контейнер: WITH_TEST, WITH_LINT (почему так сделано описано в соответствующей статье confluence). Переменные устанавливаются в true/false в зависимости от необходимости запуска тестов.
 
 Код:
+
 ```bash
 docker run \
   --name "$NAME" \
@@ -19,11 +21,13 @@ docker run \
   --env NPM_AUTH_TOKEN=$NPM_AUTH_TOKEN \
   --env BASE_URL=$BASE_URL \
   --env BASE_API_URL=$BASE_API_URL \
+  --env HTTP_SCHEME=$HTTP_SCHEME \
   --env WITH_TEST=true \
   --env WITH_LINT=false \
 ```
 
 Запуск в build-entrypoint.sh:
+
 ```bash
 if [ $WITH_TEST == true ]
 then
@@ -39,4 +43,5 @@ fi
 ```
 
 Можно плодить сколько угодно, но решение временное - переделывать нужно фундаментально, описание в confluence:
+
 - [DevOps](https://artcpt.atlassian.net/wiki/spaces/V2/pages/19562465752)
