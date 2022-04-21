@@ -1,28 +1,21 @@
-/* eslint-disable no-param-reassign */
+/* eslint-disable no-param-reassign, newline-per-chained-call */
 import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
+import { SensitiveAnalysisDrawUtils } from '@app/components/SensitiveAnalysis/chart/drawUtils';
 import { SensitiveAnalysis } from '@app/interfaces/SensitiveAnalysisInterface';
 import * as d3 from 'd3';
 
 import { cnChart } from './cn-chart';
-import { SensitiveAnalysisChart } from './drawUtils';
 
 import './Chart.css';
+import TornadoChart = SensitiveAnalysisDrawUtils.TornadoChart;
 
 const PER_ELEMENT_HEIGHT = 66.6;
-
-type Sorted = {
-  range: number;
-  index: number;
-};
 
 export const SensitiveAnalysisChartComponent: FC<
   SensitiveAnalysis & { availableNames: string[] }
 > = ({ names, percentiles, resultMinMax, zeroPoint, availableNames }) => {
   const d3Container = useRef(null);
 
-  /**
-   * Необходимо собрать объект, собираем все значения из percentiles и мапим их по названию
-   */
   const [currentPercentiles, setCurrentPercentiles] =
     useState<number[][]>(percentiles);
   const [currentHeight, setCurrentHeight] = useState<number>(
@@ -30,21 +23,9 @@ export const SensitiveAnalysisChartComponent: FC<
   );
 
   useEffect(() => {
-    /**
-     * Пока что нет сортировки на backend, приходится вручную сортировать все
-     * Сортируем путям вычитания максимального значения из минимального
-     * И полученный результат сортируем с сохранением индекса у изначальных данных
-     */
-    const resultSorted: Sorted[] = resultMinMax.map(
-      (result: number[], index: number) => ({
-        range: result[1] - result[0],
-        index,
-      }),
-    );
-
-    const result = resultSorted
-      .map(({ index }) => percentiles[index])
-      .filter((percent: number[], index: number) => {
+    const result = resultMinMax
+      .map((_, index) => percentiles[index])
+      .filter((_, index) => {
         return availableNames.includes(names[index]);
       });
 
@@ -55,22 +36,15 @@ export const SensitiveAnalysisChartComponent: FC<
         ? result.length * PER_ELEMENT_HEIGHT
         : 150,
     );
-  }, [
-    availableNames,
-    percentiles,
-    resultMinMax,
-    setCurrentPercentiles,
-    setCurrentHeight,
-    names,
-  ]);
+  }, [availableNames, percentiles, names, resultMinMax]);
 
   const draw = useCallback(() => {
     const svg = d3.select(d3Container.current);
 
-    /** Чистим все, для перерисовки графиков */
+    /** Чистим всё, для перерисовки графиков */
     svg.selectAll('*').remove();
 
-    const data: SensitiveAnalysisChart.Payload[] = [];
+    const data: SensitiveAnalysisDrawUtils.Payload[] = [];
 
     let cloneResultMinMax = [...resultMinMax];
 
@@ -78,14 +52,11 @@ export const SensitiveAnalysisChartComponent: FC<
       availableNames.includes(names[index]),
     );
 
-    cloneResultMinMax.forEach((result: number[], index) => {
+    cloneResultMinMax.forEach((result: number[], index: number) => {
       result.forEach((currentResult: number, innerIndex: number) => {
         data.push({
           name: availableNames[index],
-          value:
-            innerIndex === 0
-              ? zeroPoint - currentResult
-              : currentResult - zeroPoint,
+          value: currentResult - zeroPoint, // сейчас если отриц, то рисует влево
           category: innerIndex === 0 ? 0 : 1,
           percentile: currentPercentiles[index]
             ? currentPercentiles[index][innerIndex]
@@ -94,53 +65,25 @@ export const SensitiveAnalysisChartComponent: FC<
       });
     });
 
-    const { series, bias, options } = SensitiveAnalysisChart.getAxisData(data);
-
-    const getColor = (key) => {
-      return options.colors[key];
-    };
-
-    const { xScale, x1Scale, yScale } = SensitiveAnalysisChart.getAxisScale({
-      series,
-      resultMinMax: cloneResultMinMax,
-      bias,
-    });
-
-    const { xAxis, yAxis, y2Axis, y3Axis } = SensitiveAnalysisChart.getAxis({
-      xScale,
-      x1Scale,
-      yScale,
-      options,
-      resultMinMax: cloneResultMinMax,
-      currentPercentiles,
-      bias,
-      series,
-      zeroPoint,
+    const chart: TornadoChart = SensitiveAnalysisDrawUtils.tornadoChart(
       data,
-    });
+      zeroPoint,
+      cloneResultMinMax,
+      svg,
+      availableNames,
+      currentHeight,
+    );
 
-    svg
-      .append('g')
-      .attr('class', 'chart__main')
-      .selectAll('g')
-      .data(series)
-      .join('g')
-      .attr('fill', (d) => getColor(d.key))
-      .selectAll('rect')
-      .data((d) => d.map((v) => Object.assign(v, { key: d.key })))
-      .join('rect')
-      .attr('class', 'chart__bar')
-      .attr('x', (d) => xScale(d[0]))
-      .attr('y', ({ data: [name] }: any) => yScale(name) || 0)
-      .attr('rx', () => 2)
-      .attr('width', (d) => xScale(d[1]) - xScale(d[0]))
-      .attr('height', yScale.bandwidth());
-
-    svg.append('g').call(yAxis);
-    svg.append('g').call(y2Axis);
-    svg.append('g').call(y3Axis);
-    svg.append('g').call(xAxis);
-  }, [resultMinMax, currentPercentiles, names, availableNames, zeroPoint]);
+    // отдаём актуальные данные на рисовку
+    svg.datum(data).call(chart);
+  }, [
+    availableNames,
+    currentHeight,
+    currentPercentiles,
+    names,
+    resultMinMax,
+    zeroPoint,
+  ]);
 
   useEffect(() => {
     if (d3Container.current) {
@@ -151,19 +94,7 @@ export const SensitiveAnalysisChartComponent: FC<
   return (
     <div className="chart">
       <div className={cnChart()}>
-        <svg
-          width={
-            SensitiveAnalysisChart.Width +
-            SensitiveAnalysisChart.Margin.left +
-            SensitiveAnalysisChart.Margin.right
-          }
-          height={
-            currentHeight +
-            SensitiveAnalysisChart.Margin.top +
-            SensitiveAnalysisChart.Margin.bottom
-          }
-          ref={d3Container}
-        />
+        <svg ref={d3Container} />
       </div>
     </div>
   );

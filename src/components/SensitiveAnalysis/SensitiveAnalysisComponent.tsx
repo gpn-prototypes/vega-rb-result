@@ -221,7 +221,6 @@ export const SensitiveAnalysisComponent: FC<Props> = ({ sidebarRow }) => {
     <div className={cn()}>
       <div className={cn('Statistic')}>
         <Text>Статистика</Text>
-
         {isLoadingStatistic || !sensitiveAnalysisStatisticData ? (
           <Loader />
         ) : (
@@ -250,7 +249,7 @@ export const SensitiveAnalysisComponent: FC<Props> = ({ sidebarRow }) => {
               <ChoiceGroup
                 value={activeTab}
                 items={tabItems}
-                name="SensitiveAnaLysisChoiceGroup"
+                name="SensitiveAnalysisChoiceGroup"
                 size="s"
                 view="ghost"
                 width="full"
