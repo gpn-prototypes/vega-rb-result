@@ -1,5 +1,6 @@
 .chart {
   margin-bottom: var(--space-xs);
+
   color: var(--color-typo-secondary);
   border-radius: 4px;
 
@@ -28,7 +29,9 @@
 
     text {
       font-size: var(--size-text-xs);
+
       color: rgb(246 251 253 / 60%);
+
       transform: translateY(10px);
     }
 
@@ -63,6 +66,7 @@
 
     &_position_right text {
       color: var(--color-typo-normal);
+
       transform: translateX(5px);
     }
 
@@ -73,8 +77,10 @@
 
   &__description {
     margin-bottom: var(--space-m);
+
     font-size: 14px;
     line-height: 140%;
+
     color: var(--color-typo-secondary);
   }
 
@@ -84,6 +90,7 @@
 
   &__dot-text {
     fill: var(--color-typo-primary);
+
     font-size: 10px;
     line-height: 14px;
   }

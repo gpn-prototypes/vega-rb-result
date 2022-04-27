@@ -1,23 +1,29 @@
 .ContextMenuBaseItem {
-  display: grid;
   padding: 18px var(--space-s);
-  grid-gap: var(--space-m);
+
+  display: grid;
+
   background-color: var(--color-bg-default);
   border: 1px solid var(--color-bg-border);
   border-radius: var(--control-radius);
   box-shadow: 0 2px 2px rgb(0 0 0 / 4%), 0 4px 16px rgb(0 32 51 / 18%);
+  grid-gap: var(--space-m);
 
   &__Wrapper {
     display: flex;
     justify-content: space-between;
     align-items: center;
+
     font-size: var(--size-text-s);
     line-height: 20px;
+
     cursor: pointer;
+
     color: var(--color-typo-primary);
 
     &_Border {
       padding-top: 15px;
+
       border-top: 1px solid var(--color-bg-border);
     }
 
@@ -27,8 +33,9 @@
     }
 
     &_Disabled {
-      pointer-events: none;
       cursor: not-allowed;
+      pointer-events: none;
+
       color: var(--color-control-typo-disable);
     }
   }

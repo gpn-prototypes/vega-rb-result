@@ -4,10 +4,11 @@
 
 .CancelModeContent {
   &__Header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
     margin-bottom: var(--space-m);
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 
     .Text {
       flex-grow: 1;

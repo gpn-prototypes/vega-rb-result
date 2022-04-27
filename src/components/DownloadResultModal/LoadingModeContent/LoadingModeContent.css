@@ -1,9 +1,10 @@
 .LoadingModeContent {
   &__Header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
     margin-bottom: var(--space-m);
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 
     .Text {
       flex-grow: 1;
@@ -11,9 +12,10 @@
   }
 
   &__Body {
+    margin-bottom: var(--space-xl);
+
     display: flex;
     flex-direction: column;
-    margin-bottom: var(--space-xl);
 
     .Loader {
       margin: var(--space-3xl) 0;

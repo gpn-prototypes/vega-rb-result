@@ -5,7 +5,9 @@
 
   &__Content {
     margin-top: var(--space-m);
+
     display: grid;
+
     min-height: 244px;
     grid-gap: var(--space-m) 120px;
     grid-template-columns: 545px 545px;
@@ -13,6 +15,7 @@
 
   &__Loader {
     margin-top: var(--space-3xl);
+
     min-height: 244px;
   }
 
@@ -23,6 +26,7 @@
 
   &__ActiveRow {
     margin-left: var(--space-4xl);
+
     display: flex;
   }
 }

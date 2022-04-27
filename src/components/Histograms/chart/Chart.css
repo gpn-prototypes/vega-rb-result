@@ -1,5 +1,6 @@
 .chart {
   margin-bottom: var(--space-xs);
+
   color: var(--color-typo-secondary);
   border-radius: 4px;
 
@@ -8,6 +9,7 @@
     stroke: var(--color-typo-warning);
     stroke-width: 1;
     stroke-dasharray: 2;
+
     opacity: 0.7;
   }
 
@@ -22,7 +24,9 @@
 
     text {
       font-size: var(--size-text-xs);
+
       color: rgb(246 251 253 / 60%);
+
       transform: translateY(10px);
     }
 
@@ -58,8 +62,10 @@
 
   &__description {
     margin-bottom: var(--space-m);
+
     font-size: 14px;
     line-height: 140%;
+
     color: var(--color-typo-secondary);
   }
 
@@ -69,6 +75,7 @@
 
   &__dot-text {
     fill: var(--color-typo-primary);
+
     font-size: 10px;
     line-height: 14px;
     text-anchor: start;

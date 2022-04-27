@@ -2,5 +2,6 @@
   position: fixed;
   right: var(--space-m);
   bottom: var(--space-m);
+
   min-width: 500px;
 }

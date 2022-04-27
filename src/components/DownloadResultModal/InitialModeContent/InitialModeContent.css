@@ -1,9 +1,10 @@
 .InitialModeContent {
   &__Header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
     margin-bottom: var(--space-m);
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 
     .Text {
       flex-grow: 1;
@@ -28,10 +29,12 @@
   }
 
   &__Checkbox-group {
+    padding: var(--space-xs) var(--space-s);
+
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    padding: var(--space-xs) var(--space-s);
+
     border: 1px solid var(--color-bg-border);
     border-radius: 4px;
 
@@ -45,12 +48,14 @@
   }
 
   &__Checkbox-group-header {
+    margin-bottom: var(--space-xs);
+
     display: flex;
     justify-content: space-around;
-    margin-bottom: var(--space-xs);
 
     .Text {
       flex: 1 1 auto;
+
       padding-right: var(--space-s);
     }
   }
