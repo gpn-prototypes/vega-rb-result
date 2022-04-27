@@ -6,7 +6,7 @@
   "author": "gpn",
   "license": "UNLICENSED",
   "engines": {
-    "node": "^12.16.2",
+    "node": "^12.16.2 || ^16",
     "yarn": "^1.22.4"
   },
   "config": {
@@ -30,13 +30,13 @@
     "lint-fix": "npm-run-all format lint-fix:*",
     "lint:ts": "eslint '{src,types}/**/*.ts{,x}'",
     "lint:ts:fix": "eslint --ext=.ts,.tsx . --fix",
-    "lint:css": "stylelint 'src/**/*.css'",
-    "lint:css:fix": "stylelint 'src/**/*.css' --fix"
+    "lint:css": "stylelint '**/*.css'",
+    "lint:css:fix": "stylelint '**/*.css' --fix"
   },
   "dependencies": {
     "@apollo/client": "^3.3.11",
     "@consta/uikit": "^3.14.0",
-    "@gpn-prototypes/vega-ui": "^4.0.3",
+    "@gpn-prototypes/vega-ui": "^4.0.5",
     "array-to-tree": "^3.3.2",
     "bem-cn": "^3.0.1",
     "classnames": "^2.3.1",
@@ -104,7 +104,7 @@
     "cross-env": "^7.0.2",
     "css-loader": "5.2.7",
     "babel-loader": "^8.1.0",
-    "@gpn-prototypes/frontend-configs": "^1.4.6",
+    "@gpn-prototypes/frontend-configs": "^1.4.9",
     "@svgr/webpack": "^5.5.0",
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.0.4",
@@ -113,7 +113,7 @@
     "@types/jest": "^26.0.14",
     "@types/lodash": "^4.14.178",
     "@types/node": "^14.11.8",
-    "@types/react": "^16.9.56",
+    "@types/react": "^18.0.8",
     "@types/react-dom": "^16.9.9",
     "@types/react-redux": "^7.1.9",
     "@types/react-router-dom": "^5.1.5",
