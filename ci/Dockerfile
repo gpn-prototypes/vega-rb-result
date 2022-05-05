@@ -1,4 +1,4 @@
-FROM registry.access.redhat.com/ubi7/nodejs-12
+FROM registry.access.redhat.com/ubi8/nodejs-16:1-32
 
 WORKDIR /app
 
