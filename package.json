@@ -107,7 +107,7 @@
     "@gpn-prototypes/frontend-configs": "^1.4.9",
     "@svgr/webpack": "^5.5.0",
     "@testing-library/jest-dom": "^5.11.4",
-    "@testing-library/react": "^11.0.4",
+    "@testing-library/react": "^13.2.0",
     "@types/classnames": "^2.3.1",
     "@types/d3": "^7.0.0",
     "@types/jest": "^26.0.14",
