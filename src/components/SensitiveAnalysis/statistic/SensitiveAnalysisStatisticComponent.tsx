@@ -58,10 +58,8 @@ export const SensitiveAnalysisStatisticComponent: FC<Props> = ({
   const columns: TableColumn<TableRow>[] = statistic?.headers.map(
     (header: SensitiveAnalysisStatisticHeaders) => {
       if (header?.children && header?.children?.length > 0) {
-        const title = header.name.toLowerCase();
-
         return {
-          title: title.charAt(0).toUpperCase() + title.slice(1),
+          title: header.name,
           columns: header.children.map(
             (childrenHeader: SensitiveAnalysisStatisticHeaders) =>
               getMappedColumn(childrenHeader, false),
