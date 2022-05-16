@@ -1,7 +1,7 @@
 import { SnackBarItemDefault } from '@consta/uikit/SnackBar';
 import actionCreatorFactory from 'typescript-fsa';
 
-const factory = actionCreatorFactory('settings');
+const factory = actionCreatorFactory('notify');
 
 export interface NotifyStore {
   items: SnackBarItemDefault[];
