@@ -4,7 +4,7 @@ import { TableActions } from '@app/store/table/tableActions';
 import { RootState } from '@app/store/types';
 import { HiddenColumns } from '@app/types/typesTable';
 import { Button } from '@consta/uikit/Button';
-import { IconAdd } from '@consta/uikit/IconAdd';
+import { IconCollapse } from '@consta/uikit/IconCollapse';
 import { IconRemove } from '@consta/uikit/IconRemove';
 
 import { Column } from '../TableResultRbController/TableResultRb/types';
@@ -26,7 +26,7 @@ export const ColumnExpanderComponent: React.FC<Props> = ({ column }) => {
 
   const getIcon = () => {
     if (hiddenColumns && hiddenColumns[column.accessor] === true) {
-      return IconAdd;
+      return IconCollapse;
     }
 
     return IconRemove;

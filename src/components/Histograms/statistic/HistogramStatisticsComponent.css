@@ -11,7 +11,7 @@
   }
 
   &__Row {
-    padding: 4px 8px;
+    padding: var(--space-2xs) calc(var(--space-xs) + var(--space-3xs));
 
     display: flex;
     justify-content: flex-end;
@@ -22,14 +22,17 @@
     font-size: 14px;
     line-height: 120%;
     text-align: right;
+    white-space: nowrap;
 
-    color: var(--color-typo-primary);
+    color: var(--color-typo-secondary);
     border-bottom: 1px solid var(--color-bg-border);
 
     &_last {
       justify-content: flex-start;
 
       text-align: left;
+
+      color: var(--color-typo-primary);
 
       border-left: 1px solid var(--color-bg-border);
     }
@@ -50,7 +53,7 @@
   }
 
   &__Statistic {
-    margin-top: var(--space-m);
+    margin-top: var(--space-s);
 
     display: grid;
     grid-gap: var(--space-m);

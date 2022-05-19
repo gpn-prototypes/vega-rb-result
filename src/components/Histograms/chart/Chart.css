@@ -63,14 +63,14 @@
   &__description {
     margin-bottom: var(--space-m);
 
-    font-size: 14px;
-    line-height: 140%;
+    font-size: 12px !important;
+    line-height: 150% !important;
 
     color: var(--color-typo-secondary);
   }
 
   &__dot {
-    padding: 2px;
+    padding: var(--space-3xs);
   }
 
   &__dot-text {

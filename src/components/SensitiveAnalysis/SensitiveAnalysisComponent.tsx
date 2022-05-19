@@ -20,14 +20,13 @@ import { Button } from '@consta/uikit/Button';
 import { ChoiceGroup } from '@consta/uikit/ChoiceGroup';
 import { Loader } from '@consta/uikit/Loader';
 import { Sidebar } from '@consta/uikit/Sidebar';
-import { Text } from '@consta/uikit/Text';
 import { useMount } from '@gpn-prototypes/vega-ui';
 import { block } from 'bem-cn';
 
 import { VerticalMoreContextMenu } from '../Helpers/VerticalMoreContextMenu/VerticalMoreContextMenu';
 
 import { SensitiveAnalysisChartComponent } from './chart/Chart';
-import { SensitiveAnalysisStatisticComponent } from './statistic/SensitiveAnalysisStatisticComponent';
+import { SensitiveAnalysisStatistics } from './statistic/SensitiveAnalysisStatistics';
 
 import './SensitiveAnalysisComponent.css';
 
@@ -175,7 +174,7 @@ export const SensitiveAnalysisComponent: FC<Props> = ({ sidebarRow }) => {
     setMenuItems(updatedMenuItems);
   };
 
-  const isShowMixFluid = useMemo(() => {
+  const isDisplayMixtureFluid = useMemo(() => {
     return sensitiveAnalysisData && sensitiveAnalysisData.length > 1;
   }, [sensitiveAnalysisData]);
 
@@ -220,11 +219,10 @@ export const SensitiveAnalysisComponent: FC<Props> = ({ sidebarRow }) => {
   const statistic = (
     <div className={cn()}>
       <div className={cn('Statistic')}>
-        <Text>Статистика</Text>
         {isLoadingStatistic || !sensitiveAnalysisStatisticData ? (
           <Loader />
         ) : (
-          <SensitiveAnalysisStatisticComponent
+          <SensitiveAnalysisStatistics
             statistic={sensitiveAnalysisStatisticData[activeTab?.idx || 0]}
           />
         )}
@@ -244,7 +242,7 @@ export const SensitiveAnalysisComponent: FC<Props> = ({ sidebarRow }) => {
             onClick={handleClick}
           />
 
-          {isShowMixFluid ? (
+          {isDisplayMixtureFluid ? (
             <div className={cn('Tabs')}>
               <ChoiceGroup
                 value={activeTab}

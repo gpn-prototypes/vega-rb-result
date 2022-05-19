@@ -6,6 +6,10 @@
       /* stylelint-disable-next-line length-zero-no-unit */
       --buttons-wrapper-size: 0px;
     }
+
+    &.TableCell_isHeader {
+      color: var(--color-control-typo-ghost);
+    }
   }
 
   .TableCell_isControl {
@@ -18,6 +22,7 @@
 
   .TableCell_isHeader {
     min-width: 80px;
+    height: 50px;
 
     font-size: var(--size-text-xs);
     font-weight: 400;
