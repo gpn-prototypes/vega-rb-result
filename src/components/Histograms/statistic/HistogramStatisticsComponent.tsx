@@ -64,7 +64,7 @@ export const HistogramStatisticsComponent: FC<Props> = () => {
       {statistics.map((innerStatistic: HistogramStatistic) => {
         return (
           <div>
-            <div className={cn('Statistic')}>
+            <div className={cn('Statistics')}>
               <div>{getRows(innerStatistic)}</div>
               <div>{getRows(innerStatistic, true)}</div>
             </div>
