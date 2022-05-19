@@ -43,8 +43,6 @@ export const ColumnExpanderComponent: FC<Props> = ({ column }) => {
     setHiddenColumns(hidden);
   };
 
-  // console.log(hiddenColumns, column);
-
   return (
     <Button
       size="xs"

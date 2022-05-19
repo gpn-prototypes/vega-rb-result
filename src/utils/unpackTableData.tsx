@@ -208,7 +208,6 @@ export const prepareColumns = ({
   };
 
   const preparedAttributes = attributes.map((attribute: ResultAttribute) => {
-    console.log(attribute);
     const column: Column = getPreparedColumn({
       title: [attribute.shortName, attribute.units].filter(Boolean).join(', '),
       accessor: attribute.code as keyof RbDomainEntityInput,
@@ -357,7 +356,6 @@ export function unpackTableData(
 ): GridCollection {
   const columns: Column[] = prepareColumns(projectStructure);
 
-  console.log(projectStructure);
   const rows: RowEntity[] = getDecimalRows(
     prepareRows(projectStructure),
     columns,
