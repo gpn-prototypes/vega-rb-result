@@ -24,7 +24,8 @@ export const getHiddenColumns = (): HiddenColumns => {
     ? hiddenColumnsFromLocalStorage
     : {
         PERCENTILE: true,
-        GCOS: true,
+        GCOS_OIL: true,
+        GCOS_GAS: true,
       };
 };
 

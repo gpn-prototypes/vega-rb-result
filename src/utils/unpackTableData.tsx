@@ -45,7 +45,7 @@ export const getNameWithParents = (
         .join(',');
 };
 
-/** Подготовка колонок */
+/** Подготовка колонок(маппинг данных с бэка) */
 /** TODO: Вынести методы в хелперы и тестить их отдельно */
 export const prepareColumns = ({
   domainEntities,
@@ -138,19 +138,45 @@ export const prepareColumns = ({
       innerAttribute.viewType === 'attribute',
   )[0];
 
-  /** Первая колонка рисков */
-  const firstRisk = attributes.filter(
-    (innerAttribute: ResultAttribute) => innerAttribute.viewType === 'risk',
+  /** Первая колонка рисков по газу */
+  const firstRiskOil = attributes.filter(
+    (innerAttribute: ResultAttribute) => innerAttribute.viewType === 'risk_oil',
+  )[0];
+
+  /** Первая колонка рисков по нефти */
+  const firstRiskGas = attributes.filter(
+    (innerAttribute: ResultAttribute) => innerAttribute.viewType === 'risk_gas',
   )[0];
 
   const isAttributeFirst = (attribute: ResultAttribute) =>
     firstMain && firstMain.code === attribute.code;
 
-  const isRiskFirst = (attribute: ResultAttribute) =>
-    firstRisk && firstRisk.code === attribute.code;
+  const isRiskOilFirst = (attribute: ResultAttribute) =>
+    firstRiskOil && firstRiskOil.code === attribute.code;
+
+  const isRiskGasFirst = (attribute: ResultAttribute) =>
+    firstRiskGas && firstRiskGas.code === attribute.code;
 
   const isAttributeOrRiskFirst = (attribute: ResultAttribute) =>
-    isAttributeFirst(attribute) || isRiskFirst(attribute);
+    isAttributeFirst(attribute) ||
+    isRiskOilFirst(attribute) ||
+    isRiskGasFirst(attribute);
+
+  const isAttributeOrRisk = (
+    attribute: ResultAttribute,
+  ): string | undefined => {
+    if (isAttributeFirst(attribute)) {
+      return 'attribute';
+    }
+    if (isRiskOilFirst(attribute)) {
+      return 'risk_oil';
+    }
+    if (isRiskGasFirst(attribute)) {
+      return 'risk_gas';
+    }
+
+    return undefined;
+  };
 
   /** Получение группы колонок, которые можно скрывать */
   const getColumnAccessorGroup = (attribute: ResultAttribute) => {
@@ -159,8 +185,7 @@ export const prepareColumns = ({
         attributes
           .filter(
             (innerAttribute: ResultAttribute) =>
-              innerAttribute.viewType ===
-              (isAttributeFirst(attribute) ? 'attribute' : 'risk'),
+              innerAttribute.viewType === isAttributeOrRisk(attribute),
           )
           .filter((_, index: number) => index !== 0)
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -183,10 +208,16 @@ export const prepareColumns = ({
   };
 
   const preparedAttributes = attributes.map((attribute: ResultAttribute) => {
+    console.log(attribute);
     const column: Column = getPreparedColumn({
       title: [attribute.shortName, attribute.units].filter(Boolean).join(', '),
       accessor: attribute.code as keyof RbDomainEntityInput,
-      align: attribute.code === 'PERCENTILE' ? 'left' : 'right',
+      align:
+        attribute.code === 'PERCENTILE' ||
+        attribute.code === 'GCOS_GAS' ||
+        attribute.code === 'GCOS_OIL'
+          ? 'left'
+          : 'right',
       visible: attribute?.visible,
       geoType: attribute?.geoType,
       control: getColumnControl(attribute),
@@ -325,6 +356,8 @@ export function unpackTableData(
   decimalFixed: DecimalFixed,
 ): GridCollection {
   const columns: Column[] = prepareColumns(projectStructure);
+
+  console.log(projectStructure);
   const rows: RowEntity[] = getDecimalRows(
     prepareRows(projectStructure),
     columns,
