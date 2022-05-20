@@ -113,6 +113,12 @@ export interface GridCollection {
   entitiesCount?: number;
 }
 
+export enum ViewType {
+  Attribute = 'attribute',
+  RiskOil = 'risk_oil',
+  RiskGas = 'risk_gas',
+}
+
 export interface FilteredGridDataKeys {
   columnsKeys: string[];
   rowsKeys: string[];

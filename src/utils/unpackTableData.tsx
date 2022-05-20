@@ -19,7 +19,7 @@ import {
   getDecimalRows,
   getHiddenColumns,
 } from '../store/table/tableReducers';
-import { DecimalFixed, GridCollection } from '../types/typesTable';
+import { DecimalFixed, GridCollection, ViewType } from '../types/typesTable';
 
 import { getNumberWithSpaces } from './StringHelper';
 
@@ -28,8 +28,6 @@ const isHasParentAll = (parents: Parent[]): boolean => {
     parents.find((innerParent: Parent) => innerParent.isTotal) !== undefined
   );
 };
-
-export type ViewType = 'attribute' | 'risk';
 
 export const getNameWithParents = (
   index: number,
@@ -135,44 +133,40 @@ export const prepareColumns = ({
   /** Первая колонка аттрибутов */
   const firstMain = attributes.filter(
     (innerAttribute: ResultAttribute) =>
-      innerAttribute.viewType === 'attribute',
-  )[0];
-
-  /** Первая колонка рисков по газу */
-  const firstRiskOil = attributes.filter(
-    (innerAttribute: ResultAttribute) => innerAttribute.viewType === 'risk_oil',
+      innerAttribute.viewType === ViewType.Attribute,
   )[0];
 
   /** Первая колонка рисков по нефти */
-  const firstRiskGas = attributes.filter(
-    (innerAttribute: ResultAttribute) => innerAttribute.viewType === 'risk_gas',
+  const firstRiskOil = attributes.filter(
+    (innerAttribute: ResultAttribute) =>
+      innerAttribute.viewType === ViewType.RiskOil,
   )[0];
 
-  const isAttributeFirst = (attribute: ResultAttribute) =>
-    firstMain && firstMain.code === attribute.code;
+  /** Первая колонка рисков по газу */
+  const firstRiskGas = attributes.filter(
+    (innerAttribute: ResultAttribute) =>
+      innerAttribute.viewType === ViewType.RiskGas,
+  )[0];
 
-  const isRiskOilFirst = (attribute: ResultAttribute) =>
-    firstRiskOil && firstRiskOil.code === attribute.code;
-
-  const isRiskGasFirst = (attribute: ResultAttribute) =>
-    firstRiskGas && firstRiskGas.code === attribute.code;
+  const isFirstByFluid = (fluid, attribute) =>
+    fluid && fluid.code === attribute.code;
 
   const isAttributeOrRiskFirst = (attribute: ResultAttribute) =>
-    isAttributeFirst(attribute) ||
-    isRiskOilFirst(attribute) ||
-    isRiskGasFirst(attribute);
+    isFirstByFluid(firstMain, attribute) ||
+    isFirstByFluid(firstRiskOil, attribute) ||
+    isFirstByFluid(firstRiskGas, attribute);
 
   const isAttributeOrRisk = (
     attribute: ResultAttribute,
   ): string | undefined => {
-    if (isAttributeFirst(attribute)) {
-      return 'attribute';
+    if (isFirstByFluid(firstMain, attribute)) {
+      return ViewType.Attribute;
     }
-    if (isRiskOilFirst(attribute)) {
-      return 'risk_oil';
+    if (isFirstByFluid(firstRiskOil, attribute)) {
+      return ViewType.RiskOil;
     }
-    if (isRiskGasFirst(attribute)) {
-      return 'risk_gas';
+    if (isFirstByFluid(firstRiskGas, attribute)) {
+      return ViewType.RiskGas;
     }
 
     return undefined;
@@ -207,16 +201,17 @@ export const prepareColumns = ({
     return undefined;
   };
 
+  const setCellTextAlign = ({ code }: ResultAttribute) => {
+    return code === 'PERCENTILE' || code === 'GCOS_GAS' || code === 'GCOS_OIL'
+      ? 'left'
+      : 'right';
+  };
+
   const preparedAttributes = attributes.map((attribute: ResultAttribute) => {
     const column: Column = getPreparedColumn({
       title: [attribute.shortName, attribute.units].filter(Boolean).join(', '),
       accessor: attribute.code as keyof RbDomainEntityInput,
-      align:
-        attribute.code === 'PERCENTILE' ||
-        attribute.code === 'GCOS_GAS' ||
-        attribute.code === 'GCOS_OIL'
-          ? 'left'
-          : 'right',
+      align: setCellTextAlign(attribute),
       visible: attribute?.visible,
       geoType: attribute?.geoType,
       control: getColumnControl(attribute),
