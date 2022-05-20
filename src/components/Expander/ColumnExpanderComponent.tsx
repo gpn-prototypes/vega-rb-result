@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { FC, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { TableActions } from '@app/store/table/tableActions';
 import { RootState } from '@app/store/types';
@@ -13,7 +13,7 @@ interface Props {
   column: Column;
 }
 
-export const ColumnExpanderComponent: React.FC<Props> = ({ column }) => {
+export const ColumnExpanderComponent: FC<Props> = ({ column }) => {
   const dispatch = useDispatch();
   const setHiddenColumns = useCallback(
     (hidden: HiddenColumns) => dispatch(TableActions.setHiddenColumns(hidden)),
@@ -25,16 +25,16 @@ export const ColumnExpanderComponent: React.FC<Props> = ({ column }) => {
   );
 
   const getIcon = () => {
-    if (hiddenColumns && hiddenColumns[column.accessor] === true) {
+    if (hiddenColumns && hiddenColumns[column.accessor]) {
       return IconAdd;
     }
 
     return IconRemove;
   };
 
-  const handleClick = (event: React.MouseEvent) => {
-    event.preventDefault();
-    event.stopPropagation();
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
 
     const hidden = { ...hiddenColumns };
 

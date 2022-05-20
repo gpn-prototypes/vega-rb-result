@@ -19,7 +19,7 @@ import {
   getDecimalRows,
   getHiddenColumns,
 } from '../store/table/tableReducers';
-import { DecimalFixed, GridCollection } from '../types/typesTable';
+import { DecimalFixed, GridCollection, ViewType } from '../types/typesTable';
 
 import { getNumberWithSpaces } from './StringHelper';
 
@@ -28,8 +28,6 @@ const isHasParentAll = (parents: Parent[]): boolean => {
     parents.find((innerParent: Parent) => innerParent.isTotal) !== undefined
   );
 };
-
-export type ViewType = 'attribute' | 'risk';
 
 export const getNameWithParents = (
   index: number,
@@ -45,7 +43,7 @@ export const getNameWithParents = (
         .join(',');
 };
 
-/** Подготовка колонок */
+/** Подготовка колонок(маппинг данных с бэка) */
 /** TODO: Вынести методы в хелперы и тестить их отдельно */
 export const prepareColumns = ({
   domainEntities,
@@ -135,22 +133,44 @@ export const prepareColumns = ({
   /** Первая колонка аттрибутов */
   const firstMain = attributes.filter(
     (innerAttribute: ResultAttribute) =>
-      innerAttribute.viewType === 'attribute',
+      innerAttribute.viewType === ViewType.Attribute,
   )[0];
 
-  /** Первая колонка рисков */
-  const firstRisk = attributes.filter(
-    (innerAttribute: ResultAttribute) => innerAttribute.viewType === 'risk',
+  /** Первая колонка рисков по нефти */
+  const firstRiskOil = attributes.filter(
+    (innerAttribute: ResultAttribute) =>
+      innerAttribute.viewType === ViewType.RiskOil,
   )[0];
 
-  const isAttributeFirst = (attribute: ResultAttribute) =>
-    firstMain && firstMain.code === attribute.code;
+  /** Первая колонка рисков по газу */
+  const firstRiskGas = attributes.filter(
+    (innerAttribute: ResultAttribute) =>
+      innerAttribute.viewType === ViewType.RiskGas,
+  )[0];
 
-  const isRiskFirst = (attribute: ResultAttribute) =>
-    firstRisk && firstRisk.code === attribute.code;
+  const isFirstByFluid = (fluid, attribute) =>
+    fluid && fluid.code === attribute.code;
 
   const isAttributeOrRiskFirst = (attribute: ResultAttribute) =>
-    isAttributeFirst(attribute) || isRiskFirst(attribute);
+    isFirstByFluid(firstMain, attribute) ||
+    isFirstByFluid(firstRiskOil, attribute) ||
+    isFirstByFluid(firstRiskGas, attribute);
+
+  const isAttributeOrRisk = (
+    attribute: ResultAttribute,
+  ): string | undefined => {
+    if (isFirstByFluid(firstMain, attribute)) {
+      return ViewType.Attribute;
+    }
+    if (isFirstByFluid(firstRiskOil, attribute)) {
+      return ViewType.RiskOil;
+    }
+    if (isFirstByFluid(firstRiskGas, attribute)) {
+      return ViewType.RiskGas;
+    }
+
+    return undefined;
+  };
 
   /** Получение группы колонок, которые можно скрывать */
   const getColumnAccessorGroup = (attribute: ResultAttribute) => {
@@ -159,8 +179,7 @@ export const prepareColumns = ({
         attributes
           .filter(
             (innerAttribute: ResultAttribute) =>
-              innerAttribute.viewType ===
-              (isAttributeFirst(attribute) ? 'attribute' : 'risk'),
+              innerAttribute.viewType === isAttributeOrRisk(attribute),
           )
           .filter((_, index: number) => index !== 0)
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -182,11 +201,17 @@ export const prepareColumns = ({
     return undefined;
   };
 
+  const setCellTextAlign = ({ code }: ResultAttribute) => {
+    return code === 'PERCENTILE' || code === 'GCOS_GAS' || code === 'GCOS_OIL'
+      ? 'left'
+      : 'right';
+  };
+
   const preparedAttributes = attributes.map((attribute: ResultAttribute) => {
     const column: Column = getPreparedColumn({
       title: [attribute.shortName, attribute.units].filter(Boolean).join(', '),
       accessor: attribute.code as keyof RbDomainEntityInput,
-      align: attribute.code === 'PERCENTILE' ? 'left' : 'right',
+      align: setCellTextAlign(attribute),
       visible: attribute?.visible,
       geoType: attribute?.geoType,
       control: getColumnControl(attribute),
@@ -325,6 +350,7 @@ export function unpackTableData(
   decimalFixed: DecimalFixed,
 ): GridCollection {
   const columns: Column[] = prepareColumns(projectStructure);
+
   const rows: RowEntity[] = getDecimalRows(
     prepareRows(projectStructure),
     columns,
