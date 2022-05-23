@@ -5,16 +5,6 @@
 
   width: 100%;
 
-  .TableCell_isHeader {
-    min-width: 80px;
-
-    font-size: var(--size-text-xs);
-    letter-spacing: inherit;
-    text-transform: inherit;
-
-    color: var(--color-typo-primary);
-  }
-
   &__Title {
     position: fixed;
     z-index: var(--layout-z-portal);
@@ -59,7 +49,7 @@
   }
 
   &__Statistic {
-    margin-top: var(--space-s);
+    margin-top: var(--space-m);
 
     min-height: 200px;
   }

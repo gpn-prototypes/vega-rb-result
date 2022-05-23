@@ -1,0 +1,47 @@
+/* stylelint-disable no-duplicate-selectors */
+.SensitiveAnalysisStatistics {
+  & .TableHeader-Row {
+    & .TableHeader-Cell:not(.TableHeader-Cell_isFirstColumn)::after {
+      position: static;
+    }
+
+    & .TableCell_isHeader {
+      min-width: 80px;
+
+      font-size: var(--size-text-xs);
+      font-weight: 400;
+      letter-spacing: inherit;
+      text-transform: inherit;
+
+      color: var(--color-control-typo-ghost);
+
+      &:first-child {
+        height: 50px;
+      }
+
+      &:first-child {
+        & .TableCell-Wrapper:first-child {
+          padding-left: var(--space-xs);
+        }
+      }
+    }
+
+    & .TableCell-Wrapper {
+      padding: 0;
+
+      border-right: 1px solid var(--color-bg-border);
+    }
+
+    &::after {
+      position: static !important;
+    }
+  }
+
+  & .Table-CellsRow {
+    & .TableCell-Wrapper {
+      padding: 0;
+
+      line-height: 29px;
+    }
+  }
+}

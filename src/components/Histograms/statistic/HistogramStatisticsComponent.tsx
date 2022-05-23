@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { FC, useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   HistogramStatistic,
@@ -8,7 +8,6 @@ import { HistogramActions } from '@app/store/histogram/HistogramActions';
 import { RootState } from '@app/store/types';
 import { MathHelper } from '@app/utils/MathHelper';
 import { Loader } from '@consta/uikit/Loader';
-import { Text } from '@consta/uikit/Text';
 import { block } from 'bem-cn';
 
 import './HistogramStatisticsComponent.css';
@@ -20,7 +19,7 @@ interface Props {
   bins: number;
 }
 
-export const HistogramStatisticsComponent: React.FC<Props> = () => {
+export const HistogramStatisticsComponent: FC<Props> = () => {
   /** Store */
   const dispatch = useDispatch();
   const statistics: HistogramStatistic[] = useSelector(
@@ -65,8 +64,7 @@ export const HistogramStatisticsComponent: React.FC<Props> = () => {
       {statistics.map((innerStatistic: HistogramStatistic) => {
         return (
           <div>
-            <Text>{innerStatistic.title}</Text>
-            <div className={cn('Statistic')}>
+            <div className={cn('Statistics')}>
               <div>{getRows(innerStatistic)}</div>
               <div>{getRows(innerStatistic, true)}</div>
             </div>

@@ -96,8 +96,8 @@
   }
 
   &__text {
-    font-size: 14px;
-    line-height: 17px;
+    font-size: 12px;
+    line-height: 18px;
     fill: var(--color-typo-secondary);
     text-anchor: end;
 

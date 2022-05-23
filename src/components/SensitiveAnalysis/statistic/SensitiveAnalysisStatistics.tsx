@@ -6,7 +6,14 @@ import {
   SensitiveAnalysisStatisticRows,
 } from '@app/interfaces/SensitiveAnalysisInterface';
 import { MathHelper } from '@app/utils/MathHelper';
+import { cnMixSpace } from '@consta/uikit/MixSpace';
 import { Table, TableColumn, TableRow } from '@consta/uikit/Table';
+import { Text } from '@consta/uikit/Text';
+import { block } from 'bem-cn';
+
+import './SensitiveAnalysisStatistics.css';
+
+const cn = block('SensitiveAnalysisStatistics');
 
 interface Props {
   statistic: SensitiveAnalysisStatistic;
@@ -22,7 +29,7 @@ const getMappedColumn = (
     title,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     accessor: header.code as any,
-    align: isLeft ? 'left' : 'right',
+    align: isLeft ? 'left' : 'center',
     renderCell: (row: TableRow) => {
       if (Number(row[header.code]) === 0) {
         return '—';
@@ -35,7 +42,11 @@ const getMappedColumn = (
         );
       }
 
-      return row[header.code];
+      return (
+        <Text as="div" size="s" className={cnMixSpace({ pH: 'xs', pV: '2xs' })}>
+          {row[header.code]}
+        </Text>
+      );
     },
   };
 
@@ -52,14 +63,12 @@ const getMappedRow = (cells: SensitiveAnalysisStatisticCell[]): TableRow => {
   return row;
 };
 
-export const SensitiveAnalysisStatisticComponent: FC<Props> = ({
-  statistic,
-}) => {
+export const SensitiveAnalysisStatistics: FC<Props> = ({ statistic }) => {
   const columns: TableColumn<TableRow>[] = statistic?.headers.map(
     (header: SensitiveAnalysisStatisticHeaders) => {
       if (header?.children && header?.children?.length > 0) {
         return {
-          title: header.name,
+          title: header.name === 'НГЗ/НГР' ? 'НГЗ/НГР, млн.м³' : header.name,
           columns: header.children.map(
             (childrenHeader: SensitiveAnalysisStatisticHeaders) =>
               getMappedColumn(childrenHeader, false),
@@ -75,5 +84,7 @@ export const SensitiveAnalysisStatisticComponent: FC<Props> = ({
     (row: SensitiveAnalysisStatisticRows) => getMappedRow(row.cells),
   );
 
-  return <Table columns={columns} rows={rows} zebraStriped="odd" />;
+  return (
+    <Table columns={columns} className={cn()} rows={rows} zebraStriped="odd" />
+  );
 };
