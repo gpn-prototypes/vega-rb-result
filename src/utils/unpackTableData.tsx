@@ -43,6 +43,78 @@ export const getNameWithParents = (
         .join(',');
 };
 
+const widthMap = {
+  GEO_CATEGORY: 90,
+  niznir_condensate_gcos_gas: 170,
+  niznir_condensate_gu_gas: 170,
+  ngzngr_condensate_gu_gas: 170,
+  ngzngr_condensate_gcos_gas: 170,
+  niznir_dissolved_gas_gu_oil: 170,
+  niznir_dissolved_gas_gcos_oil: 170,
+  niznir_gu_oil: 150,
+  /** НИЗ/НИР нефти с учётом GCoS, тыс. т */
+  niznir_gcos_oil: 170,
+  /** НГЗ/НГР раств газа в случае ГУ, млн. м³ */
+  ngzngr_dissolved_gas_gu_oil: 170,
+  /** НГЗ/НГР раств газа с учётом GCoS, млн. м³ */
+  ngzngr_dissolved_gas_gcos_oil: 170,
+  niznir_gu_gas: 150,
+  /** НИЗ/НИР газа с учётом GCoS, млн. м³ */
+  niznir_gcos_gas: 170,
+  ngzngr_filtered_gas: 150,
+  /** НГЗ/НГР газа с учётом GCoS, млн. м³ */
+  ngzngr_GCoS_gas: 170,
+  SEAL_SAFETY_GAS: 110,
+  ngzngr_filtered_oil: 130,
+  /** НГЗ/НГР нефти с учётом GCoS, тыс. т */
+  ngzngr_GCoS_oil: 160,
+  SEAL_SAFETY_OIL: 110,
+  PETROLEUM_TRAP_OIL: 110,
+  COLLECTOR_OIL: 110,
+  /** НИЗ/НИР конденсата, тыс. т */
+  niznir_condensate_gas: 150,
+  CONDENSATE_RECOVERY_FACTOR: 110,
+  /** НГЗ/НГР конденсата, тыс. т */
+  ngzngr_condensate_gas: 150,
+  niznir_dissolved_gas_oil: 130,
+  /** НИЗ/НИР нефти, тыс. т */
+  niznir_oil: 150,
+  OIL_RECOVERY_FACTOR: 110,
+  /** НИЗ/НИР раств газа, млн. м³ */
+  ngzngr_dissolved_gas_oil: 130,
+  /** Газосодержание, м³/т */
+  GAS_CONTENT: 170,
+  niznir_gas: 130,
+  /** F, тыс. м² */
+  MIXTURE_AREA: 100,
+  /** H эфф.нн, м */
+  OIL_POOL_NET_THICKNESS: 100,
+  /** Кᴴп, д. ед. */
+  OIL_FORMATION_POROSITY_RATIO: 100,
+  /** Кн, д. ед. */
+  FORMATION_OIL_SATURATION_FACTOR: 100,
+  /** Плотность, г/см³ */
+  DENSITY: 130,
+  /** Пересч. коэф., д. ед. */
+  CONVERSION_FACTOR: 130,
+  /** К⸢п, д. ед. */
+  GAS_FORMATION_POROSITY_RATIO: 100,
+  /** НГЗ/НГР нефти, тыс. т */
+  ngzngr_oil: 110,
+  /** НГЗ/НГР газа, млн. м³ */
+  ngzngr_gas: 110,
+  /** КИГ, д. ед. */
+  GAS_RECOVERY_FACTOR: 100,
+  /** Мат. порода */
+  PARENT_MATERIAL_OIL: 100,
+  /** Мат. порода */
+  PARENT_MATERIAL_GAS: 100,
+  /** Миграция */
+  MIGRATION_GAS: 100,
+  /** Коллектор */
+  COLLECTOR_GAS: 100,
+};
+
 /** Подготовка колонок(маппинг данных с бэка) */
 /** TODO: Вынести методы в хелперы и тестить их отдельно */
 export const prepareColumns = ({
@@ -75,6 +147,7 @@ export const prepareColumns = ({
       isResizable: true,
       visible,
       geoType,
+      width: widthMap[accessor] ? widthMap[accessor] : undefined,
       decimal,
       isRisk,
       control,
