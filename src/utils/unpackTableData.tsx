@@ -1,5 +1,6 @@
 import React from 'react';
 import { ColumnExpanderComponent } from '@app/components/Expander/ColumnExpanderComponent';
+import { DELIMITER_CODE } from '@app/constants/GeneralConstants';
 
 import {
   Column,
@@ -40,7 +41,7 @@ export const getNameWithParents = (
     : domainEntities
         .slice(0, index + 1)
         .map((entity: ResultDomainEntity) => row[entity.code]?.value || '')
-        .join(',');
+        .join(DELIMITER_CODE);
 };
 
 const widthMap = {
@@ -180,7 +181,7 @@ export const prepareColumns = ({
               : domainEntities
                   .slice(0, index + 1)
                   .map((entity: ResultDomainEntity) => entity.code)
-                  .join(',');
+                  .join(DELIMITER_CODE);
 
           return (
             <div
@@ -294,10 +295,10 @@ export const prepareColumns = ({
         /** Заполняем коды и названия с учетом родителей, нужно для отправки данных в отображение гистограм */
         const codeWithParents = domainEntities
           .map((entity: ResultDomainEntity) => entity.code)
-          .join(',');
+          .join(DELIMITER_CODE);
         const nameWithParents = domainEntities
           .map((entity: ResultDomainEntity) => row[entity.code]?.value || '')
-          .join(',');
+          .join(DELIMITER_CODE);
 
         const value = row[attribute.code]?.formattedValue;
 
@@ -387,14 +388,14 @@ export const prepareRows = ({
                 : domainObject.parents
                     .slice(0, indexParent + 1)
                     .map((innerParent) => innerParent.code || '')
-                    .join(',');
+                    .join(DELIMITER_CODE);
             const parentNames =
               indexParent === 0
                 ? parent.name
                 : domainObject.parents
                     .slice(0, indexParent + 1)
                     .map((innerParent) => innerParent.name || '')
-                    .join(',');
+                    .join(DELIMITER_CODE);
 
             row[percIndex][parent.code] = {
               code: attributeValue.code,

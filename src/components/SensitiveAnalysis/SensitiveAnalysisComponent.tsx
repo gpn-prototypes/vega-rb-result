@@ -1,5 +1,6 @@
 import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { DELIMITER_CODE } from '@app/constants/GeneralConstants';
 import {
   MenuContextGroup,
   MenuContextItem,
@@ -83,15 +84,17 @@ export const SensitiveAnalysisComponent: FC<Props> = ({ sidebarRow }) => {
     setIsLoading(true);
     setIsLoadingStatistic(true);
 
-    loadSensitiveAnalysisData(dispatch, sidebarRow.title.split(',')).then(
-      () => {
-        setIsLoading(false);
-      },
-    );
+    loadSensitiveAnalysisData(
+      dispatch,
+      sidebarRow.title.split(DELIMITER_CODE),
+    ).then(() => {
+      setIsLoading(false);
+    });
 
-    loadSensitiveAnalysisStatistic(dispatch, sidebarRow.title.split(',')).then(
-      () => setIsLoadingStatistic(false),
-    );
+    loadSensitiveAnalysisStatistic(
+      dispatch,
+      sidebarRow.title.split(DELIMITER_CODE),
+    ).then(() => setIsLoadingStatistic(false));
 
     return resetState;
   });
