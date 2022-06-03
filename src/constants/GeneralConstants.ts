@@ -20,3 +20,5 @@ export const FLUID_TYPES = [
 export enum AttributeCode {
   GeoType = 'GEO_TYPE',
 }
+
+export const DELIMITER_CODE = '_&888&_';

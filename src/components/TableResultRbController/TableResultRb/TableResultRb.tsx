@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { ContextMenuDropdown } from '@app/components/Helpers/ContextMenuDropdown';
 import { EFluidType, EFluidTypeCode, EGeoCategory } from '@app/constants/Enums';
+import { DELIMITER_CODE } from '@app/constants/GeneralConstants';
 import { MenuContextItem } from '@app/interfaces/ContextMenuInterface';
 import {
   TableActions,
@@ -342,7 +343,7 @@ export const TableResultRb: React.FC = () => {
       }
 
       if (
-        code.split(',').length === entitiesCount &&
+        code.split(DELIMITER_CODE).length === entitiesCount &&
         (title || '').indexOf('Всего') === -1 &&
         openSensitiveAnalysis
       ) {

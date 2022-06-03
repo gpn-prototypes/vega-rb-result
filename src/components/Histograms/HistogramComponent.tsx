@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { VerticalMoreContextMenu } from '@app/components/Helpers/VerticalMoreContextMenu/VerticalMoreContextMenu';
+import { DELIMITER_CODE } from '@app/constants/GeneralConstants';
 import { Histogram } from '@app/generated/graphql';
 import { MenuContextItem } from '@app/interfaces/ContextMenuInterface';
 import { HistogramActions } from '@app/store/histogram/HistogramActions';
@@ -96,7 +97,9 @@ export const HistogramComponent: React.FC = () => {
               Выбранный объект:
             </Text>
 
-            <Text size="s">&nbsp;{activeRow?.title.split(',').join(', ')}</Text>
+            <Text size="s">
+              &nbsp;{activeRow?.title.split(DELIMITER_CODE).join(', ')}
+            </Text>
           </div>
         </div>
 

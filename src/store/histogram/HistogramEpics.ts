@@ -1,3 +1,4 @@
+import { DELIMITER_CODE } from '@app/constants/GeneralConstants';
 import { Histogram, HistogramStatistic } from '@app/generated/graphql';
 import { ofAction } from '@app/operators/ofAction';
 import {
@@ -30,7 +31,7 @@ export const getDomainEntityNames = (
   grid: GridCollection,
 ): string[] => {
   return row !== undefined
-    ? row.title.split(',')
+    ? row.title.split(DELIMITER_CODE)
     : [String((grid.rows[0][grid.columns[0].accessor] as any)?.value)];
 };
 
