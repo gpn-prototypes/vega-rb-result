@@ -100,7 +100,7 @@ describe('UnpackTableData', () => {
 
     expect(nameWithParents).toEqual('концепция 1');
     expect(nameWithParentsSecondRow).toEqual('Архангеловский');
-    expect(nameWithParentsNotRoot).toEqual('концепция 1,Архангеловский');
+    expect(nameWithParentsNotRoot).toEqual('концепция 1_&888&_Архангеловский');
     expect(nameWithParentsNotRoot2).toEqual(
       'концепция 1,Архангеловский,2_Месторождение',
     );
