@@ -12,7 +12,7 @@ import { Action } from 'typescript-fsa';
 
 import { GeneralActions } from '../general/generalActions';
 import { HistogramActions } from '../histogram/HistogramActions';
-import { LoaderAction } from '../loader/loaderActions';
+import { LoaderActions } from '../loader/loaderActions';
 import { NotifyActions } from '../notify/notifyActions';
 import { SettingsActions } from '../settings/settingsActions';
 import { TableActions } from '../table/tableActions';
@@ -52,7 +52,7 @@ const handleChangeLocationEpic: Epic<
       dispatch(treeDuck.actions.resetState());
       dispatch(TableActions.resetState());
       dispatch(HistogramActions.resetState());
-      dispatch(LoaderAction.resetStore());
+      dispatch(LoaderActions.resetStore());
     }),
     ignoreElements(),
   );

@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { FileAction } from '@app/store/file/fileActions';
+import { FileActions } from '@app/store/file/fileActions';
 import { RootState } from '@app/store/types';
 import { Button } from '@consta/uikit/Button';
 import { IconClose } from '@consta/uikit/IconClose';
@@ -29,7 +29,7 @@ export const CancelModeContent: React.FC<ModalContentProps> = ({
   /** Callbacks */
   const cancelFetch = useCallback(() => {
     if (isLoading) {
-      dispatch(FileAction.stopFetchingFile());
+      dispatch(FileActions.stopFetchingFile());
     }
   }, [dispatch, isLoading]);
 

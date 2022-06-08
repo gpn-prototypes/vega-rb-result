@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { FileAction } from '@app/store/file/fileActions';
+import { FileActions } from '@app/store/file/fileActions';
 import { Button } from '@consta/uikit/Button';
 import { Checkbox } from '@consta/uikit/Checkbox';
 import { IconClose } from '@consta/uikit/IconClose';
@@ -66,7 +66,7 @@ export const InitialModeContent: React.FC<ModalContentProps> = ({
   const downloadResult = (): void => {
     try {
       dispatch(
-        FileAction.fetchResultFile({
+        FileActions.fetchResultFile({
           statistics: checkedState[DownloadTypeEnum.Statistics],
           samples: checkedState[DownloadTypeEnum.Samples],
           plots: checkedState[DownloadTypeEnum.Plots],

@@ -1,10 +1,7 @@
-import React, { FC, useCallback, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { LoaderAction } from '@app/store/loader/loaderActions';
-import { NotifyActions } from '@app/store/notify/notifyActions';
+import React, { FC, useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { RootState } from '@app/store/types';
 import { Modal } from '@consta/uikit/Modal';
-import { SnackBarItemDefault } from '@consta/uikit/SnackBar';
 import { block } from 'bem-cn';
 
 import { CancelModeContent } from './CancelModeContent/CancelModeContent';
@@ -14,7 +11,7 @@ import { ModalContentProps, ModalMode } from './ModalContentType';
 
 import './DownloadResultModal.css';
 
-export const cn = block('DownloadResultModal');
+const cn = block('DownloadResultModal');
 
 interface Props {
   handleClose: () => void;
@@ -32,53 +29,26 @@ const modalConfig: ModalConfig = {
   cancel: CancelModeContent,
 };
 
-export const DownloadResultModal: React.FC<Props> = ({ handleClose }) => {
+export const DownloadResultModal: FC<Props> = ({ handleClose }) => {
   /** Store */
-  const dispatch = useDispatch();
-
   const isLoaded: boolean = useSelector(
     ({ loader }: RootState): boolean => loader.loaded.file || false,
   );
 
   /** State */
-  const [mode, setMode] = React.useState<ModalMode>(ModalMode.initial);
-  const [isFileLarge, setIsFileLarge] = React.useState<boolean>(false);
-
-  /** Callbacks */
-  const showNotification = useCallback(
-    (item: SnackBarItemDefault) => dispatch(NotifyActions.appendItem(item)),
-    [dispatch],
-  );
-  const hideNotification = useCallback(
-    (id: string) => dispatch(NotifyActions.removeItem(id)),
-    [dispatch],
-  );
-
-  /** Effects */
-  useEffect(() => {
-    return () => {
-      dispatch(LoaderAction.resetType('file'));
-    };
-  }, [dispatch]);
+  const [mode, setMode] = useState<ModalMode>(ModalMode.initial);
+  const [isFileLarge, setIsFileLarge] = useState<boolean>(false);
 
   /**
    * Подписываемся на состояние загрузки:
    * когда файл загружен,
-   * закрываем модалку и показываем нотификацию
+   * закрываем модалку
    * */
   useEffect(() => {
     if (isLoaded) {
       handleClose();
-
-      showNotification({
-        key: 'success',
-        message: 'Файл расчёта сохранён на компьютер',
-        status: 'success',
-        onClose: () => hideNotification('success'),
-        autoClose: 5,
-      });
     }
-  }, [isLoaded, handleClose, showNotification, hideNotification]);
+  }, [handleClose, isLoaded]);
 
   const ContentComponent = modalConfig[mode];
 

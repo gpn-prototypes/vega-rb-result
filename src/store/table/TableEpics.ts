@@ -14,7 +14,7 @@ import {
   tap,
 } from 'rxjs/operators';
 
-import { LoaderAction } from '../loader/loaderActions';
+import { LoaderActions } from '../loader/loaderActions';
 import { RootState, StoreDependencies } from '../types';
 
 import { TableActions } from './tableActions';
@@ -27,7 +27,7 @@ const handleInitLoadTableEpic: Epic<
 > = (action$, state$, { dispatch, projectService }) => {
   return action$.pipe(
     ofAction(TableActions.initLoadTable),
-    tap(() => dispatch(LoaderAction.setLoading('table'))),
+    tap(() => dispatch(LoaderActions.setLoading('table'))),
     distinctUntilChanged(),
     switchMap(() => {
       return zip(from(loadTableData()), from(loadDecimalData()));
@@ -56,7 +56,7 @@ const handleInitLoadTableEpic: Epic<
         }
       },
     ),
-    tap(() => dispatch(LoaderAction.setLoaded('table'))),
+    tap(() => dispatch(LoaderActions.setLoaded('table'))),
     ignoreElements(),
   );
 };
@@ -75,7 +75,7 @@ const handleSetDecimalEpic: Epic<
 > = (action$, state$, { dispatch }) => {
   return action$.pipe(
     ofAction(TableActions.initUpdateDecimalFixed),
-    tap(() => dispatch(LoaderAction.setLoading('decimal'))),
+    tap(() => dispatch(LoaderActions.setLoading('decimal'))),
     distinctUntilChanged(),
     switchMap(({ payload }) => {
       let currentDecimal = state$.value.table.decimalFixed[payload.columnCode];
@@ -93,7 +93,7 @@ const handleSetDecimalEpic: Epic<
     }),
     tap(() => {
       dispatch(TableActions.updateDecimal());
-      dispatch(LoaderAction.setLoaded('decimal'));
+      dispatch(LoaderActions.setLoaded('decimal'));
     }),
     ignoreElements(),
   );

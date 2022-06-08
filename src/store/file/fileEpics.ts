@@ -13,12 +13,12 @@ import { Epic } from 'redux-observable';
 import { from } from 'rxjs';
 import { filter, ignoreElements, switchMap, tap } from 'rxjs/operators';
 
-import { LoaderAction } from '../loader/loaderActions';
+import { LoaderActions } from '../loader/loaderActions';
 import { NotifyActions } from '../notify/notifyActions';
 import { RootState, StoreDependencies } from '../types';
-import { WebsocketAction } from '../websocket/websocketActions';
+import { WebsocketActions } from '../websocket/websocketActions';
 
-import { FetchFilePayload, FileAction } from './fileActions';
+import { FetchFilePayload, FileActions } from './fileActions';
 
 const fetchResultFileEpic: Epic<
   AnyAction,
@@ -27,8 +27,8 @@ const fetchResultFileEpic: Epic<
   StoreDependencies
 > = (action$, state$, { dispatch, projectService }) =>
   action$.pipe(
-    ofAction(FileAction.fetchResultFile),
-    tap(() => dispatch(LoaderAction.setLoading('file'))),
+    ofAction(FileActions.fetchResultFile),
+    tap(() => dispatch(LoaderActions.setLoading('file'))),
     /** Получаем id, для запроса на websocket */
     switchMap((action: { payload: FetchFilePayload }) => {
       return from(
@@ -46,7 +46,7 @@ const fetchResultFileEpic: Epic<
     switchMap((id) => {
       const { projectId } = projectService;
 
-      dispatch(FileAction.setWebsocketId(id));
+      dispatch(FileActions.setWebsocketId(id));
 
       return from(
         createWebsocket({
@@ -58,7 +58,7 @@ const fetchResultFileEpic: Epic<
     }),
     switchMap(() => {
       return action$.pipe(
-        ofAction(WebsocketAction.handleMessage),
+        ofAction(WebsocketActions.handleMessage),
         filter(({ payload }) =>
           websocketFilterByType(
             WebsocketDomain.CalculationResultArchive,
@@ -71,7 +71,7 @@ const fetchResultFileEpic: Epic<
           switch (message.code) {
             case 'CALCULATION_RESULT_ARCHIVE/START':
               dispatch(
-                FileAction.setFileStatus(
+                FileActions.setFileStatus(
                   message.payload.message || 'Начало генерации архива',
                 ),
               );
@@ -80,22 +80,46 @@ const fetchResultFileEpic: Epic<
 
             case 'CALCULATION_RESULT_ARCHIVE/IN_PROGRESS':
               dispatch(
-                FileAction.setFileStatus(
+                FileActions.setFileStatus(
                   `${message.payload.message}. Прогресс: ${message.payload.progress}%`,
                 ),
               );
 
+              if (
+                state$.value.file.downloadArchiveModal.isClosed &&
+                state$.value.file.downloadArchiveModal.allowNotifications
+              ) {
+                dispatch(
+                  NotifyActions.appendItem({
+                    key: payload.id,
+                    message: `Экспорт результата расчёта ${message.payload.progress}%`,
+                    onClose: () => {
+                      dispatch(
+                        FileActions.setDownloadArchiveModalMode({
+                          ...state$.value.file.downloadArchiveModal,
+                          allowNotifications: false,
+                        }),
+                      );
+
+                      dispatch(NotifyActions.removeItem(payload.id));
+                    },
+                    status: 'success',
+                    autoClose: false,
+                  }),
+                );
+              }
+
               break;
 
             case 'CALCULATION_RESULT_ARCHIVE/ERROR':
-              dispatch(LoaderAction.setLoaded('file'));
+              dispatch(LoaderActions.setLoaded('file'));
 
               dispatch(
                 NotifyActions.appendItem({
                   key: payload.id,
                   message: message.payload.message,
                   status: 'alert',
-                  autoClose: 5,
+                  autoClose: 3,
                   onAutoClose: () =>
                     dispatch(NotifyActions.removeItem(payload.id)),
                 }),
@@ -108,8 +132,19 @@ const fetchResultFileEpic: Epic<
                 (message.payload as WebSocketCompleteDownloadPayload)
                   .attachment_url,
               ).then(() => {
+                dispatch(
+                  NotifyActions.appendItem({
+                    key: 'success',
+                    message: 'Файл расчёта сохранён на компьютер',
+                    status: 'success',
+                    onClose: () =>
+                      dispatch(NotifyActions.removeItem('success')),
+                    autoClose: 3,
+                  }),
+                );
                 dispatch(NotifyActions.removeItem(payload.id));
-                dispatch(LoaderAction.setLoaded('file'));
+                dispatch(LoaderActions.setLoaded('file'));
+                dispatch(LoaderActions.resetType('file'));
               });
 
               break;
@@ -130,10 +165,10 @@ export const handleStopFetchingFile: Epic<
   StoreDependencies
 > = (action$, state$, { dispatch }) =>
   action$.pipe(
-    ofAction(FileAction.stopFetchingFile),
+    ofAction(FileActions.stopFetchingFile),
     tap(() => {
       dispatch(
-        WebsocketAction.sendMessage({
+        WebsocketActions.sendMessage({
           id: state$.value.file.websocketId,
           message: {
             code: 'CALCULATION_RESULT_ARCHIVE/STOP',

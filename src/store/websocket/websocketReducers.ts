@@ -1,7 +1,7 @@
 import { reducerWithInitialState } from 'typescript-fsa-reducers';
 
 import {
-  WebsocketAction,
+  WebsocketActions,
   WebsocketKeyValue,
   WebsocketPayload,
   WebsocketStore,
@@ -13,7 +13,7 @@ export const websocketStoreInitialState: WebsocketStore = {
 
 export const WebsocketReducers = reducerWithInitialState<WebsocketStore>(
   websocketStoreInitialState,
-).case(WebsocketAction.setWebsocket, (state, payload: WebsocketPayload) => {
+).case(WebsocketActions.setWebsocket, (state, payload: WebsocketPayload) => {
   const cloneState = { ...state };
 
   cloneState.instance[payload.id] = payload.websocket;

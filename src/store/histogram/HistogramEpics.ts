@@ -18,7 +18,7 @@ import {
   withLatestFrom,
 } from 'rxjs/operators';
 
-import { LoaderAction } from '../loader/loaderActions';
+import { LoaderActions } from '../loader/loaderActions';
 import { TableActions } from '../table/tableActions';
 import { tableActiveRowSelector } from '../table/TableSelectors';
 import { RootState, StoreDependencies } from '../types';
@@ -92,7 +92,7 @@ const loadHistogramEpic: Epic<
     ofAction(TableActions.setActiveRow, HistogramActions.setNumberOfRows),
     withLatestFrom(statePairs$),
     filter(() => state$.value.settings.showHistogram),
-    tap(() => dispatch(LoaderAction.setLoading('histogram'))),
+    tap(() => dispatch(LoaderActions.setLoading('histogram'))),
     distinctUntilChanged(),
     switchMap(([{ payload }, [oldState, newState]]) => {
       toggleActiveTableCellClass(newState, oldState);
@@ -119,7 +119,7 @@ const loadHistogramEpic: Epic<
     tap((histograms: Histogram[]) =>
       dispatch(HistogramActions.setHistograms(histograms)),
     ),
-    tap(() => dispatch(LoaderAction.setLoaded('histogram'))),
+    tap(() => dispatch(LoaderActions.setLoaded('histogram'))),
     ignoreElements(),
   );
 };
@@ -132,7 +132,7 @@ const loadHistogramStatisticEpic: Epic<
 > = (action$, state$, { dispatch }) =>
   action$.pipe(
     ofAction(HistogramActions.loadStatistic, TableActions.setActiveRow),
-    tap(() => dispatch(LoaderAction.setLoading('histogram-statistic'))),
+    tap(() => dispatch(LoaderActions.setLoading('histogram-statistic'))),
     filter(() => state$.value.histogram.isShowStatistic),
     switchMap(() => {
       return from(
@@ -148,7 +148,7 @@ const loadHistogramStatisticEpic: Epic<
     tap((statistics: HistogramStatistic[]) =>
       dispatch(HistogramActions.setStatistics(statistics)),
     ),
-    tap(() => dispatch(LoaderAction.setLoaded('histogram-statistic'))),
+    tap(() => dispatch(LoaderActions.setLoaded('histogram-statistic'))),
     ignoreElements(),
   );
 
