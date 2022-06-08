@@ -20,9 +20,10 @@ import {
 } from '@app/constants/GeneralConstants';
 import projectService from '@app/services/ProjectService';
 import competitiveAccessDuck from '@app/store/competitiveAccessDuck';
+import { FileActions } from '@app/store/file/fileActions';
 import { GeneralActions } from '@app/store/general/generalActions';
 import { HistogramActions } from '@app/store/histogram/HistogramActions';
-import { LoaderAction } from '@app/store/loader/loaderActions';
+import { LoaderActions } from '@app/store/loader/loaderActions';
 import { NotifyActions } from '@app/store/notify/notifyActions';
 import projectDuck from '@app/store/projectDuck';
 import { SettingsActions } from '@app/store/settings/settingsActions';
@@ -48,19 +49,15 @@ const cn = block('RbResultPage');
 const RbResultPage: React.FC = () => {
   const dispatch = useDispatch();
 
-  const histogramIsLoading: boolean = useSelector(
-    ({ loader }: RootState) => loader.loading.histogram,
-  );
+  /** Refs */
+  const treeEditorRef = useRef<HTMLDivElement>(null);
+  const settingsRef = useRef<HTMLDivElement>(null);
 
-  const tableIsLoading: boolean = useSelector(
-    ({ loader }: RootState) => loader.loading.table,
-  );
+  /** State */
+  const [isShownTree, setIsShownTree] = useState(true);
+  const [isOpenedModal, setIsOpenedModal] = useState<boolean>(false);
 
-  const isTabsDisabled = useMemo(
-    () => tableIsLoading || histogramIsLoading,
-    [tableIsLoading, histogramIsLoading],
-  );
-
+  /** Callbacks */
   const setFluidType = useCallback(
     (type: EFluidType) => dispatch(TableActions.setFluidType(type)),
     [dispatch],
@@ -76,11 +73,27 @@ const RbResultPage: React.FC = () => {
     [dispatch],
   );
 
-  const treeEditorRef = useRef<HTMLDivElement>(null);
-  const settingsRef = useRef<HTMLDivElement>(null);
-  const [isShownTree, setIsShownTree] = useState(true);
-  const [openedModal, setOpenedModal] = useState<boolean>(false);
+  const handleResize = (): void => {
+    if (treeEditorRef?.current?.clientWidth) {
+      setIsShownTree(Number(treeEditorRef?.current?.clientWidth) > 120);
+    }
+  };
 
+  const handleChangeFluidType = (type: EFluidType) => {
+    setFluidType(type);
+  };
+
+  const toggleDownloadResultModal = (isOpen: boolean) => {
+    setIsOpenedModal(isOpen);
+    dispatch(
+      FileActions.setDownloadArchiveModalMode({
+        isClosed: !isOpen,
+        allowNotifications: true,
+      }),
+    );
+  };
+
+  /** Store */
   const sidebarRow: GridActiveRow | undefined = useSelector(
     ({ table }: RootState) => table.sidebarRow,
   );
@@ -101,16 +114,21 @@ const RbResultPage: React.FC = () => {
     ({ table }: RootState) => table.fluidType || EFluidType.ALL,
   );
 
-  const handleResize = (): void => {
-    if (treeEditorRef?.current?.clientWidth) {
-      setIsShownTree(Number(treeEditorRef?.current?.clientWidth) > 120);
-    }
-  };
+  const histogramIsLoading: boolean = useSelector(
+    ({ loader }: RootState) => loader.loading.histogram,
+  );
 
-  const handleChangeFluidType = (type: EFluidType) => {
-    setFluidType(type);
-  };
+  const tableIsLoading: boolean = useSelector(
+    ({ loader }: RootState) => loader.loading.table,
+  );
 
+  /** Memo */
+  const isTabsDisabled = useMemo(
+    () => tableIsLoading || histogramIsLoading,
+    [tableIsLoading, histogramIsLoading],
+  );
+
+  /** Effects */
   /** Очищаем стору */
   useMount(() => {
     return () => {
@@ -120,7 +138,7 @@ const RbResultPage: React.FC = () => {
       dispatch(treeDuck.actions.resetState());
       dispatch(TableActions.resetState());
       dispatch(HistogramActions.resetState());
-      dispatch(LoaderAction.resetStore());
+      dispatch(LoaderActions.resetStore());
     };
   });
 
@@ -208,7 +226,7 @@ const RbResultPage: React.FC = () => {
 
                       <span ref={settingsRef} className={cn('SettingElement')}>
                         <IconDownload
-                          onClick={() => setOpenedModal(true)}
+                          onClick={() => toggleDownloadResultModal(true)}
                           size="m"
                         />
                       </span>
@@ -259,8 +277,10 @@ const RbResultPage: React.FC = () => {
           </SplitPanes.Pane>
         </SplitPanes>
 
-        {openedModal && (
-          <DownloadResultModal handleClose={() => setOpenedModal(false)} />
+        {isOpenedModal && (
+          <DownloadResultModal
+            handleClose={() => toggleDownloadResultModal(false)}
+          />
         )}
 
         <NotifyComponent />

@@ -4,7 +4,7 @@ import { AnyAction } from 'redux';
 import { Epic } from 'redux-observable';
 import { ignoreElements, tap } from 'rxjs/operators';
 
-import { WebsocketAction } from '../websocketActions';
+import { WebsocketActions } from '../websocketActions';
 
 function isNotClose(websocket: WebSocket): boolean {
   return websocket.readyState !== 3 && websocket.readyState !== 2;
@@ -17,7 +17,7 @@ export const handleSendWebsocketEpic: Epic<
   StoreDependencies
 > = (action$, state$) =>
   action$.pipe(
-    ofAction(WebsocketAction.sendMessage),
+    ofAction(WebsocketActions.sendMessage),
     tap(({ payload }) => {
       const currentWebsocket: WebSocket | undefined =
         state$.value.websocket.instance[payload.id];

@@ -20,7 +20,7 @@ export interface LoaderStore {
   loading: LoadingKeyValue;
 }
 
-export const LoaderAction = {
+export const LoaderActions = {
   setLoaded: factory<LoadingType>('SET_LOADED'),
   setLoading: factory<LoadingType>('SET_LOADING'),
   resetStore: factory('RESET_STORE'),

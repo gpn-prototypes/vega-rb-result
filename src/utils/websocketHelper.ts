@@ -2,7 +2,7 @@ import projectService from '@app/services/ProjectService';
 import { isSecureBaseApiUrl } from '@app/services/utils';
 import {
   HandleMessagePayload,
-  WebsocketAction,
+  WebsocketActions,
 } from '@app/store/websocket/websocketActions';
 import {
   WebsocketDomain,
@@ -37,7 +37,7 @@ export async function createWebsocket({
 
   if (ws) {
     dispatch(
-      WebsocketAction.setWebsocket({
+      WebsocketActions.setWebsocket({
         id,
         websocket: ws,
       }),
@@ -54,7 +54,7 @@ export async function createWebsocket({
 
   ws.onmessage = (event) => {
     dispatch(
-      WebsocketAction.handleMessage({
+      WebsocketActions.handleMessage({
         id,
         message: JSON.parse(event.data),
       }),

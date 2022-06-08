@@ -27,8 +27,8 @@ export interface WebsocketStore {
   instance: WebsocketKeyValue;
 }
 
-export const WebsocketAction = {
-  setWebsocket: factory<WebsocketPayload>('WEBSOCKET/SET_WEBSOCKET'),
-  handleMessage: factory<HandleMessagePayload>('WEBSOCKET/HANDLE_MESSAGE'),
-  sendMessage: factory<SendMessagePayload>('WEBSOCKET/SEND_MESSAGE'),
+export const WebsocketActions = {
+  setWebsocket: factory<WebsocketPayload>('SET_WEBSOCKET'),
+  handleMessage: factory<HandleMessagePayload>('HANDLE_MESSAGE'),
+  sendMessage: factory<SendMessagePayload>('SEND_MESSAGE'),
 };

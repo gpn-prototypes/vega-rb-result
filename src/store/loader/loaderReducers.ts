@@ -1,6 +1,6 @@
 import { reducerWithInitialState } from 'typescript-fsa-reducers';
 
-import { LoaderAction, LoaderStore, LoadingType } from './loaderActions';
+import { LoaderActions, LoaderStore, LoadingType } from './loaderActions';
 
 export const loaderStoreInitialState: LoaderStore = Object.freeze({
   loaded: {
@@ -22,7 +22,7 @@ export const loaderStoreInitialState: LoaderStore = Object.freeze({
 export const LoaderReducers = reducerWithInitialState<LoaderStore>(
   loaderStoreInitialState,
 )
-  .case(LoaderAction.setLoading, (state, type: LoadingType) => {
+  .case(LoaderActions.setLoading, (state, type: LoadingType) => {
     const cloneState = { ...state };
 
     cloneState.loaded[type] = false;
@@ -30,7 +30,7 @@ export const LoaderReducers = reducerWithInitialState<LoaderStore>(
 
     return cloneState;
   })
-  .case(LoaderAction.setLoaded, (state, type: LoadingType) => {
+  .case(LoaderActions.setLoaded, (state, type: LoadingType) => {
     const cloneState = { ...state };
 
     cloneState.loaded[type] = true;
@@ -38,7 +38,7 @@ export const LoaderReducers = reducerWithInitialState<LoaderStore>(
 
     return cloneState;
   })
-  .case(LoaderAction.resetType, (state, type: LoadingType) => {
+  .case(LoaderActions.resetType, (state, type: LoadingType) => {
     const cloneState = { ...state };
 
     cloneState.loaded[type] = false;
@@ -46,7 +46,7 @@ export const LoaderReducers = reducerWithInitialState<LoaderStore>(
 
     return cloneState;
   })
-  .case(LoaderAction.resetStore, () => {
+  .case(LoaderActions.resetStore, () => {
     return {
       loaded: {
         'file': false,
