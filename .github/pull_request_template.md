@@ -1,12 +1,19 @@
-## Problem statement
+## Описание проблемы
 
-_{Jira issue number, description or crucial excerpts}_
+_{Номер задачи в Jira, описание или важные примечания}_
 
-## Solution details
+## Детали решения
 
-_{What has been done (list of details)}_
+_{Что было сделано (перечень изменений)}_
 
-## Type
+## Скриншоты
+
+Скриншоты до изменений
+
+
+Скриншоты после изменений
+
+## Тип
 
 - [ ] Feature
 - [ ] Bug Fix
@@ -14,30 +21,30 @@ _{What has been done (list of details)}_
 - [ ] Test
 - [ ] Other
 
-## Associated issues
+## Связанные задачи
 
-_{Jira issues or PRs related to this one}_
+_{Задачи Jira или PR-ы, связанные с этим PR}_
 
 ## Quality control
 
-- [ ] PR: Based on a correct branch
-- [ ] PR: Head branch is rebased on the base branch
-- [ ] PR: Assignee chosen and necessary labels are set
-- [ ] PR: Current form is filled out (where it makes sense)
-- [ ] PR: Diff checked for irrelevant changes
-- [ ] PR: Commit messages follow [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) specs
-- [ ] PR: Checked for spelling, grammar and typos
-- [ ] JS: There's no errors/warnings in the browser dev console
-- [ ] Layout: Tested with various content amounts
-- [ ] Docs: All the important changes and features are described
-- [ ] Tests: Configuration files are checked at test repositories
-- [ ] Tests: New unit tests developed
-- [ ] Tests: New E2E tests developed
-- [ ] Tests: Existing unit tests passed successfully
-- [ ] Tests: Existing E2E tests passed successfully
-- [ ] Tests: Manually tested on personal instance
+- [ ] PR: На основе правильной ветки
+- [ ] PR: Head ветка отребейжена на base ветку
+- [ ] PR: Выбран Assignee и проставлены нужные лейблы
+- [ ] PR: Данная форма заполнена (пункты, которые имеют значение)
+- [ ] PR: Дифф проверен на неактуальные изменения
+- [ ] PR: Сообщения коммитов написаны по правилам [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/)
+- [ ] PR: Проверен на орфографию, грамматику и опечатки
+- [ ] JS: Нет errors/warnings в консоли браузера
+- [ ] Layout: Протестирован с различным содержимым
+- [ ] Docs: Все важные изменения и фичи описаны
+- [ ] Tests: Конфигурационные файлы проверяются в тестовых репозиториях
+- [ ] Tests: Разработаны новые unit тесты
+- [ ] Tests: Разработаны новые E2E тесты
+- [ ] Tests: Существующие unit тесты успешно проходят
+- [ ] Tests: Существующие E2E тесты успешно проходят
+- [ ] Tests: Протестировано вручную на собственном стенде
 
-## Notable statements
-- [ ] Affects configuration files
-- [ ] Brings new packages or updates existing
-- [ ] Opened follow-up tasks to resolve
+## Примечания
+- [ ] Влияет на конфигурационные файлы
+- [ ] Добавляются новые пакеты или обновляются существующие
+- [ ] Открыты задачи для последующего решения
