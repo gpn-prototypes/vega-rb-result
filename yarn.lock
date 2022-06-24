@@ -1862,10 +1862,10 @@
   resolved "https://npm.pkg.github.com/download/@gpn-prototypes/frontend-configs/1.4.11/ff7c592d35fe4b78dd5c25bd555bf43585ea656cbe8bec95aca57d7af7bf332c#cd836bbbe9fdfa3e9fa6a275f3611f182c6ca458"
   integrity sha512-y0TQ5rB7HsZYefUOdfKuxUfSAcVUfqvb7LscYX2p2TT56IxvOMmlIRSc2ORB1pv3rX0L00tZbvrmMO7Yi93uxA==
 
-"@gpn-prototypes/vega-ui@^4.0.20":
-  version "4.0.20"
-  resolved "https://npm.pkg.github.com/download/@gpn-prototypes/vega-ui/4.0.20/1f26ce382f27ff6129faeadfb3a6cf64793f30d77b43c31c344bfd2a717864b0#ac96ff1861d25a2ee6a014c4d3ae1f0059c29cae"
-  integrity sha512-x5ZpDogT2SEuoBrgA6RywiNjWiI2OlUhWAnQWKRls5p/4x8d/Y75XJLnKE3xBysW76m8sh7oDdBNSI5sjuvDzg==
+"@gpn-prototypes/vega-ui@^4.0.24":
+  version "4.0.24"
+  resolved "https://npm.pkg.github.com/download/@gpn-prototypes/vega-ui/4.0.24/df1d5fd7613e7775593605c1a253006efa1a9587a480d07027e9daa637517ff4#1f58c5c493ed9304449c33bb744e2f13f1948926"
+  integrity sha512-f1vgEXdTY7ZwkCnM5+rl5Ldz1XSR+Ee4M11uMFAD2k2rUdXH8bSKzfnoXOkAf4tPC7cfP7WtNVW7XZk4z3GPSg==
   dependencies:
     "@consta/uikit" "^3.24.1-beta.0"
     "@emotion/babel-preset-css-prop" "^10.0.27"
