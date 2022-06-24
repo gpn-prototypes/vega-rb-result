@@ -5,6 +5,7 @@ const ImportMapPlugin = require('webpack-import-map-plugin');
 const { getAppConfig } = require('./app-config');
 const path = require('path');
 const dotenv = require('dotenv');
+const SystemJSPublicPathWebpackPlugin = require('systemjs-webpack-interop/SystemJSPublicPathWebpackPlugin');
 
 const { projectName } = getAppConfig();
 
@@ -78,6 +79,10 @@ module.exports = (webpackConfigEnv) => {
         'process.env.BASE_API_URL': JSON.stringify(process.env.BASE_API_URL),
         'process.env.HTTP_SCHEME': JSON.stringify(process.env.HTTP_SCHEME),
         ...envKeys,
+      }),
+      new SystemJSPublicPathWebpackPlugin({
+        rootDirectoryLevel: 1,
+        systemjsModuleName: `@vega/${getAppConfig().projectName}`,
       }),
     ],
   });
