@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - name: Скачивание репозитория
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Установка ноды
         uses: actions/setup-node@v1
