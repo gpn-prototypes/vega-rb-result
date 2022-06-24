@@ -136,7 +136,7 @@
     "ts-loader": "^8.0.12",
     "url-loader": "^4.1.1",
     "webpack": "^4.44.2",
-    "webpack-cli": "^3.3.12",
+    "webpack-cli": "^4.10.0",
     "webpack-config-single-spa-react": "^1.12.0",
     "webpack-config-single-spa-react-ts": "^1.12.0",
     "webpack-config-single-spa-ts": "^1.12.0",
