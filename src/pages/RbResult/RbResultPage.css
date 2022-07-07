@@ -62,6 +62,13 @@
       display: none;
     }
   }
+
+  &__Sidebar {
+    margin-top: var(--space-3xl);
+    padding: var(--space-l);
+
+    min-width: 738px;
+  }
 }
 
 .Header {

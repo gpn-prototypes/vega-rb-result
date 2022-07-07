@@ -265,7 +265,7 @@ const RbResultPage: React.FC = () => {
                       dispatch(TableActions.resetSidebarRow())
                     }
                     hasOverlay
-                    className={cn('Sidebar')}
+                    className={cn('Sidebar').toString()}
                   >
                     {sidebarRow && (
                       <SensitiveAnalysisComponent sidebarRow={sidebarRow} />
