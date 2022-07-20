@@ -48,6 +48,7 @@ export const GENERATE_CALCULATION_RESULT_ARCHIVE = gql`
   mutation generateCalculationResultArchive(
     $version: Int!
     $plots: Boolean
+    $projectData: Boolean
     $samples: Boolean
     $statistics: Boolean
   ) {
@@ -66,6 +67,7 @@ export const GENERATE_CALCULATION_RESULT_ARCHIVE = gql`
         resourceBase {
           generateCalculationResultArchive(
             samples: $samples
+            projectData: $projectData
             statistics: $statistics
             plots: $plots
           ) {

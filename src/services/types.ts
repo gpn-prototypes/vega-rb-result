@@ -42,6 +42,7 @@ export interface IProjectService {
 
   generateCalculationResultArchiveProcessId(
     statistics: boolean,
+    projectData: boolean,
     samples: boolean,
     plots: boolean,
   ): Promise<string>;

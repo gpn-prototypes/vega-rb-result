@@ -390,6 +390,7 @@ class ProjectService implements IProjectService {
 
   async generateCalculationResultArchiveProcessId(
     statistics: boolean,
+    projectData: boolean,
     samples: boolean,
     plots: boolean,
   ): Promise<string> {
@@ -402,6 +403,7 @@ class ProjectService implements IProjectService {
         variables: {
           version: this.version,
           statistics,
+          projectData,
           samples,
           plots,
         },

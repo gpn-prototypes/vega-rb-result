@@ -32,11 +32,17 @@ export const InitialModeContent: React.FC<ModalContentProps> = ({
     Record<DownloadTypeEnum, boolean>
   >({
     statistics: true,
+    projectData: true,
     samples: true,
     plots: false,
   });
 
   const downloadDataTypes: DownloadData[] = [
+    {
+      name: DownloadNameEnum.ProjectData,
+      type: DownloadTypeEnum.ProjectData,
+      size: 'Небольшой',
+    },
     {
       name: DownloadNameEnum.Statistics,
       type: DownloadTypeEnum.Statistics,
@@ -68,6 +74,7 @@ export const InitialModeContent: React.FC<ModalContentProps> = ({
       dispatch(
         FileActions.fetchResultFile({
           statistics: checkedState[DownloadTypeEnum.Statistics],
+          projectData: checkedState[DownloadTypeEnum.ProjectData],
           samples: checkedState[DownloadTypeEnum.Samples],
           plots: checkedState[DownloadTypeEnum.Plots],
         }),
@@ -121,7 +128,12 @@ export const InitialModeContent: React.FC<ModalContentProps> = ({
         </div>
         <div className={cn('Checkbox-group')}>
           {downloadDataTypes.map((dataType) => (
-            <div key={dataType.type} className={cn('Checkbox-group-item')}>
+            <div
+              key={dataType.type}
+              className={cn('Checkbox-group-item', {
+                projectData: dataType.type === DownloadTypeEnum.ProjectData,
+              })}
+            >
               <Checkbox
                 label={dataType.name}
                 checked={checkedState[dataType.type]}

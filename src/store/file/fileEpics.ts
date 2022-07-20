@@ -34,6 +34,7 @@ const fetchResultFileEpic: Epic<
       return from(
         projectService.generateCalculationResultArchiveProcessId(
           action.payload.statistics,
+          action.payload.projectData,
           action.payload.samples,
           action.payload.plots,
         ),
