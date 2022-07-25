@@ -65,8 +65,13 @@
     justify-content: space-between;
     align-items: center;
 
+    &_projectData {
+      border-bottom: 1px solid var(--color-bg-border);
+    }
+
     &:not(:last-child) {
-      margin-bottom: var(--space-m);
+      margin-bottom: var(--space-xs);
+      padding-bottom: var(--space-xs);
     }
   }
 }

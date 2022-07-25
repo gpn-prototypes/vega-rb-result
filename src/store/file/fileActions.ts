@@ -4,6 +4,7 @@ const factory = actionCreatorFactory('file');
 
 export type FetchFilePayload = {
   statistics: boolean;
+  projectData: boolean;
   samples: boolean;
   plots: boolean;
 };
